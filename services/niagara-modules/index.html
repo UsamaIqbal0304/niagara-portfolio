@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custom Niagara Module &amp; Driver Development | Niagara 4 and Niagara 5</title>
+<meta name="description" content="Bespoke Niagara Framework modules: rt, wb and ux components written against the Baja API. Drivers for equipment with no stock Niagara support, custom services, and integrations. Pure Java, signed, and stamped to run on JACE hardware.">
+<link rel="canonical" href="https://plantroomlabs.com/services/niagara-modules/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Custom Niagara Module &amp; Driver Development | Niagara 4 and Niagara 5">
+<meta property="og:description" content="Bespoke Niagara Framework modules: rt, wb and ux components written against the Baja API. Drivers for equipment with no stock Niagara support, custom services, and integrations. Pure Java, signed, and stamped to run on JACE hardware.">
+<meta property="og:url" content="https://plantroomlabs.com/services/niagara-modules/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Custom Niagara Module &amp; Driver Development | Niagara 4 and Niagara 5">
+<meta name="twitter:description" content="Bespoke Niagara Framework modules: rt, wb and ux components written against the Baja API. Drivers for equipment with no stock Niagara support, custom services, and integrations. Pure Java, signed, and stamped to run on JACE hardware.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "hello@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "hello@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "Service",
+   "@id": "https://plantroomlabs.com/services/niagara-modules/#service",
+   "name": "Custom Niagara modules and drivers",
+   "description": "Bespoke Niagara Framework modules: rt, wb and ux components written against the Baja API. Drivers for equipment with no stock Niagara support, custom services, and integrations. Pure Java, signed, and stamped to run on JACE hardware.",
+   "serviceType": "Custom software development",
+   "provider": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "url": "https://plantroomlabs.com/services/niagara-modules/",
+   "offers": {
+    "@type": "Offer",
+    "priceSpecification": {
+     "@type": "PriceSpecification",
+     "description": "Fixed price per deliverable, quoted against a written specification."
+    },
+    "availability": "https://schema.org/InStock"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Services",
+     "item": "https://plantroomlabs.com/services/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Custom modules & drivers"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<path d="M8 10h11a3.5 3.5 0 0 1 0 7H13a3.5 3.5 0 0 0 0 7h11" stroke="var(--pl-accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="8" cy="10" r="1.9" fill="var(--pl-accent)"/><circle cx="24" cy="24" r="1.9" fill="var(--pl-accent)"/></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/" aria-current="page">Services</a></li><li><a href="/work/">Work</a></li><li><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__links--overflow"><a href="/faq/">FAQ</a></li><li class="pl-nav__links--overflow"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/services/">Services</a></li><li>Custom modules &amp; drivers</li></ol></nav>
+    <p class="pl-eyebrow">Service</p>
+    <h1>Custom Niagara modules and drivers</h1>
+    <p class="pl-lede">When the driver you need does not exist, or the stock one does not do the thing the job actually requires. <strong>rt</strong>, <strong>wb</strong> and <strong>ux</strong> modules written against the Baja API, signed, and stamped to install across a mixed estate.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Baja API</li><li class="pl-chip pl-chip--on-dark">rt / wb / ux</li><li class="pl-chip pl-chip--on-dark">Pure Java</li><li class="pl-chip pl-chip--on-dark">Signed modules</li><li class="pl-chip pl-chip--on-dark">Source on request</li></ul>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Scope this work</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="/work/">See the work</a>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+<h2>What this covers</h2>
+<div class="pl-grid pl-grid--2" style="margin-top:var(--pl-s-9)">
+  <div class="pl-card"><h3>Drivers for unsupported equipment</h3>
+    <p>Plant, meters and controllers with a documented protocol but no Niagara driver —
+       a serial or IP device, a vendor REST or MQTT API, a proprietary register map. Modelled as
+       a proper network / device / point tree so it behaves like any other driver under
+       Workbench, with discovery, ping monitoring and status propagation.</p></div>
+  <div class="pl-card"><h3>Station services</h3>
+    <p>Components that live under <code>Services</code> and do work on a schedule or on
+       a change of value: exports, reconciliation, derived points, watchdogs,
+       bulk alarm shaping. Configured from Workbench like any stock service.</p></div>
+  <div class="pl-card"><h3>Integrations outward</h3>
+    <p>Pushing station data to something that is not Niagara — a data lake, an analytics
+       platform, a CMMS, a customer API — with buffering and retry, so a network outage
+       does not silently lose a day of readings.</p></div>
+  <div class="pl-card"><h3>Extending what is already there</h3>
+    <p>A subclass of an existing component, an extra slot on a point, a new action on a
+       device. Often the cheapest route: reuse the stock driver, add the one behaviour
+       the specification demands.</p></div>
+</div>
+
+<h2 style="margin-top:var(--pl-s-13)">How the module is built</h2>
+<p class="pl-sub">The constraints below are not preferences. They are what makes a module
+   still work in three years, on hardware you have not bought yet.</p>
+<table class="pl-spec" style="margin-top:var(--pl-s-9)">
+ <thead><tr><th scope="col">Constraint</th><th scope="col">Why it is held</th></tr></thead>
+ <tbody>
+  <tr><th scope="row">No native code</th>
+      <td>Pure Java plus JS and CSS resources. A module with a native library has to be built
+          per architecture, and will not load on a QNX/ARM JACE at all. One build runs on the
+          controller and on an x86 Supervisor.</td></tr>
+  <tr><th scope="row">Stamped to the oldest version it must support</th>
+      <td>A module's declared dependency is a minimum, not a pin. Stamped at 4.10 it installs
+          on 4.10 and everything above; stamped at 4.15 it is refused outright on a 4.14
+          station. Stamping to your floor means one build covers a mixed estate.</td></tr>
+  <tr><th scope="row">Signed</th>
+      <td>Every module ships signed. Niagara 4.14 and 4.15 default to
+          <code>moduleVerificationMode=medium</code>, which requires a trusted certificate;
+          hardened sites run <code>high</code>, which requires a CA-issued one. Niagara 5
+          makes a valid signature mandatory with no grace period.</td></tr>
+  <tr><th scope="row">Java 21 clean</th>
+      <td>New work compiles clean under Java 21 and does not depend on
+          <code>SecurityManager</code>, which Niagara 5 removes. The same source keeps
+          building for Niagara 4.</td></tr>
+  <tr><th scope="row">Small</th>
+      <td>A JACE-8000 is a single-core ARM with a fraction of a laptop's memory. Few modules,
+          small jars, no framework hauled in for one utility method.</td></tr>
+ </tbody>
+</table>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Deliverables</p>
+      <h2>What you actually receive</h2>
+      <p class="pl-sub">Fixed price per deliverable, quoted against a written specification.
+         No hourly billing, and no price before the scope is in writing.</p>
+    </div>
+    <table class="pl-spec">
+      <thead><tr><th scope="col">Deliverable</th><th scope="col">Detail</th></tr></thead>
+      <tbody><tr><th scope="row">A written specification</th><td>Agreed before a price exists. Point model, protocol behaviour, failure behaviour, target Niagara version, target hardware.</td></tr><tr><th scope="row">The signed module</th><td>Built, signed and stamped to your floor version, with the palette entries and Workbench views the spec calls for.</td></tr><tr><th scope="row">An installation note</th><td>Which station, which service container, what to set, and how to verify it is working — written for the engineer who commissions it, not for a developer.</td></tr><tr><th scope="row">Source on request</th><td>Bespoke work can be delivered with source, so the module does not die if this practice does.</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Also</p>
+      <h2>Other services</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg></span>
+        <h3><a href="/services/bajaux-widgets/">bajaux widgets</a></h3>
+        <p>Custom bajaux and BajaScript widgets for Niagara 4 and Niagara 5: responsive dashboards, navigation, equipment views and charts, bound to live station ORDs and BQL history, themed to your brand and usable in PX and in a browser.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 9v11"/><path d="M11.5 13.5l2.5 2.5 3.5-4"/></svg></span>
+        <h3><a href="/services/px-graphics/">PX graphics</a></h3>
+        <p>Niagara PX graphics built as a reusable, bindable template set: standard PX sheets per plant type, relative-ORD binding so one sheet serves every unit, navigation hierarchy, and a graphics standard your engineers can apply without redrawing.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>New Niagara station and JACE controller setup end to end: platform commissioning, TLS and certificate configuration, user and role model, BACnet and Modbus driver integration, point naming and tagging, histories, alarms, schedules and backups.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 3.5a5 5 0 0 0-6.8 6.3L3 14.5V21h6.5l4.7-4.7a5 5 0 0 0 6.3-6.8L17 12.5 11.5 7z"/></svg></span>
+        <h3><a href="/services/workbench-tooling/">Workbench tooling</a></h3>
+        <p>Custom Workbench views and tools that remove repetitive Niagara engineering: bulk point renaming and retagging, station audits, provisioning helpers, mass alarm and history configuration, and pre-migration module inventories.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l8 4v6c0 4.6-3.3 8.3-8 9.5-4.7-1.2-8-4.9-8-9.5v-6z"/><path d="M9 12l2.2 2.2L15.5 10"/></svg></span>
+        <h3><a href="/services/niagara-5-migration/">Niagara 5 migration</a></h3>
+        <p>Niagara 5 readiness audits and migration work: which third-party modules survive Java 21 and mandatory signing, what a JACE-8000 to JACE-9000 controller swap actually involves, and porting existing modules so they load on Niagara 5.</p></div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:hello@plantroomlabs.com">hello@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<path d="M8 10h11a3.5 3.5 0 0 1 0 7H13a3.5 3.5 0 0 0 0 7h11" stroke="var(--pl-dark-accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="8" cy="10" r="1.9" fill="var(--pl-dark-accent)"/><circle cx="24" cy="24" r="1.9" fill="var(--pl-dark-accent)"/></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:hello@plantroomlabs.com">hello@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>More</h4>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

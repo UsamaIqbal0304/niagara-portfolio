@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Niagara Development FAQ — Signing, JACE Support, Pricing, Niagara 5</title>
+<meta name="description" content="Answers on Niagara module signing modes, JACE-8000 support, source code, fixed-price quoting, PX versus bajaux, and what a Niagara 5 readiness audit produces.">
+<link rel="canonical" href="https://plantroomlabs.com/faq/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Niagara Development FAQ — Signing, JACE Support, Pricing, Niagara 5">
+<meta property="og:description" content="Answers on Niagara module signing modes, JACE-8000 support, source code, fixed-price quoting, PX versus bajaux, and what a Niagara 5 readiness audit produces.">
+<meta property="og:url" content="https://plantroomlabs.com/faq/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Niagara Development FAQ — Signing, JACE Support, Pricing, Niagara 5">
+<meta name="twitter:description" content="Answers on Niagara module signing modes, JACE-8000 support, source code, fixed-price quoting, PX versus bajaux, and what a Niagara 5 readiness audit produces.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "hello@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "hello@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "FAQPage",
+   "@id": "https://plantroomlabs.com/faq/#faq",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Do you work on Niagara 4 or Niagara 5?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Both. Current production work targets Niagara 4.14 and 4.15, because that is what is installed. New code is written to compile clean under Java 21 so the same source builds for Niagara 5 when you need it. Modules are stamped to the oldest Niagara version you have to support, not to the newest one available."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Will a module you build run on a JACE-8000?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. Everything is pure Java plus JavaScript and CSS resources, with no native code, so one build runs on a QNX/ARMv7 JACE-8000 and on an x86 Supervisor without a separate compile. Modules are kept small deliberately, because a JACE is a single-core ARM controller with a fraction of a laptop's memory."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Are the modules signed?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. Niagara 4.14 and 4.15 ship with niagara.moduleVerificationMode=medium, which requires a certificate the host trusts, and hardened sites run high, which requires a CA-issued one. Niagara 5 makes a valid signature mandatory with no grace period. Tell us which mode your hosts run and the signing arrangement is matched to it before delivery, not after."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do we get the source code?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "For bespoke work, yes, on request and in scope. The reason is self-interested as much as generous: the single most expensive problem in this market is a module whose author has disappeared and whose source nobody holds, and we would rather not add to the pile."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How is the work priced?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Fixed price per deliverable, quoted against a written specification. No hourly billing. The specification comes first and is yours whether or not you proceed; if scope changes, the specification changes first and the price follows it."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the difference between a PX sheet and a bajaux widget?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A PX sheet is a graphic your own engineers can open and edit in Workbench. A bajaux widget is HTML, CSS and JavaScript wrapped as a Niagara component, which drops into a PX sheet like any other widget. Use PX where engineers must be able to edit without a developer; use bajaux where a view has to be responsive, carry a brand, or do something no stock widget does. Most sites want both."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can you take over a module somebody else wrote?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "If the source exists, yes — porting, re-signing and a regression pass are routine. If the source is gone and the vendor is not coming back, the honest answer is usually to rebuild the function rather than reverse-engineer a jar, and that gets said plainly at quoting time rather than discovered halfway through."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What does a Niagara 5 readiness audit actually produce?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A machine-generated inventory of every third-party module across the estate — vendor, version, signature state and stamped Niagara version — with a verdict per module of rebuild, port, replace or at-risk, the reasoning behind each verdict, and a sequencing plan covering what must happen before any controller is swapped."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is Niagara 4 about to stop working?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. Niagara 4 is supported to 2028. Niagara 5 is expected to reach general availability around the end of 2026. Dates published around licence transfer are commercial deadlines for a discount rather than a point at which anything stops running. Plan for the migration; do not let anyone panic you into it. Confirm current dates with your distributor."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Are the demos on this site connected to a real building?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, and deliberately so. The widget code, the config files and the ORD strings are exactly what a station would run, but the station behind them is a simulator running in your browser. Publishing a live connection into somebody's building would be a poor idea."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Who do you work with?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Systems integrators and controls contractors who need a module or a widget set they do not have time to write, distributors whose customers are asking for something outside the stock catalogue, and building owners with an estate and a migration to scope. Work is remote."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Are you affiliated with Tridium?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. This is an independent development practice. Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium, Inc., used here only to describe what the work is compatible with."
+     }
+    }
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "FAQ"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<path d="M8 10h11a3.5 3.5 0 0 1 0 7H13a3.5 3.5 0 0 0 0 7h11" stroke="var(--pl-accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="8" cy="10" r="1.9" fill="var(--pl-accent)"/><circle cx="24" cy="24" r="1.9" fill="var(--pl-accent)"/></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li><a href="/work/">Work</a></li><li><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__links--overflow"><a href="/faq/" aria-current="page">FAQ</a></li><li class="pl-nav__links--overflow"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li>FAQ</li></ol></nav>
+    <p class="pl-eyebrow">FAQ</p>
+    <h1>Questions we get asked before a first project</h1>
+    <p class="pl-lede">Version support, hardware, signing, source, pricing and Niagara&nbsp;5 —
+       answered plainly, including where the answer is "no".</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-faq"><details>
+      <summary>Do you work on Niagara 4 or Niagara 5?</summary>
+      <div class="pl-faq__body"><p>Both. Current production work targets Niagara 4.14 and 4.15, because that is what is installed. New code is written to compile clean under Java 21 so the same source builds for Niagara 5 when you need it. Modules are stamped to the oldest Niagara version you have to support, not to the newest one available.</p></div>
+    </details><details>
+      <summary>Will a module you build run on a JACE-8000?</summary>
+      <div class="pl-faq__body"><p>Yes. Everything is pure Java plus JavaScript and CSS resources, with no native code, so one build runs on a QNX/ARMv7 JACE-8000 and on an x86 Supervisor without a separate compile. Modules are kept small deliberately, because a JACE is a single-core ARM controller with a fraction of a laptop's memory.</p></div>
+    </details><details>
+      <summary>Are the modules signed?</summary>
+      <div class="pl-faq__body"><p>Yes. Niagara 4.14 and 4.15 ship with <code>niagara.moduleVerificationMode=medium</code>, which requires a certificate the host trusts, and hardened sites run <code>high</code>, which requires a CA-issued one. Niagara 5 makes a valid signature mandatory with no grace period. Tell us which mode your hosts run and the signing arrangement is matched to it before delivery, not after.</p></div>
+    </details><details>
+      <summary>Do we get the source code?</summary>
+      <div class="pl-faq__body"><p>For bespoke work, yes, on request and in scope. The reason is self-interested as much as generous: the single most expensive problem in this market is a module whose author has disappeared and whose source nobody holds, and we would rather not add to the pile.</p></div>
+    </details><details>
+      <summary>How is the work priced?</summary>
+      <div class="pl-faq__body"><p>Fixed price per deliverable, quoted against a written specification. No hourly billing. The specification comes first and is yours whether or not you proceed; if scope changes, the specification changes first and the price follows it.</p></div>
+    </details><details>
+      <summary>What is the difference between a PX sheet and a bajaux widget?</summary>
+      <div class="pl-faq__body"><p>A PX sheet is a graphic your own engineers can open and edit in Workbench. A bajaux widget is HTML, CSS and JavaScript wrapped as a Niagara component, which drops into a PX sheet like any other widget. Use PX where engineers must be able to edit without a developer; use bajaux where a view has to be responsive, carry a brand, or do something no stock widget does. Most sites want both.</p></div>
+    </details><details>
+      <summary>Can you take over a module somebody else wrote?</summary>
+      <div class="pl-faq__body"><p>If the source exists, yes — porting, re-signing and a regression pass are routine. If the source is gone and the vendor is not coming back, the honest answer is usually to rebuild the function rather than reverse-engineer a jar, and that gets said plainly at quoting time rather than discovered halfway through.</p></div>
+    </details><details>
+      <summary>What does a Niagara 5 readiness audit actually produce?</summary>
+      <div class="pl-faq__body"><p>A machine-generated inventory of every third-party module across the estate — vendor, version, signature state and stamped Niagara version — with a verdict per module of rebuild, port, replace or at-risk, the reasoning behind each verdict, and a sequencing plan covering what must happen before any controller is swapped.</p></div>
+    </details><details>
+      <summary>Is Niagara 4 about to stop working?</summary>
+      <div class="pl-faq__body"><p>No. Niagara 4 is supported to 2028. Niagara 5 is expected to reach general availability around the end of 2026. Dates published around licence transfer are commercial deadlines for a discount rather than a point at which anything stops running. Plan for the migration; do not let anyone panic you into it. Confirm current dates with your distributor.</p></div>
+    </details><details>
+      <summary>Are the demos on this site connected to a real building?</summary>
+      <div class="pl-faq__body"><p>No, and deliberately so. The widget code, the config files and the ORD strings are exactly what a station would run, but the station behind them is a simulator running in your browser. Publishing a live connection into somebody's building would be a poor idea.</p></div>
+    </details><details>
+      <summary>Who do you work with?</summary>
+      <div class="pl-faq__body"><p>Systems integrators and controls contractors who need a module or a widget set they do not have time to write, distributors whose customers are asking for something outside the stock catalogue, and building owners with an estate and a migration to scope. Work is remote.</p></div>
+    </details><details>
+      <summary>Are you affiliated with Tridium?</summary>
+      <div class="pl-faq__body"><p>No. This is an independent development practice. Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium, Inc., used here only to describe what the work is compatible with.</p></div>
+    </details></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:hello@plantroomlabs.com">hello@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<path d="M8 10h11a3.5 3.5 0 0 1 0 7H13a3.5 3.5 0 0 0 0 7h11" stroke="var(--pl-dark-accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="8" cy="10" r="1.9" fill="var(--pl-dark-accent)"/><circle cx="24" cy="24" r="1.9" fill="var(--pl-dark-accent)"/></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:hello@plantroomlabs.com">hello@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>More</h4>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

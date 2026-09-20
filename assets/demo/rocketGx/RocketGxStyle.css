@@ -1,0 +1,921 @@
+/* ============================================================================
+   RocketGX — widget stylesheet for Niagara PX  (GENERATED — do not edit)
+
+   Source:    ~/first-demo/src/tokens.css + components.css
+   Generator: nmodule/rocketGx/build-css.py
+
+   Every rule is scoped to .rgx-root so nothing leaks into the PX view it is
+   dropped onto. Custom properties live on .rgx-root rather than :root so two
+   instances of the widget on one sheet can carry different accent colours.
+   ========================================================================= */
+
+/* ============================================================================
+   RocketGX Design System — Layer 1: Tokens
+   ----------------------------------------------------------------------------
+   Every value in the product resolves to something in this file. Nothing below
+   this layer hard-codes a colour, a radius or a duration.
+
+   The eleven anchor colours are taken verbatim from the master design sheet
+   (section 1, COLOR & TYPE). Each has been extended into a usable scale so the
+   system can express hover, press, subtle fills and borders without inventing
+   new hues. The anchors are marked --- ANCHOR ---; changing one shifts its
+   whole scale.
+   ========================================================================= */
+
+.rgx-root {
+  color-scheme: light;
+
+  /* ---------------------------------------------------------------- neutrals
+     The reference gives six neutrals. They are not evenly spaced, because they
+     encode surface depth: canvas sits behind sidebar sits behind submenu, and
+     cards float just above canvas. The scale below preserves those exact
+     values and fills the gaps. */
+
+  --gx-n-00:  #ffffff;
+  --gx-n-05:  #fbfcfe;
+  --gx-n-10:  #f7f8fc;   /* --- ANCHOR --- CANVAS      */
+  --gx-n-15:  #f2f4f9;
+  --gx-n-20:  #eef0f5;   /* --- ANCHOR --- CARD        */
+  --gx-n-25:  #e8eaf2;   /* --- ANCHOR --- SIDEBAR     */
+  --gx-n-30:  #dde2ec;   /* --- ANCHOR --- SUBMENU     */
+  --gx-n-35:  #d2d8e4;
+  --gx-n-40:  #c2cad9;
+  --gx-n-50:  #a5aec1;
+  --gx-n-60:  #7d8798;
+  --gx-n-70:  #5f6b7c;   /* --- ANCHOR --- MUTED TEXT  */
+  --gx-n-80:  #404854;   /* --- ANCHOR --- TEXT        */
+  --gx-n-90:  #2f353f;
+  --gx-n-95:  #252a31;   /* --- ANCHOR --- ACTIVE      */
+  --gx-n-99:  #16191e;
+
+  /* ------------------------------------------------------------- status hues
+     Four semantic families. Each gets a tint (fills), a base (the anchor, used
+     for text and marks) and a shade (borders, hover). */
+
+  --gx-ok-tint:    #e6f6ec;
+  --gx-ok-soft:    #c2e8d0;
+  --gx-ok:         #35b15b;   /* --- ANCHOR --- HEALTHY          */
+  --gx-ok-deep:    #268345;
+
+  --gx-bad-tint:   #fdeaea;
+  --gx-bad-soft:   #f8c4c3;
+  --gx-bad:        #e53935;   /* --- ANCHOR --- FAULT / ALARM    */
+  --gx-bad-deep:   #b32723;
+
+  --gx-run-tint:   #f0edff;
+  --gx-run-soft:   #d5ccff;
+  --gx-run:        #7b61ff;   /* --- ANCHOR --- ACTIVE STATE     */
+  --gx-run-deep:   #5b41d6;
+
+  --gx-info-tint:  #e0f7fc;
+  --gx-info-soft:  #a6e7f4;
+  --gx-info:       #00b8d9;   /* --- ANCHOR --- INFO / TEMPERATURE */
+  --gx-info-deep:  #0090aa;
+
+  /* A fifth family the reference implies but never names: "attention" —
+     between healthy and fault. Derived, not anchored. */
+  --gx-warn-tint:  #fff4e0;
+  --gx-warn-soft:  #ffd99e;
+  --gx-warn:       #f29d0b;
+  --gx-warn-deep:  #c47c00;
+
+  /* ---------------------------------------------------------- semantic roles
+     Components reference these, never the raw scales above. Re-pointing a role
+     is how the dark theme works. */
+
+  --gx-canvas:        var(--gx-n-10);
+  --gx-canvas-mesh-a: rgba(123, 97, 255, 0.055);
+  --gx-canvas-mesh-b: rgba(0, 184, 217, 0.055);
+  --gx-rail:          var(--gx-n-25);
+  --gx-submenu:       var(--gx-n-30);
+  --gx-surface:       var(--gx-n-00);
+  --gx-surface-sunk:  var(--gx-n-20);
+  --gx-surface-raised:var(--gx-n-00);
+
+  --gx-text:          var(--gx-n-80);
+  --gx-text-muted:    var(--gx-n-70);
+  --gx-text-faint:    var(--gx-n-60);
+  --gx-text-invert:   var(--gx-n-00);
+  --gx-text-strong:   var(--gx-n-95);
+
+  --gx-line:          rgba(37, 42, 49, 0.09);
+  --gx-line-strong:   rgba(37, 42, 49, 0.16);
+  --gx-line-inset:    rgba(255, 255, 255, 0.85);   /* the top highlight hairline */
+
+  --gx-active:        var(--gx-n-95);
+  --gx-accent:        var(--gx-run);
+  --gx-accent-tint:   var(--gx-run-tint);
+
+  --gx-tooltip-bg:    var(--gx-n-95);
+  --gx-tooltip-text:  var(--gx-n-00);
+
+  --gx-focus:         var(--gx-run);
+  --gx-focus-ring:    0 0 0 2px var(--gx-canvas), 0 0 0 4px var(--gx-run);
+
+  /* ------------------------------------------------------------------- type
+     One family, two roles. Numerals are tabular everywhere a value can change
+     in place — a plant reading that shifts width as it updates reads as noise. */
+
+  --gx-font: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont,
+             "Segoe UI", Roboto, sans-serif;
+  --gx-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --gx-fs-micro: 10px;   /* section eyebrows, table heads */
+  --gx-fs-xs:    11px;   /* chips, units */
+  --gx-fs-sm:    12px;   /* secondary rows */
+  --gx-fs-md:    13px;   /* body, list items */
+  --gx-fs-lg:    15px;   /* card values */
+  --gx-fs-xl:    19px;   /* page title */
+  --gx-fs-2xl:   26px;   /* hero readings */
+
+  --gx-fw-regular: 400;
+  --gx-fw-medium:  500;
+  --gx-fw-semi:    600;
+  --gx-fw-bold:    700;
+
+  --gx-lh-tight: 1.15;
+  --gx-lh-base:  1.45;
+
+  --gx-track-eyebrow: 0.09em;   /* uppercase micro-labels */
+  --gx-track-title:  -0.015em;  /* large text tightens */
+
+  /* ------------------------------------------------------------------ space
+     4px base. Every gap, pad and inset is a step on this scale. */
+
+  --gx-s-1:  2px;
+  --gx-s-2:  4px;
+  --gx-s-3:  6px;
+  --gx-s-4:  8px;
+  --gx-s-5:  12px;
+  --gx-s-6:  16px;
+  --gx-s-7:  20px;
+  --gx-s-8:  24px;
+  --gx-s-9:  32px;
+  --gx-s-10: 40px;
+  --gx-s-11: 56px;
+
+  /* ------------------------------------------------------------------ radii */
+
+  --gx-r-xs:  4px;
+  --gx-r-sm:  6px;
+  --gx-r-md:  10px;
+  --gx-r-lg:  14px;
+  --gx-r-xl:  20px;
+  --gx-r-pill: 999px;
+
+  /* -------------------------------------------------------------- elevation
+     Two-part shadows: a tight contact shadow plus a wide ambient one. On a
+     light BMS canvas a single blurred shadow reads as smudge; the contact
+     layer is what makes a card feel like it has an edge. */
+
+  --gx-e-0: none;
+  --gx-e-1: 0 1px 1px rgba(37,42,49,0.04), 0 1px 3px rgba(37,42,49,0.05);
+  --gx-e-2: 0 1px 2px rgba(37,42,49,0.05), 0 4px 12px rgba(37,42,49,0.07);
+  --gx-e-3: 0 2px 4px rgba(37,42,49,0.06), 0 10px 28px rgba(37,42,49,0.10);
+  --gx-e-4: 0 4px 8px rgba(37,42,49,0.08), 0 20px 48px rgba(37,42,49,0.14);
+  --gx-e-glow: 0 0 0 1px var(--gx-run-soft), 0 6px 20px rgba(123,97,255,0.22);
+
+  /* ----------------------------------------------------------------- motion
+     One easing curve for everything that moves under a pointer, one for things
+     that enter. Durations are deliberately short: this is a control interface,
+     not a marketing site. */
+
+  --gx-t-fast:  120ms;
+  --gx-t-base:  180ms;
+  --gx-t-slow:  260ms;
+  --gx-ease:        cubic-bezier(0.2, 0.8, 0.2, 1);
+  --gx-ease-enter:  cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ------------------------------------------------------------------ sizes */
+
+  --gx-rail-w:      88px;
+  --gx-submenu-w:   232px;
+  --gx-topbar-h:    64px;
+  --gx-row-h:       36px;
+  --gx-control-h:   30px;
+
+  --gx-z-content:   1;
+  --gx-z-rail:     20;
+  --gx-z-topbar:   30;
+  --gx-z-popover:  60;
+  --gx-z-tooltip:  80;
+}
+
+/* ============================================================================
+   Dark theme — the same system, roles re-pointed. No component changes.
+   ========================================================================= */
+
+.rgx-root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --gx-canvas:        #0e1116;
+  --gx-canvas-mesh-a: rgba(123, 97, 255, 0.16);
+  --gx-canvas-mesh-b: rgba(0, 184, 217, 0.13);
+  --gx-rail:          #141922;
+  --gx-submenu:       #1a202b;
+  --gx-surface:       #171d26;
+  --gx-surface-sunk:  #11161e;
+  --gx-surface-raised:#1c232e;
+
+  --gx-text:          #dfe4ec;
+  --gx-text-muted:    #97a2b3;
+  --gx-text-faint:    #6f7b8d;
+  --gx-text-invert:   #0e1116;
+  --gx-text-strong:   #ffffff;
+
+  --gx-line:          rgba(255, 255, 255, 0.08);
+  --gx-line-strong:   rgba(255, 255, 255, 0.16);
+  --gx-line-inset:    rgba(255, 255, 255, 0.06);
+
+  --gx-active:        #ffffff;
+  --gx-tooltip-bg:    #262e3a;
+  --gx-tooltip-text:  #ffffff;
+  --gx-focus-ring:    0 0 0 2px var(--gx-canvas), 0 0 0 4px var(--gx-run);
+
+  /* Status hues brighten and their tints invert to low-alpha washes, so a
+     HEALTHY chip stays legible without glowing off the screen. */
+  --gx-ok:        #4ed07c;  --gx-ok-tint:   rgba(78, 208, 124, 0.14);
+  --gx-ok-soft:   rgba(78, 208, 124, 0.32);
+  --gx-bad:       #ff5f5b;  --gx-bad-tint:  rgba(255, 95, 91, 0.14);
+  --gx-bad-soft:  rgba(255, 95, 91, 0.32);
+  --gx-run:       #9b85ff;  --gx-run-tint:  rgba(155, 133, 255, 0.16);
+  --gx-run-soft:  rgba(155, 133, 255, 0.34);
+  --gx-info:      #33d3ee;  --gx-info-tint: rgba(51, 211, 238, 0.14);
+  --gx-info-soft: rgba(51, 211, 238, 0.32);
+  --gx-warn:      #ffb43d;  --gx-warn-tint: rgba(255, 180, 61, 0.14);
+  --gx-warn-soft: rgba(255, 180, 61, 0.32);
+
+  --gx-e-1: 0 1px 1px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.36);
+  --gx-e-2: 0 1px 2px rgba(0,0,0,0.36), 0 4px 12px rgba(0,0,0,0.42);
+  --gx-e-3: 0 2px 4px rgba(0,0,0,0.40), 0 10px 28px rgba(0,0,0,0.50);
+  --gx-e-4: 0 4px 8px rgba(0,0,0,0.44), 0 20px 48px rgba(0,0,0,0.58);
+}
+
+/* Respect the OS preference on first load; data-theme always wins. */
+@media (prefers-reduced-motion: reduce) {
+  .rgx-root { --gx-t-fast: 1ms; --gx-t-base: 1ms; --gx-t-slow: 1ms; }
+}
+
+
+/* ============================================================================
+   RocketGX Design System — Layer 2: Components
+   ----------------------------------------------------------------------------
+   Every rule here resolves to a token. If you find yourself typing a hex value
+   or a pixel radius below this line, it belongs in tokens.css instead.
+
+   Naming: .gx-<block>__<element> --<modifier>
+   ========================================================================= */
+
+.rgx-root *,
+.rgx-root *::before,
+.rgx-root *::after { box-sizing: border-box; }
+
+
+
+.rgx-root {
+  font-family: var(--gx-font);
+  font-size: var(--gx-fs-md);
+  line-height: var(--gx-lh-base);
+  color: var(--gx-text);
+  background: var(--gx-canvas);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-variant-numeric: tabular-nums;
+
+  position: absolute; inset: 0; overflow: hidden;}
+
+/* The canvas is not flat. Two very low-alpha colour fields sit behind
+   everything, so large empty areas have depth without introducing a pattern
+   that competes with data. */
+.rgx-root.gx-mesh::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(760px 520px at 12% -8%,  var(--gx-canvas-mesh-a), transparent 62%),
+    radial-gradient(680px 480px at 96% 104%, var(--gx-canvas-mesh-b), transparent 58%);
+}
+
+.rgx-root :focus-visible { outline: none; box-shadow: var(--gx-focus-ring); border-radius: var(--gx-r-sm); }
+
+/* ---------------------------------------------------------------- utilities */
+
+.rgx-root .gx-eyebrow {
+  font-size: var(--gx-fs-micro);
+  font-weight: var(--gx-fw-bold);
+  letter-spacing: var(--gx-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--gx-text-faint);
+}
+.rgx-root .gx-num { font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.rgx-root .gx-mono { font-family: var(--gx-font-mono); }
+.rgx-root .gx-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ============================================================== 1. APP SHELL */
+
+.rgx-root .gx-app {
+  position: relative; z-index: var(--gx-z-content);
+  display: grid;
+  grid-template-columns: var(--gx-rail-w) auto 1fr;
+  grid-template-rows: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ================================================================== 2. RAIL */
+
+.rgx-root .gx-rail {
+  grid-column: 1;
+  z-index: var(--gx-z-rail);
+  display: flex; flex-direction: column; align-items: center;
+  padding: var(--gx-s-5) 0 var(--gx-s-6);
+  background: var(--gx-rail);
+  border-right: 1px solid var(--gx-line);
+  box-shadow: inset -1px 0 0 var(--gx-line-inset);
+}
+
+.rgx-root .gx-rail__brand {
+  display: flex; flex-direction: column; align-items: center; gap: var(--gx-s-2);
+  padding-bottom: var(--gx-s-5);
+  margin-bottom: var(--gx-s-3);
+  width: 100%;
+  border-bottom: 1px solid var(--gx-line);
+}
+.rgx-root .gx-rail__mark {
+  width: 34px; height: 34px; display: grid; place-items: center;
+  border-radius: var(--gx-r-md);
+  background: linear-gradient(150deg, var(--gx-run), var(--gx-info));
+  box-shadow: 0 4px 12px rgba(123, 97, 255, 0.30);
+  color: #fff;
+}
+.rgx-root .gx-rail__mark svg { width: 19px; height: 19px; }
+.rgx-root .gx-rail__wordmark {
+  font-size: var(--gx-fs-xs); font-weight: var(--gx-fw-bold);
+  letter-spacing: 0.02em; color: var(--gx-text-strong);
+}
+
+.rgx-root .gx-rail__nav {
+  flex: 1 1 auto; width: 100%;
+  overflow-y: auto; overflow-x: visible;
+  padding: var(--gx-s-2) var(--gx-s-3);
+  display: flex; flex-direction: column; gap: var(--gx-s-1);
+}
+.rgx-root .gx-rail__nav::-webkit-scrollbar { width: 0; }
+
+.rgx-root .gx-rail__item { position: relative; }
+
+.rgx-root .gx-rail__btn {
+  width: 100%;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: var(--gx-s-4) var(--gx-s-2) var(--gx-s-3);
+  border: 1px solid transparent;
+  border-radius: var(--gx-r-md);
+  background: transparent;
+  color: var(--gx-text-muted);
+  font: inherit; cursor: pointer;
+  transition: background var(--gx-t-fast) var(--gx-ease),
+              color var(--gx-t-fast) var(--gx-ease),
+              border-color var(--gx-t-fast) var(--gx-ease);
+}
+.rgx-root .gx-rail__btn:hover { background: rgba(255,255,255,0.72); color: var(--gx-text); }
+.rgx-root[data-theme="dark"] .gx-rail__btn:hover { background: rgba(255,255,255,0.05); }
+
+.rgx-root .gx-rail__icon { width: 22px; height: 22px; display: grid; place-items: center; }
+.rgx-root .gx-rail__icon svg {
+  width: 20px; height: 20px; fill: none; stroke: currentColor;
+  stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+}
+.rgx-root .gx-rail__label {
+  font-size: 9.5px; font-weight: var(--gx-fw-bold);
+  letter-spacing: 0.055em; text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Selected section. The reference marks it with the darkest neutral, filled —
+   the single strongest mark in the interface, so only ever one exists. */
+.rgx-root .gx-rail__item.is-current > .gx-rail__btn {
+  background: var(--gx-active);
+  color: var(--gx-text-invert);
+  box-shadow: var(--gx-e-2);
+}
+.rgx-root[data-theme="dark"] .gx-rail__item.is-current > .gx-rail__btn {
+  background: var(--gx-run); color: #fff;
+}
+
+/* A section with children gets a corner notch rather than a chevron: at 88px
+   wide a chevron competes with the label, a notch does not. */
+.rgx-root .gx-rail__item.has-sub > .gx-rail__btn::after {
+  content: ''; position: absolute; right: 7px; top: 9px;
+  width: 3px; height: 3px; border-radius: 50%;
+  background: currentColor; opacity: 0.35;
+}
+.rgx-root .gx-rail__item.has-sub.is-current > .gx-rail__btn::after { opacity: 0.55; }
+
+.rgx-root .gx-rail__foot { width: 100%; padding: var(--gx-s-3) var(--gx-s-3) 0; border-top: 1px solid var(--gx-line); }
+
+/* ------------------------------------------------------------- 2b. TOOLTIP
+   Rail tooltips are the primary affordance for the collapsed icon labels, so
+   they carry more than a name: title + a status line. They appear after a
+   short delay so sweeping the pointer down the rail does not strobe.
+
+   ONE tooltip element lives at the end of <body> and is moved to whichever
+   rail item is hovered. It cannot be a child of the item: the rail scrolls, and
+   a scroll container with overflow-y:auto computes overflow-x as auto too, so
+   an absolutely-positioned child gets clipped at the rail's edge no matter what
+   overflow-x is set to. Fixed positioning from the body escapes that entirely,
+   and it drops ten duplicate nodes from the DOM. */
+
+.rgx-root .gx-tip {
+  position: absolute; left: 0; top: 0;
+  z-index: var(--gx-z-tooltip);
+  transform: translateY(-50%) translateX(-4px);
+  min-width: 132px; max-width: 260px;
+  padding: var(--gx-s-4) var(--gx-s-5);
+  border-radius: var(--gx-r-md);
+  background: var(--gx-tooltip-bg);
+  color: var(--gx-tooltip-text);
+  box-shadow: var(--gx-e-4);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--gx-t-fast) var(--gx-ease),
+              transform var(--gx-t-base) var(--gx-ease-enter);
+}
+.rgx-root .gx-tip.is-on { opacity: 1; transform: translateY(-50%) translateX(0); }
+.rgx-root .gx-tip::before {
+  content: ''; position: absolute; right: 100%; top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: var(--gx-tooltip-bg);
+}
+.rgx-root .gx-tip__title {
+  font-size: var(--gx-fs-sm); font-weight: var(--gx-fw-semi);
+  white-space: nowrap; letter-spacing: 0.01em;
+}
+.rgx-root .gx-tip__meta {
+  margin-top: 3px;
+  display: flex; align-items: center; gap: var(--gx-s-3);
+  font-size: var(--gx-fs-xs); color: rgba(255,255,255,0.62);
+  white-space: nowrap;
+}
+.rgx-root .gx-tip__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gx-ok); }
+.rgx-root .gx-tip__dot--bad { background: var(--gx-bad); }
+.rgx-root .gx-tip__dot--run { background: var(--gx-run); }
+.rgx-root .gx-tip__kbd {
+  margin-left: auto; padding: 1px 5px; border-radius: var(--gx-r-xs);
+  background: rgba(255,255,255,0.12); font-size: 10px; font-weight: var(--gx-fw-semi);
+}
+
+/* ================================================================ 3. SUBMENU
+   The second column in the master sheet. It is a peer of the rail, not a
+   popover: it stays open, it is scrollable, and it is where a section's
+   children live. Width animates to zero when the current section has none. */
+
+.rgx-root .gx-sub {
+  grid-column: 2;
+  width: var(--gx-submenu-w);
+  display: flex; flex-direction: column;
+  background: var(--gx-submenu);
+  border-right: 1px solid var(--gx-line);
+  overflow: hidden;
+  transition: width var(--gx-t-slow) var(--gx-ease);
+}
+.rgx-root .gx-sub.is-empty { width: 0; border-right-width: 0; }
+
+.rgx-root .gx-sub__head {
+  flex: 0 0 auto;
+  padding: var(--gx-s-6) var(--gx-s-6) var(--gx-s-4);
+  display: flex; align-items: baseline; gap: var(--gx-s-3);
+}
+.rgx-root .gx-sub__title {
+  font-size: var(--gx-fs-md); font-weight: var(--gx-fw-semi);
+  color: var(--gx-text-strong); letter-spacing: var(--gx-track-title);
+  white-space: nowrap;
+}
+.rgx-root .gx-sub__count {
+  margin-left: auto; padding: 1px 7px; border-radius: var(--gx-r-pill);
+  background: rgba(37,42,49,0.07); color: var(--gx-text-faint);
+  font-size: var(--gx-fs-micro); font-weight: var(--gx-fw-bold);
+}
+.rgx-root[data-theme="dark"] .gx-sub__count { background: rgba(255,255,255,0.08); }
+
+.rgx-root .gx-sub__list {
+  flex: 1 1 auto; overflow-y: auto;
+  padding: 0 var(--gx-s-4) var(--gx-s-6);
+  display: flex; flex-direction: column; gap: var(--gx-s-1);
+}
+
+.rgx-root .gx-sub__group { margin-top: var(--gx-s-5); }
+.rgx-root .gx-sub__group:first-child { margin-top: 0; }
+.rgx-root .gx-sub__group-label { padding: 0 var(--gx-s-4) var(--gx-s-3); }
+
+.rgx-root .gx-sub__link {
+  position: relative;
+  display: flex; align-items: center; gap: var(--gx-s-4);
+  min-height: var(--gx-row-h);
+  padding: var(--gx-s-3) var(--gx-s-4);
+  border: 1px solid transparent;
+  border-radius: var(--gx-r-sm);
+  color: var(--gx-text); font-size: var(--gx-fs-md);
+  text-decoration: none; cursor: pointer; text-align: left;
+  background: transparent; font-family: inherit; width: 100%;
+  transition: background var(--gx-t-fast) var(--gx-ease),
+              border-color var(--gx-t-fast) var(--gx-ease);
+}
+.rgx-root .gx-sub__link:hover { background: rgba(255,255,255,0.66); border-color: var(--gx-line); }
+.rgx-root[data-theme="dark"] .gx-sub__link:hover { background: rgba(255,255,255,0.05); }
+
+.rgx-root .gx-sub__link.is-active {
+  background: var(--gx-surface);
+  border-color: var(--gx-line-strong);
+  box-shadow: var(--gx-e-1);
+  font-weight: var(--gx-fw-medium);
+}
+/* Active marker: a 3px accent bar, the only place the accent hue is used
+   structurally rather than semantically. */
+.rgx-root .gx-sub__link.is-active::before {
+  content: ''; position: absolute; left: -1px; top: 7px; bottom: 7px;
+  width: 3px; border-radius: 0 3px 3px 0; background: var(--gx-accent);
+}
+.rgx-root .gx-sub__link-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rgx-root .gx-sub__link-meta { font-size: var(--gx-fs-xs); color: var(--gx-text-faint); }
+
+/* Nested third level — a section's child can itself have children. Collapsed
+   by default; the caret rotates. */
+.rgx-root .gx-sub__branch > .gx-sub__link .gx-sub__caret {
+  width: 14px; height: 14px; flex: 0 0 auto; color: var(--gx-text-faint);
+  transition: transform var(--gx-t-base) var(--gx-ease);
+}
+.rgx-root .gx-sub__branch.is-open > .gx-sub__link .gx-sub__caret { transform: rotate(90deg); }
+.rgx-root .gx-sub__children {
+  overflow: hidden; max-height: 0;
+  margin-left: var(--gx-s-6);
+  border-left: 1px solid var(--gx-line-strong);
+  transition: max-height var(--gx-t-slow) var(--gx-ease);
+}
+.rgx-root .gx-sub__branch.is-open > .gx-sub__children { max-height: 320px; }
+.rgx-root .gx-sub__children .gx-sub__link { font-size: var(--gx-fs-sm); min-height: 30px; margin-left: var(--gx-s-3); }
+
+/* The floor picker from the reference — a compact numeric variant of the list */
+.rgx-root .gx-floors { display: flex; flex-direction: column; gap: var(--gx-s-2); padding: 0 var(--gx-s-6) var(--gx-s-6); }
+.rgx-root .gx-floor {
+  height: 34px; display: grid; place-items: center;
+  border: 1px solid var(--gx-line); border-radius: var(--gx-r-sm);
+  background: var(--gx-surface); color: var(--gx-text);
+  font-size: var(--gx-fs-md); font-weight: var(--gx-fw-medium);
+  cursor: pointer; font-family: inherit;
+  transition: all var(--gx-t-fast) var(--gx-ease);
+}
+.rgx-root .gx-floor:hover { border-color: var(--gx-line-strong); transform: translateY(-1px); box-shadow: var(--gx-e-1); }
+.rgx-root .gx-floor.is-active {
+  background: var(--gx-active); color: var(--gx-text-invert);
+  border-color: var(--gx-active); box-shadow: var(--gx-e-2);
+}
+/* In dark theme --gx-active is white, which would make the selected floor the
+   loudest thing on screen and inconsistent with the rail's current section.
+   Both use the accent instead. */
+.rgx-root[data-theme="dark"] .gx-floor.is-active {
+  background: var(--gx-run); border-color: var(--gx-run); color: #fff;
+}
+
+/* ================================================================= 4. TOPBAR */
+
+.rgx-root .gx-main { grid-column: 3; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+.rgx-root .gx-topbar {
+  flex: 0 0 auto; height: var(--gx-topbar-h);
+  z-index: var(--gx-z-topbar);
+  display: flex; align-items: center; gap: var(--gx-s-6);
+  padding: 0 var(--gx-s-8);
+  border-bottom: 1px solid var(--gx-line);
+  background: rgba(247, 248, 252, 0.86);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+}
+.rgx-root .gx-topbar__nav { display: flex; align-items: center; gap: var(--gx-s-3); }
+.rgx-root .gx-topbar__center { flex: 1 1 auto; min-width: 0; text-align: center; }
+.rgx-root .gx-topbar__eyebrow { display: block; }
+.rgx-root .gx-topbar__title {
+  margin: 1px 0 0;
+  font-size: var(--gx-fs-xl); font-weight: var(--gx-fw-semi);
+  letter-spacing: var(--gx-track-title); color: var(--gx-text-strong);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rgx-root .gx-topbar__right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.rgx-root .gx-topbar__stamp { display: flex; align-items: center; gap: var(--gx-s-4); font-size: var(--gx-fs-sm); color: var(--gx-text-muted); }
+.rgx-root .gx-topbar__stamp b { color: var(--gx-text); font-weight: var(--gx-fw-semi); }
+.rgx-root .gx-topbar__sep { width: 1px; height: 11px; background: var(--gx-line-strong); }
+.rgx-root .gx-topbar__oat { display: flex; align-items: center; gap: var(--gx-s-3); font-size: var(--gx-fs-sm); color: var(--gx-text-muted); }
+.rgx-root .gx-topbar__oat svg { width: 16px; height: 16px; color: var(--gx-info); }
+
+/* ============================================================== 5. CONTROLS */
+
+.rgx-root .gx-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--gx-s-3);
+  height: var(--gx-control-h); padding: 0 var(--gx-s-5);
+  border: 1px solid var(--gx-line-strong); border-radius: var(--gx-r-sm);
+  background: var(--gx-surface); color: var(--gx-text);
+  font: inherit; font-size: var(--gx-fs-sm); font-weight: var(--gx-fw-medium);
+  cursor: pointer; white-space: nowrap;
+  box-shadow: var(--gx-e-1);
+  transition: all var(--gx-t-fast) var(--gx-ease);
+}
+.rgx-root .gx-btn:hover { border-color: var(--gx-n-40); box-shadow: var(--gx-e-2); transform: translateY(-1px); }
+.rgx-root .gx-btn:active { transform: translateY(0); box-shadow: var(--gx-e-0); }
+.rgx-root .gx-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+.rgx-root .gx-btn--icon { width: var(--gx-control-h); padding: 0; border-radius: var(--gx-r-pill); }
+.rgx-root .gx-btn--primary {
+  background: var(--gx-active); border-color: var(--gx-active); color: var(--gx-text-invert);
+}
+.rgx-root .gx-btn--primary:hover { background: var(--gx-n-90); border-color: var(--gx-n-90); }
+.rgx-root .gx-btn--accent {
+  background: var(--gx-run); border-color: var(--gx-run); color: #fff;
+  box-shadow: var(--gx-e-glow);
+}
+.rgx-root .gx-btn--ghost { background: transparent; border-color: transparent; box-shadow: none; }
+.rgx-root .gx-btn--ghost:hover { background: rgba(37,42,49,0.05); border-color: transparent; }
+.rgx-root[data-theme="dark"] .gx-btn--ghost:hover { background: rgba(255,255,255,0.06); }
+
+/* Segmented control */
+.rgx-root .gx-seg { display: inline-flex; padding: 2px; gap: 2px; border-radius: var(--gx-r-sm);
+  background: var(--gx-surface-sunk); border: 1px solid var(--gx-line); }
+.rgx-root .gx-seg__opt {
+  padding: 4px 11px; border: 0; border-radius: var(--gx-r-xs);
+  background: transparent; color: var(--gx-text-muted);
+  font: inherit; font-size: var(--gx-fs-sm); font-weight: var(--gx-fw-medium); cursor: pointer;
+  transition: all var(--gx-t-fast) var(--gx-ease);
+}
+.rgx-root .gx-seg__opt.is-on { background: var(--gx-surface); color: var(--gx-text-strong); box-shadow: var(--gx-e-1); }
+
+/* ================================================================ 6. STATUS */
+
+.rgx-root .gx-chip {
+  display: inline-flex; align-items: center; gap: var(--gx-s-3);
+  height: 22px; padding: 0 var(--gx-s-4);
+  border-radius: var(--gx-r-xs);
+  font-size: var(--gx-fs-xs); font-weight: var(--gx-fw-bold);
+  letter-spacing: 0.045em; text-transform: uppercase;
+  white-space: nowrap;
+}
+/* Solid — for the legend and for a single headline state */
+.rgx-root .gx-chip--solid { color: #fff; background: var(--gx-n-60); }
+.rgx-root .gx-chip--solid.is-healthy { background: var(--gx-ok); }
+.rgx-root .gx-chip--solid.is-fault { background: var(--gx-bad); }
+.rgx-root .gx-chip--solid.is-active { background: var(--gx-run); }
+.rgx-root .gx-chip--solid.is-info { background: var(--gx-info); }
+.rgx-root .gx-chip--solid.is-inactive { background: var(--gx-n-40); color: var(--gx-n-80); }
+.rgx-root .gx-chip--solid.is-disabled { background: var(--gx-n-30); color: var(--gx-n-60); }
+
+/* Soft — the default inside dense lists and tables, where solid blocks would
+   dominate the page. Same hue, a tenth of the ink. */
+.rgx-root .gx-chip--soft { background: var(--gx-surface-sunk); color: var(--gx-text-muted); }
+.rgx-root .gx-chip--soft.is-healthy { background: var(--gx-ok-tint);   color: var(--gx-ok-deep); }
+.rgx-root .gx-chip--soft.is-fault { background: var(--gx-bad-tint);  color: var(--gx-bad-deep); }
+.rgx-root .gx-chip--soft.is-active { background: var(--gx-run-tint);  color: var(--gx-run-deep); }
+.rgx-root .gx-chip--soft.is-info { background: var(--gx-info-tint); color: var(--gx-info-deep); }
+.rgx-root .gx-chip--soft.is-warn { background: var(--gx-warn-tint); color: var(--gx-warn-deep); }
+.rgx-root[data-theme="dark"] .gx-chip--soft.is-healthy { color: var(--gx-ok); }
+.rgx-root[data-theme="dark"] .gx-chip--soft.is-fault { color: var(--gx-bad); }
+.rgx-root[data-theme="dark"] .gx-chip--soft.is-active { color: var(--gx-run); }
+.rgx-root[data-theme="dark"] .gx-chip--soft.is-info { color: var(--gx-info); }
+.rgx-root[data-theme="dark"] .gx-chip--soft.is-warn { color: var(--gx-warn); }
+
+/* Text-only — for table cells, where even a soft fill adds too much furniture */
+.rgx-root .gx-state { font-size: var(--gx-fs-sm); font-weight: var(--gx-fw-semi); }
+.rgx-root .gx-state.is-healthy { color: var(--gx-ok-deep); }
+.rgx-root .gx-state.is-fault { color: var(--gx-bad); }
+.rgx-root .gx-state.is-active { color: var(--gx-run-deep); }
+.rgx-root .gx-state.is-inactive { color: var(--gx-text-faint); }
+.rgx-root .gx-state.is-warn { color: var(--gx-warn-deep); }
+.rgx-root[data-theme="dark"] .gx-state.is-warn { color: var(--gx-warn); }
+.rgx-root[data-theme="dark"] .gx-state.is-healthy { color: var(--gx-ok); }
+.rgx-root[data-theme="dark"] .gx-state.is-active { color: var(--gx-run); }
+
+/* A live point gets a pulsing dot. Only genuinely live data may use it. */
+.rgx-root .gx-live { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--gx-ok); flex: 0 0 auto; }
+.rgx-root .gx-live::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 50%;
+  border: 1px solid var(--gx-ok); opacity: 0.6;
+  animation: gx-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.rgx-root .gx-live--bad { background: var(--gx-bad); } .rgx-root .gx-live--bad::after { border-color: var(--gx-bad); }
+@keyframes gx-ping { 0% { transform: scale(0.6); opacity: 0.8; } 80%, 100% { transform: scale(1.9); opacity: 0; } }
+
+/* ================================================================== 7. CARD */
+
+.rgx-root .gx-card {
+  position: relative;
+  border: 1px solid var(--gx-line);
+  border-radius: var(--gx-r-lg);
+  background: var(--gx-surface);
+  box-shadow: var(--gx-e-1);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow var(--gx-t-base) var(--gx-ease), transform var(--gx-t-base) var(--gx-ease);
+}
+/* The inner top highlight is what separates a premium light surface from a
+   flat grey box — a 1px white line where the card catches the light. */
+.rgx-root .gx-card::before {
+  content: ''; position: absolute; inset: 0 0 auto; height: 1px;
+  background: var(--gx-line-inset); pointer-events: none;
+}
+.rgx-root .gx-card--hover:hover { box-shadow: var(--gx-e-3); transform: translateY(-2px); }
+.rgx-root .gx-card--sunk { background: var(--gx-surface-sunk); box-shadow: none; }
+.rgx-root .gx-card--flush { border-radius: var(--gx-r-md); }
+
+.rgx-root .gx-card__head {
+  display: flex; align-items: center; gap: var(--gx-s-4);
+  padding: var(--gx-s-5) var(--gx-s-6);
+  border-bottom: 1px solid var(--gx-line);
+}
+.rgx-root .gx-card__title { font-size: var(--gx-fs-sm); font-weight: var(--gx-fw-semi); color: var(--gx-text-strong); }
+.rgx-root .gx-card__tools { margin-left: auto; display: flex; align-items: center; gap: var(--gx-s-3); }
+.rgx-root .gx-card__body { padding: var(--gx-s-5) var(--gx-s-6); display: flex; flex-direction: column; gap: var(--gx-s-2); }
+.rgx-root .gx-card__body--flush { padding: 0; }
+
+/* A section's icon badge, tinted by family */
+.rgx-root .gx-badge {
+  width: 28px; height: 28px; flex: 0 0 auto; display: grid; place-items: center;
+  border-radius: var(--gx-r-sm);
+  background: var(--gx-surface-sunk); color: var(--gx-text-muted);
+}
+.rgx-root .gx-badge svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.rgx-root .gx-badge.is-healthy { background: var(--gx-ok-tint);   color: var(--gx-ok-deep); }
+.rgx-root .gx-badge.is-fault { background: var(--gx-bad-tint);  color: var(--gx-bad-deep); }
+.rgx-root .gx-badge.is-active { background: var(--gx-run-tint);  color: var(--gx-run-deep); }
+.rgx-root .gx-badge.is-info { background: var(--gx-info-tint); color: var(--gx-info-deep); }
+.rgx-root[data-theme="dark"] .gx-badge.is-healthy { color: var(--gx-ok); }
+.rgx-root[data-theme="dark"] .gx-badge.is-fault { color: var(--gx-bad); }
+.rgx-root[data-theme="dark"] .gx-badge.is-active { color: var(--gx-run); }
+.rgx-root[data-theme="dark"] .gx-badge.is-info { color: var(--gx-info); }
+
+/* ========================================================= 8. VALUE ROW
+   The workhorse from section 2 of the master sheet: a label on the left, a
+   boxed value on the right, and an optional action. The value box is what makes
+   a reading feel like a field rather than a sentence. */
+
+.rgx-root .gx-row {
+  display: flex; align-items: center; gap: var(--gx-s-5);
+  min-height: 40px; padding: var(--gx-s-3) 0;
+  border-bottom: 1px solid var(--gx-line);
+}
+.rgx-root .gx-row:last-child { border-bottom: 0; }
+.rgx-root .gx-row__label { flex: 1 1 auto; min-width: 0; font-size: var(--gx-fs-md); color: var(--gx-text); }
+.rgx-root .gx-row__sub { font-size: var(--gx-fs-xs); color: var(--gx-text-faint); }
+
+.rgx-root .gx-value {
+  flex: 0 0 auto; min-width: 116px;
+  height: var(--gx-control-h); padding: 0 var(--gx-s-5);
+  display: inline-flex; align-items: center; justify-content: center; gap: 3px;
+  border: 1px solid var(--gx-line); border-radius: var(--gx-r-sm);
+  background: var(--gx-surface-sunk);
+  font-size: var(--gx-fs-md); font-weight: var(--gx-fw-semi);
+  color: var(--gx-text-strong);
+  font-variant-numeric: tabular-nums;
+}
+.rgx-root .gx-value--editable { background: var(--gx-surface); box-shadow: var(--gx-e-1); }
+.rgx-root .gx-value--wide { min-width: 148px; }
+.rgx-root .gx-value__unit { font-size: var(--gx-fs-xs); font-weight: var(--gx-fw-medium); color: var(--gx-text-muted); }
+.rgx-root .gx-value.is-healthy { color: var(--gx-ok-deep); }
+.rgx-root .gx-value.is-fault { color: var(--gx-bad); border-color: var(--gx-bad-soft); background: var(--gx-bad-tint); }
+.rgx-root[data-theme="dark"] .gx-value.is-healthy { color: var(--gx-ok); }
+
+.rgx-root .gx-row__act {
+  width: 26px; height: 26px; flex: 0 0 auto;
+  display: grid; place-items: center;
+  border: 0; border-radius: var(--gx-r-sm); background: transparent;
+  color: var(--gx-text-faint); cursor: pointer;
+  transition: all var(--gx-t-fast) var(--gx-ease);
+}
+.rgx-root .gx-row__act:hover { background: var(--gx-run-tint); color: var(--gx-run-deep); }
+.rgx-root .gx-row__act svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Two-column status list (PLANT MONITORING) */
+.rgx-root .gx-status-list { display: grid; grid-template-columns: 1fr; gap: 0; }
+.rgx-root .gx-status-row {
+  display: flex; align-items: center; gap: var(--gx-s-5);
+  min-height: 34px; padding: var(--gx-s-2) 0;
+  border-bottom: 1px solid var(--gx-line);
+}
+.rgx-root .gx-status-row:last-child { border-bottom: 0; }
+.rgx-root .gx-status-row__label { flex: 1 1 auto; font-size: var(--gx-fs-sm); color: var(--gx-text-muted); }
+
+/* =============================================================== 9. CALLOUT
+   Section 4 of the master sheet. A floating annotation anchored to a point on a
+   drawing: left accent bar keyed to state, icon, title, and either a status
+   chip or a value/limit pair. */
+
+.rgx-root .gx-callout {
+  position: relative;
+  display: flex; align-items: stretch;
+  min-width: 200px; max-width: 300px;
+  border: 1px solid var(--gx-line);
+  border-radius: var(--gx-r-md);
+  background: var(--gx-surface);
+  box-shadow: var(--gx-e-3);
+  overflow: hidden;
+}
+.rgx-root .gx-callout__bar { flex: 0 0 4px; background: var(--gx-ok); }
+.rgx-root .gx-callout.is-fault  .gx-callout__bar { background: var(--gx-bad); }
+.rgx-root .gx-callout.is-info   .gx-callout__bar { background: var(--gx-info); }
+.rgx-root .gx-callout.is-active .gx-callout__bar { background: var(--gx-run); }
+.rgx-root .gx-callout.is-warn   .gx-callout__bar { background: var(--gx-warn); }
+
+.rgx-root .gx-callout__body { flex: 1 1 auto; padding: var(--gx-s-4) var(--gx-s-5); min-width: 0; }
+.rgx-root .gx-callout__head { display: flex; align-items: center; gap: var(--gx-s-4); }
+.rgx-root .gx-callout__icon { width: 22px; height: 22px; flex: 0 0 auto; display: grid; place-items: center; color: var(--gx-text-muted); }
+.rgx-root .gx-callout__icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.rgx-root .gx-callout__title { font-size: var(--gx-fs-sm); font-weight: var(--gx-fw-bold); letter-spacing: 0.02em; color: var(--gx-text-strong); }
+.rgx-root .gx-callout__place { font-size: var(--gx-fs-micro); font-weight: var(--gx-fw-bold); letter-spacing: var(--gx-track-eyebrow); text-transform: uppercase; color: var(--gx-text-faint); }
+.rgx-root .gx-callout__foot {
+  margin-top: var(--gx-s-3); padding-top: var(--gx-s-3);
+  border-top: 1px solid var(--gx-line);
+  display: flex; align-items: center; gap: var(--gx-s-4);
+}
+.rgx-root .gx-callout__reading { font-size: var(--gx-fs-lg); font-weight: var(--gx-fw-semi); color: var(--gx-text-strong); }
+.rgx-root .gx-callout__pair { display: flex; justify-content: space-between; gap: var(--gx-s-6); font-size: var(--gx-fs-sm); }
+.rgx-root .gx-callout__pair span:first-child { color: var(--gx-text-faint); }
+.rgx-root .gx-callout__pair span:last-child { font-weight: var(--gx-fw-semi); color: var(--gx-text); }
+/* Leader line to the anchor point on a drawing. Only drawn when the callout is
+   actually pinned to something — .gx-callout--pinned — otherwise it dangles. */
+.rgx-root .gx-callout--pinned { overflow: visible; }
+.rgx-root .gx-callout--pinned .gx-callout__leader {
+  position: absolute; left: 100%; top: 50%; width: 28px; height: 1px;
+  background: var(--gx-line-strong);
+}
+.rgx-root .gx-callout--pinned .gx-callout__leader::after {
+  content: ''; position: absolute; right: -3px; top: -2.5px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--gx-text-faint);
+}
+
+/* ================================================================ 10. TABLE */
+
+.rgx-root .gx-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--gx-fs-sm); }
+.rgx-root .gx-table thead th {
+  position: sticky; top: 0; z-index: 1;
+  padding: var(--gx-s-4) var(--gx-s-6);
+  background: var(--gx-surface-sunk);
+  border-bottom: 1px solid var(--gx-line-strong);
+  text-align: left;
+  font-size: var(--gx-fs-micro); font-weight: var(--gx-fw-bold);
+  letter-spacing: var(--gx-track-eyebrow); text-transform: uppercase;
+  color: var(--gx-text-faint); white-space: nowrap;
+}
+.rgx-root .gx-table tbody td {
+  padding: var(--gx-s-4) var(--gx-s-6);
+  border-bottom: 1px solid var(--gx-line);
+  color: var(--gx-text); vertical-align: middle;
+}
+.rgx-root .gx-table tbody tr { transition: background var(--gx-t-fast) var(--gx-ease); }
+.rgx-root .gx-table tbody tr:hover { background: var(--gx-surface-sunk); }
+.rgx-root[data-theme="dark"] .gx-table tbody tr:hover { background: rgba(255,255,255,0.035); }
+.rgx-root .gx-table tbody tr:last-child td { border-bottom: 0; }
+.rgx-root .gx-table .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: var(--gx-fw-semi); }
+.rgx-root .gx-table .unit { color: var(--gx-text-faint); font-size: var(--gx-fs-xs); }
+.rgx-root .gx-table .when { color: var(--gx-text-faint); white-space: nowrap; }
+.rgx-root .gx-table tbody tr.is-fault td:first-child { box-shadow: inset 3px 0 0 var(--gx-bad); }
+
+/* ============================================== 11. UNCARDED TECHNICAL VISUAL
+   The master sheet is explicit: buildings, floorplans and plant diagrams stay
+   uncarded. No border, no fill, no shadow — the drawing sits directly on the
+   canvas so nothing competes with its own linework. */
+
+.rgx-root .gx-visual { display: flex; flex-direction: column; gap: var(--gx-s-4); }
+.rgx-root .gx-visual__frame {
+  position: relative;
+  display: grid; place-items: center;
+  min-height: 190px; padding: var(--gx-s-5);
+  /* deliberately: no background, no border, no radius */
+}
+.rgx-root .gx-visual__caption { text-align: center; }
+
+/* ================================================================ 12. LAYOUT */
+
+.rgx-root .gx-scroll { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; }
+.rgx-root .gx-page { padding: var(--gx-s-8); display: flex; flex-direction: column; gap: var(--gx-s-8); }
+/* align-items:start — a card must be as tall as its content, not as tall as
+   the tallest thing beside it. Stretched cards leave dead space that reads as
+   missing data. */
+.rgx-root .gx-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gx-s-6); align-items: start; }
+.rgx-root .gx-c3 { grid-column: span 3; } .rgx-root .gx-c4 { grid-column: span 4; }
+.rgx-root .gx-c5 { grid-column: span 5; } .rgx-root .gx-c6 { grid-column: span 6; }
+.rgx-root .gx-c7 { grid-column: span 7; } .rgx-root .gx-c8 { grid-column: span 8; }
+.rgx-root .gx-c9 { grid-column: span 9; } .rgx-root .gx-c12 { grid-column: span 12; }
+
+.rgx-root .gx-section__head { display: flex; align-items: baseline; gap: var(--gx-s-4); margin-bottom: var(--gx-s-5); }
+.rgx-root .gx-section__rule { flex: 1 1 auto; height: 1px; background: var(--gx-line); }
+
+@media (max-width: 1180px) {
+  .rgx-root .gx-c3,
+.rgx-root .gx-c4,
+.rgx-root .gx-c5 { grid-column: span 6; }
+  .rgx-root .gx-c7,
+.rgx-root .gx-c8,
+.rgx-root .gx-c9 { grid-column: span 12; }
+}
+
+
+/* Dark topbar needs its own opaque fallback, since the light one is
+   a literal rgba of the light canvas. */
+.rgx-root[data-theme="dark"] .gx-topbar { background: rgba(14, 17, 22, 0.86); }

@@ -1,0 +1,58 @@
+{
+  "title": "Mercury BMS",
+  "subtitle": "DemoBuilding · Level 2",
+  "showProfile": true,
+  "logoutUrl": "/logout",
+  "showLogoutButton": true,
+  "backgroundColor": "rgba(18,18,20,0.82)",
+  "menuLinkTextColor": "rgba(235,235,245,0.62)",
+  "menuFontSize": "14.5px",
+  "user": {
+    "fullName": "Usama Iqbal",
+    "title": "Controls Engineer",
+    "profileImage": "file:^avatar-1.png"
+  },
+  "menu": [
+    {
+      "li": "Home",
+      "link": ["Home", "station:|slot:/Drivers/Graphics/Home"],
+      "icon": "bx-home"
+    },
+    {
+      "li": "Air Handling",
+      "icon": "bx-wind",
+      "active": true,
+      "expanded": true,
+      "dropDownLink": [
+        { "li": "", "link": ["AHU-01 East", "station:|slot:/Drivers/BacnetNetwork/AHU1"], "active": true },
+        { "li": "", "link": ["AHU-02 West", "station:|slot:/Drivers/BacnetNetwork/AHU2"] },
+        { "li": "divider" },
+        { "li": "", "link": ["Heating Circuit", "station:|slot:/Drivers/BacnetNetwork/LTHW"] },
+        { "li": "", "link": ["Cooling Circuit", "station:|slot:/Drivers/BacnetNetwork/CHW"] }
+      ]
+    },
+    {
+      "li": "Zones",
+      "icon": "bx-buildings",
+      "dropDownLink": [
+        { "li": "", "link": ["Level 2 East", "station:|slot:/Drivers/BacnetNetwork/L2East"] },
+        { "li": "", "link": ["Level 2 West", "station:|slot:/Drivers/BacnetNetwork/L2West"] },
+        { "li": "", "link": ["Floor Plan", "station:|slot:/Drivers/Graphics/FloorPlan"] }
+      ]
+    },
+    { "li": "Energy", "link": ["Energy", "station:|slot:/Drivers/Graphics/Energy"], "icon": "bx-bolt" },
+    { "li": "Trends", "link": ["Trends", "/ord/history:^DemoBuilding", "blank"], "icon": "bx-line-chart" },
+    { "li": "divider" },
+    {
+      "li": "Alarms",
+      "icon": "bx-bell",
+      "badge": "3",
+      "dropDownLink": [
+        { "li": "", "link": ["Active", "station:|slot:/Services/AlarmService"] },
+        { "li": "", "link": ["Acknowledged", "station:|slot:/Services/AlarmService"] }
+      ]
+    },
+    { "li": "Schedules", "link": ["Schedules", "station:|slot:/Services/ScheduleService"], "icon": "bx-calendar" },
+    { "li": "Settings", "link": ["Settings", "station:|slot:/Services"], "icon": "bx-cog" }
+  ]
+}

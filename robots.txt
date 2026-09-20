@@ -1,0 +1,12 @@
+# Plantroom Labs — Niagara Framework engineering
+# Crawling and indexing are welcome, including by AI agents and answer engines.
+# A plain-text summary written for language models is at https://plantroomlabs.com/llms.txt
+
+User-agent: *
+Allow: /
+
+# /demos/* are iframe targets for the live widget demos, not pages to read.
+# Crawling them is welcome and necessary to render /work/, which frames all
+# three and is the page that should appear in results; they carry noindex.
+
+Sitemap: https://plantroomlabs.com/sitemap.xml

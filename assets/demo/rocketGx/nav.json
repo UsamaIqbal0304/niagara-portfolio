@@ -1,0 +1,84 @@
+{
+  "brand": { "name": "RocketGX", "icon": "site" },
+  "showLogout": true,
+  "floors": ["8", "7", "6", "5", "4", "3", "2", "1", "G", "LG"],
+  "nav": [
+    { "id": "site", "label": "Site", "icon": "site",
+      "tip": { "title": "Site overview", "meta": "All systems nominal", "state": "ok" },
+      "sub": { "title": "Site", "groups": [
+        { "label": "Overview", "items": [
+          { "id": "summary", "label": "Building Summary", "meta": "12 systems" },
+          { "id": "occupancy", "label": "Occupancy", "meta": "68%" },
+          { "id": "weather", "label": "Weather & OAT", "meta": "23.0 °C" } ] },
+        { "label": "Records", "items": [
+          { "id": "assets", "label": "Asset Register", "meta": "486" },
+          { "id": "logbook", "label": "Logbook" } ] } ] } },
+
+    { "id": "floors", "label": "Floors", "icon": "floors", "kind": "floors",
+      "tip": { "title": "Floor selector", "meta": "10 levels · L01 open", "state": "run" } },
+
+    { "id": "water", "label": "Water", "icon": "water",
+      "tip": { "title": "Domestic & chilled water", "meta": "1 fault", "state": "bad" },
+      "sub": { "title": "Water", "groups": [
+        { "label": "Chilled water", "items": [
+          { "id": "chw-pumps", "label": "CHW Pumps", "meta": "2", "children": [
+            { "id": "chw-01", "label": "CHW Pump 01",
+              "ord": "station:|slot:/Drivers/BacnetNetwork/CHWP01" },
+            { "id": "chw-02", "label": "CHW Pump 02",
+              "ord": "station:|slot:/Drivers/BacnetNetwork/CHWP02" } ] },
+          { "id": "cws-tanks", "label": "CWS Tanks", "meta": "2" },
+          { "id": "booster", "label": "Booster Set" } ] },
+        { "label": "Drainage", "items": [
+          { "id": "drain", "label": "Drain Pumps", "meta": "fault", "state": "fault", "children": [
+            { "id": "drain-1", "label": "Drain Pump 1" },
+            { "id": "drain-2", "label": "Drain Pump 2", "state": "fault", "meta": "fault" } ] },
+          { "id": "meters", "label": "Water Meters" } ] } ] } },
+
+    { "id": "cooling", "label": "Cooling", "icon": "cooling",
+      "tip": { "title": "Cooling plant", "meta": "4 chillers · 2 running", "state": "run" },
+      "sub": { "title": "Cooling", "groups": [
+        { "label": "Generation", "items": [
+          { "id": "chillers", "label": "Chillers", "meta": "4" },
+          { "id": "dry-cooler", "label": "Dry Coolers", "meta": "2" } ] },
+        { "label": "Distribution", "items": [
+          { "id": "vrf", "label": "VRF Systems", "meta": "18" },
+          { "id": "fcu", "label": "Fan Coil Units", "meta": "96" } ] } ] } },
+
+    { "id": "heating", "label": "Heating", "icon": "heating",
+      "tip": { "title": "Heating plant", "meta": "LTHW 68 °C flow", "state": "ok" },
+      "sub": { "title": "Heating", "groups": [
+        { "label": "Generation", "items": [
+          { "id": "boilers", "label": "Boilers", "meta": "3" },
+          { "id": "chp", "label": "CHP Unit" } ] },
+        { "label": "Distribution", "items": [
+          { "id": "lthw", "label": "LTHW Circuits", "meta": "6" },
+          { "id": "frost", "label": "Frost Protection", "meta": "inactive" } ] } ] } },
+
+    { "id": "vent", "label": "Vent.", "icon": "vent",
+      "tip": { "title": "Ventilation", "meta": "8 AHUs · 1 dirty filter", "state": "bad" },
+      "sub": { "title": "Ventilation", "groups": [
+        { "label": "Air handling", "items": [
+          { "id": "ahu", "label": "AHUs", "meta": "8" },
+          { "id": "filters", "label": "Filter Status", "meta": "dirty", "state": "warn" } ] },
+        { "label": "Life safety", "items": [
+          { "id": "smoke", "label": "Smoke Extract" },
+          { "id": "dampers", "label": "Fire Dampers", "meta": "fault", "state": "fault" } ] } ] } },
+
+    { "id": "power", "label": "Power", "icon": "power",
+      "tip": { "title": "Electrical", "meta": "1497.36 kW-hr today", "state": "run" },
+      "sub": { "title": "Power", "groups": [
+        { "label": "Distribution", "items": [
+          { "id": "db", "label": "Distribution Boards", "meta": "24" },
+          { "id": "ups", "label": "UPS" },
+          { "id": "gen", "label": "Standby Generator" } ] } ] } },
+
+    { "id": "lighting", "label": "Lighting", "icon": "lighting",
+      "tip": { "title": "Lighting control", "meta": "312 luminaires", "state": "ok" } },
+    { "id": "security", "label": "Security", "icon": "security",
+      "tip": { "title": "Access & security", "meta": "All zones armed", "state": "ok" } },
+    { "id": "energy", "label": "Energy", "icon": "energy",
+      "tip": { "title": "Energy & metering", "meta": "-11% vs last week", "state": "ok" } },
+    { "id": "analytics", "label": "Analytics", "icon": "analytics",
+      "tip": { "title": "Analytics & reports", "meta": "3 rules triggered", "state": "run" } }
+  ]
+}

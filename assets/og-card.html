@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+ *{box-sizing:border-box;margin:0}
+ body{width:1200px;height:630px;background:#0e1116;color:#fff;overflow:hidden;position:relative;
+   font-family:Inter,sans-serif;-webkit-font-smoothing:antialiased;display:flex;
+   flex-direction:column;justify-content:space-between;padding:68px 76px}
+ body::before{content:'';position:absolute;inset:0;
+   background:radial-gradient(760px 520px at 8% -12%,rgba(123,97,255,.30),transparent 62%),
+              radial-gradient(680px 480px at 100% 112%,rgba(0,184,217,.22),transparent 58%)}
+ .r{position:relative}
+ .brand{display:flex;align-items:center;gap:18px}
+ .brand b{font-size:27px;font-weight:600;letter-spacing:-.02em}
+ .brand span{display:block;font-size:13px;font-weight:500;letter-spacing:.11em;
+   text-transform:uppercase;color:#6f7b8d;margin-top:3px}
+ h1{font-size:64px;line-height:1.08;letter-spacing:-.028em;font-weight:700;max-width:19ch}
+ p{margin-top:24px;font-size:23px;line-height:1.5;color:#97a2b3;max-width:50ch}
+ .chips{display:flex;gap:11px;flex-wrap:wrap}
+ .chip{font-size:16px;font-weight:500;color:#97a2b3;background:rgba(255,255,255,.05);
+   border:1px solid rgba(255,255,255,.10);border-radius:999px;padding:9px 19px}
+ .mono{font-family:'JetBrains Mono',monospace;color:#9b85ff;font-size:17px}
+</style></head><body>
+<div class="r brand">
+  <svg width="52" height="52" viewBox="0 0 32 32" fill="none">
+    <rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,.42)" stroke-width="1.5"/>
+    <path d="M8 10h11a3.5 3.5 0 0 1 0 7H13a3.5 3.5 0 0 0 0 7h11" stroke="#9b85ff" stroke-width="2.4"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="8" cy="10" r="1.9" fill="#9b85ff"/><circle cx="24" cy="24" r="1.9" fill="#9b85ff"/></svg>
+  <b>Plantroom Labs<span>Niagara Framework engineering</span></b>
+</div>
+<div class="r">
+  <h1>Niagara work that still runs in three years.</h1>
+  <p>Custom modules, bajaux widgets, PX graphics, station engineering
+     and Niagara&nbsp;5 migration.</p>
+</div>
+<div class="r chips">
+  <span class="chip">Niagara 4.14 &amp; 4.15</span>
+  <span class="chip">Niagara 5 ready</span>
+  <span class="chip">bajaux</span>
+  <span class="chip">JACE-8000 · QNX/ARMv7</span>
+  <span class="chip">Signed modules</span>
+  <span class="chip mono">hello@plantroomlabs.com</span>
+</div>
+</body></html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Niagara Widget Demos — Interactive bajaux Dashboards</title>
+<meta name="description" content="Interactive demos of custom Niagara bajaux widgets running in your browser: AHU plant dashboard, building summary and navigation rail, driven by a simulated station with live ORD resolution and writable points.">
+<link rel="canonical" href="https://plantroomlabs.com/work/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Live Niagara Widget Demos — Interactive bajaux Dashboards">
+<meta property="og:description" content="Interactive demos of custom Niagara bajaux widgets running in your browser: AHU plant dashboard, building summary and navigation rail, driven by a simulated station with live ORD resolution and writable points.">
+<meta property="og:url" content="https://plantroomlabs.com/work/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Live Niagara Widget Demos — Interactive bajaux Dashboards">
+<meta name="twitter:description" content="Interactive demos of custom Niagara bajaux widgets running in your browser: AHU plant dashboard, building summary and navigation rail, driven by a simulated station with live ORD resolution and writable points.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "hello@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "hello@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "name": "Plant dashboard — AHU-01",
+   "applicationCategory": "BusinessApplication",
+   "applicationSubCategory": "Building automation dashboard widget",
+   "operatingSystem": "Web browser; Niagara 4 station (ux profile)",
+   "description": "Supply and return air temperature, fan power, zone CO₂, a fan-speed dial, a demand chart, a writable zone set point, plant commands and the alarm queue. Twelve tiles, each bound to its own station ORD — and the values are moving because a simulated station is pushing them. Move the set point and the plant responds.",
+   "url": "https://plantroomlabs.com/demos/ahu/",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "Interactive demonstration, free to use."
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "name": "Building summary",
+   "applicationCategory": "BusinessApplication",
+   "applicationSubCategory": "Building automation dashboard widget",
+   "operatingSystem": "Web browser; Niagara 4 station (ux profile)",
+   "description": "The same discipline at building level, light theme: KPI tiles for demand, chilled water and LTHW, plant monitoring, and an equipment table carrying fault and warning states. Toggle the theme — every component re-points from the token layer without one of them being touched.",
+   "url": "https://plantroomlabs.com/demos/building/",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "Interactive demonstration, free to use."
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "name": "Navigation rail",
+   "applicationCategory": "BusinessApplication",
+   "applicationSubCategory": "Building automation dashboard widget",
+   "operatingSystem": "Web browser; Niagara 4 station (ux profile)",
+   "description": "Site, building and floor navigation. Collapse it and it becomes an icon rail with flyout menus, so a tight PX viewport or a phone still gives the graphics the full width. Click through the sections.",
+   "url": "https://plantroomlabs.com/demos/nav/",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "Interactive demonstration, free to use."
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Work"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<path d="M8 10h11a3.5 3.5 0 0 1 0 7H13a3.5 3.5 0 0 0 0 7h11" stroke="var(--pl-accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="8" cy="10" r="1.9" fill="var(--pl-accent)"/><circle cx="24" cy="24" r="1.9" fill="var(--pl-accent)"/></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li><a href="/work/" aria-current="page">Work</a></li><li><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__links--overflow"><a href="/faq/">FAQ</a></li><li class="pl-nav__links--overflow"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li>Work</li></ol></nav>
+    <p class="pl-eyebrow">Work</p>
+    <h1>Live demos, running in your browser</h1>
+    <p class="pl-lede">These are not screenshots and not videos. Each demo below is the
+       <strong>actual widget source</strong> that would run on a station, loaded by a minimal
+       AMD loader, talking to a <strong>simulated station</strong> that resolves ORDs and pushes
+       changing values. Interact with them.</p>
+    <ul class="pl-chips">
+      <li class="pl-chip pl-chip--on-dark">Unmodified widget source</li>
+      <li class="pl-chip pl-chip--on-dark">Simulated ORD resolution</li>
+      <li class="pl-chip pl-chip--on-dark">Live subscriptions</li>
+      <li class="pl-chip pl-chip--on-dark">Writable points</li>
+    </ul>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-note" style="margin-bottom:var(--pl-s-11)">
+      <p><b>What is real and what is not.</b> The widget code, the config files, the ORD strings
+         and the rendering are exactly what a station would run. The <em>station</em> is a
+         simulator: point values are generated by a small physical model in your browser rather
+         than read from real plant, because publishing a live connection to somebody's building
+         would be a poor idea. Nothing here is a client site.</p>
+    </div>
+    
+<article class="pl-demo" id="demo-ahu">
+  <div class="pl-demo__head">
+    <div>
+      <h3>Plant dashboard — AHU-01</h3>
+      <p>Supply and return air temperature, fan power, zone CO₂, a fan-speed dial, a demand chart, a writable zone set point, plant commands and the alarm queue. Twelve tiles, each bound to its own station ORD — and the values are moving because a simulated station is pushing them. Move the set point and the plant responds.</p>
+    </div>
+    <div class="pl-demo__controls">
+      <span class="pl-chip pl-chip--ok" data-demo-status="ahu">
+        <span class="pl-demo__pulse"></span>Simulated station &middot; live</span>
+      <button class="pl-btn pl-btn--ghost" type="button" data-demo-theme="ahu">Toggle theme</button>
+      <a class="pl-btn pl-btn--ghost" href="/demos/ahu/" target="_blank" rel="noopener">Open full screen</a>
+    </div>
+  </div>
+  <div class="pl-demo__frame" style="--demo-h:820px">
+    <iframe src="/demos/ahu/" title="Plant dashboard — AHU-01 — interactive demo"
+            loading="lazy" sandbox="allow-scripts" data-demo-frame="ahu"></iframe>
+    <noscript>
+      <img src="/img/01-desktop-expanded.png" alt="Plant dashboard — AHU-01 — screenshot of the interactive demo">
+    </noscript>
+  </div>
+</article>
+<article class="pl-demo" id="demo-building">
+  <div class="pl-demo__head">
+    <div>
+      <h3>Building summary</h3>
+      <p>The same discipline at building level, light theme: KPI tiles for demand, chilled water and LTHW, plant monitoring, and an equipment table carrying fault and warning states. Toggle the theme — every component re-points from the token layer without one of them being touched.</p>
+    </div>
+    <div class="pl-demo__controls">
+      <span class="pl-chip pl-chip--ok" data-demo-status="building">
+        <span class="pl-demo__pulse"></span>Simulated station &middot; live</span>
+      <button class="pl-btn pl-btn--ghost" type="button" data-demo-theme="building">Toggle theme</button>
+      <a class="pl-btn pl-btn--ghost" href="/demos/building/" target="_blank" rel="noopener">Open full screen</a>
+    </div>
+  </div>
+  <div class="pl-demo__frame" style="--demo-h:760px">
+    <iframe src="/demos/building/" title="Building summary — interactive demo"
+            loading="lazy" sandbox="allow-scripts" data-demo-frame="building"></iframe>
+    <noscript>
+      <img src="/img/rgx-01-level1.png" alt="Building summary — screenshot of the interactive demo">
+    </noscript>
+  </div>
+</article>
+<article class="pl-demo" id="demo-nav">
+  <div class="pl-demo__head">
+    <div>
+      <h3>Navigation rail</h3>
+      <p>Site, building and floor navigation. Collapse it and it becomes an icon rail with flyout menus, so a tight PX viewport or a phone still gives the graphics the full width. Click through the sections.</p>
+    </div>
+    <div class="pl-demo__controls">
+      <span class="pl-chip pl-chip--ok" data-demo-status="nav">
+        <span class="pl-demo__pulse"></span>Simulated station &middot; live</span>
+      <button class="pl-btn pl-btn--ghost" type="button" data-demo-theme="nav">Toggle theme</button>
+      <a class="pl-btn pl-btn--ghost" href="/demos/nav/" target="_blank" rel="noopener">Open full screen</a>
+    </div>
+  </div>
+  <div class="pl-demo__frame" style="--demo-h:600px">
+    <iframe src="/demos/nav/" title="Navigation rail — interactive demo"
+            loading="lazy" sandbox="allow-scripts" data-demo-frame="nav"></iframe>
+    <noscript>
+      <img src="/img/02-collapsed-rail-flyout.png" alt="Navigation rail — screenshot of the interactive demo">
+    </noscript>
+  </div>
+</article>
+  </div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Under the hood</p>
+      <h2>How the demos work</h2>
+      <p class="pl-sub">Worth a paragraph, because the mechanism is the point: if the widget
+         needed rewriting to run here, running here would prove nothing.</p>
+    </div>
+    <div class="pl-grid pl-grid--3">
+      <div class="pl-card"><h3>The same source</h3>
+        <p>Niagara's HTML5 profile serves a PX view by creating a DOM element per
+           <code>WebWidget</code> and handing it to the AMD module named by the widget's
+           <code>js</code> ORD. The demo does exactly that, with the widget's
+           <code>rc/*.js</code> and <code>rc/*.css</code> untouched.</p></div>
+      <div class="pl-card"><h3>A simulated station</h3>
+        <p>A stand-in for <code>baja</code> resolves <code>station:|slot:/…</code> ORDs against
+           an in-browser model of an air handling unit — supply and return temperature, fan
+           speed, valve position, zone CO&#8322; — integrated on a tick, so values move the way
+           plant moves rather than jittering randomly.</p></div>
+      <div class="pl-card"><h3>Real subscriptions</h3>
+        <p>The simulator implements the subscriber contract the widgets use, so a changing point
+           pushes into the widget through the same path a station would use. Writes work too:
+           move a set point and the model responds.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Stills</p>
+      <h2>The same widgets, captured</h2>
+      <p class="pl-sub">For anyone who would rather not run JavaScript, and for print.</p>
+    </div>
+    <div class="pl-grid pl-grid--2">
+      <figure class="pl-figure">
+        <img src="/img/rgx-02-commissioning.png" loading="lazy" width="1600" height="1000"
+             alt="Building summary dashboard in a dark theme with a floor selector open on the left and full ORD paths displayed beneath each KPI tile.">
+        <figcaption><b>Commissioning mode.</b> Full ORD paths surfaced under each tile, so the
+          engineer commissioning the job can see exactly what each value is bound to.</figcaption>
+      </figure>
+      <figure class="pl-figure">
+        <img src="/img/rgx-03-tooltip.png" loading="lazy" width="1600" height="1000"
+             alt="Building summary dashboard with an information callout tooltip open over a KPI tile.">
+        <figcaption><b>Callouts.</b> Contextual detail without leaving the view.</figcaption>
+      </figure>
+      <figure class="pl-figure pl-figure--phone">
+        <img src="/img/03-iphone.png" loading="lazy" width="1000" height="1780"
+             alt="The AHU dashboard rendered on a phone, with cards stacked vertically and navigation collapsed to an icon rail.">
+        <figcaption><b>Same widgets, phone.</b> One responsive component set rather than a
+          separate mobile view to maintain.</figcaption>
+      </figure>
+      <figure class="pl-figure">
+        <img src="/img/01-desktop-expanded.png" loading="lazy" width="1440" height="1024"
+             alt="Dark-themed Niagara AHU dashboard showing supply and return air temperature, fan power, zone CO2, a fan-speed dial, a 12-hour demand chart, a set point slider, plant command toggles and an active alarm list.">
+        <figcaption><b>Plant dashboard.</b> The desktop view at full width.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:hello@plantroomlabs.com">hello@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<path d="M8 10h11a3.5 3.5 0 0 1 0 7H13a3.5 3.5 0 0 0 0 7h11" stroke="var(--pl-dark-accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="8" cy="10" r="1.9" fill="var(--pl-dark-accent)"/><circle cx="24" cy="24" r="1.9" fill="var(--pl-dark-accent)"/></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:hello@plantroomlabs.com">hello@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>More</h4>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>
