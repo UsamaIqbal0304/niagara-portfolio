@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custom Niagara Modules &amp; bajaux Widgets — Niagara 4 &amp; Niagara 5</title>
+<meta name="description" content="Bespoke Niagara Framework module development: bajaux widgets, PX graphics, drivers and Workbench tooling for Niagara 4, and Java 21 porting for Niagara 5.">
+<!-- Remove this line once the real contact address is in the footer, so the page can be indexed. -->
+<meta name="robots" content="noindex">
+<style>
+  :root{
+    --bg:#0b0d10; --panel:#14171c; --panel-2:#1a1e25; --line:#252b34;
+    --fg:#e8eaee; --muted:#9aa3b0; --dim:#6c7684;
+    --accent:#3b82f6; --ok:#22c55e; --warn:#f59e0b;
+    --max:1080px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.87em;
+       background:var(--panel-2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; color:#cbd5e1}
+
+  header{border-bottom:1px solid var(--line); padding:56px 0 44px; background:
+    radial-gradient(1200px 400px at 20% -10%, rgba(59,130,246,.10), transparent 60%)}
+  .eyebrow{color:var(--accent); font-size:13px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; margin:0 0 14px}
+  h1{margin:0 0 18px; font-size:clamp(28px,4.4vw,44px); line-height:1.15; letter-spacing:-.02em; font-weight:700}
+  .lede{margin:0; font-size:clamp(17px,2vw,19px); color:var(--muted); max-width:68ch}
+  .lede strong{color:var(--fg); font-weight:600}
+
+  .badges{display:flex; flex-wrap:wrap; gap:8px; margin:26px 0 0; padding:0; list-style:none}
+  .badges li{font-size:13px; color:var(--muted); background:var(--panel);
+    border:1px solid var(--line); border-radius:999px; padding:6px 13px}
+
+  section{padding:56px 0; border-bottom:1px solid var(--line)}
+  h2{font-size:22px; margin:0 0 8px; letter-spacing:-.01em}
+  .sub{color:var(--dim); margin:0 0 30px; font-size:15px}
+
+  figure{margin:0 0 40px}
+  figure img{width:100%; height:auto; display:block; border:1px solid var(--line);
+    border-radius:10px; background:var(--panel)}
+  figcaption{margin-top:12px; color:var(--muted); font-size:14.5px; max-width:72ch}
+  figcaption b{color:var(--fg); font-weight:600}
+  .pair{display:grid; grid-template-columns:1fr 1fr; gap:24px}
+  .pair figure{margin-bottom:0}
+  .phone img{max-width:300px; margin:0 auto}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); gap:18px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:20px}
+  .card h3{margin:0 0 8px; font-size:15.5px}
+  .card p{margin:0; color:var(--muted); font-size:14.5px}
+
+  .note{background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--accent);
+    border-radius:0 8px 8px 0; padding:18px 20px; color:var(--muted); font-size:15px}
+  .note b{color:var(--fg)}
+
+  table{width:100%; border-collapse:collapse; font-size:15px}
+  th,td{text-align:left; padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{color:var(--dim); font-weight:600; font-size:13px; letter-spacing:.06em; text-transform:uppercase}
+  td:first-child{color:var(--fg); white-space:nowrap; padding-right:22px}
+  td{color:var(--muted)}
+
+  footer{padding:48px 0 64px; color:var(--dim); font-size:14px}
+  footer .contact{font-size:17px; color:var(--fg); margin:0 0 10px}
+
+  @media(max-width:720px){ .pair{grid-template-columns:1fr} section{padding:40px 0} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Niagara Framework development</p>
+    <h1>Custom Niagara modules, built to your spec.</h1>
+    <p class="lede">
+      bajaux widgets, PX graphics, drivers and Workbench tooling for <strong>Niagara 4</strong> —
+      and Java&nbsp;21 porting for <strong>Niagara&nbsp;5</strong>. Pure Java and JS, so it runs on
+      JACE hardware as readily as on a Supervisor. Fixed price per deliverable.
+    </p>
+    <ul class="badges">
+      <li>Niagara 4.14 &amp; 4.15</li>
+      <li>bajaux / BajaScript</li>
+      <li>JACE-8000 (QNX / ARMv7)</li>
+      <li>Signed modules</li>
+      <li>Niagara 5 ready</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Work</h2>
+    <p class="sub">
+      Two widget sets, running in a Niagara station. Screens are from a demonstration
+      station, not a client site.
+    </p>
+
+    <figure>
+      <img src="img/01-desktop-expanded.png" alt="Dark-themed Niagara dashboard showing an air handling unit: supply and return air temperature, fan power, zone CO2, a fan-speed dial, a 12-hour electrical demand chart, zone set point slider, plant command toggles and an active alarm list.">
+      <figcaption>
+        <b>Plant dashboard — AHU-01.</b> Live point values, writable set points, command
+        toggles and the alarm queue on one view. Every tile is bound to a real station ORD
+        (<code>station:|slot:/Drivers/BacnetNetwork/AHU1/points/…</code>) and the charts are
+        driven by BQL history rollups — not static artwork.
+      </figcaption>
+    </figure>
+
+    <div class="pair">
+      <figure>
+        <img src="img/rgx-01-level1.png" alt="Light-themed building summary dashboard with KPI tiles for total demand, chilled water, LTHW flow and open faults, a plant monitoring panel, an equipment status table and callout tooltips.">
+        <figcaption>
+          <b>Building summary, light theme.</b> KPI tiles, plant status, an equipment table
+          with fault and warning states, and callouts. The same components themed for a
+          client's brand.
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="img/rgx-02-commissioning.png" alt="The same building summary dashboard in a dark theme, with a floor selector open on the left and full ORD paths displayed beneath each KPI tile.">
+        <figcaption>
+          <b>Commissioning mode.</b> The same view, dark, with the floor selector open and
+          full ORD paths surfaced under each tile — so the engineer commissioning it can see
+          exactly what each value is bound to.
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="pair" style="margin-top:40px; align-items:start">
+      <figure class="phone">
+        <img src="img/03-iphone.png" alt="The same AHU dashboard rendered on a phone, with cards stacked vertically and the navigation collapsed to an icon rail.">
+        <figcaption>
+          <b>Same widgets, phone.</b> One responsive component set rather than a separate
+          mobile view to maintain.
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="img/02-collapsed-rail-flyout.png" alt="The dashboard with the navigation sidebar collapsed to a narrow icon rail and a flyout menu open.">
+        <figcaption>
+          <b>Collapsed navigation.</b> The sidebar collapses to an icon rail with flyout
+          menus, giving the graphics the full width on a small screen or a tight PX view.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What we build</h2>
+    <p class="sub">Fixed price per deliverable, quoted against a written spec.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>bajaux widgets &amp; PX graphics</h3>
+        <p>Dashboards, navigation and equipment views themed to your brand and bound to
+           your points. Responsive, so one set covers desktop, tablet and phone.</p>
+      </div>
+      <div class="card">
+        <h3>Custom modules &amp; drivers</h3>
+        <p>Bespoke <code>rt</code>, <code>wb</code> and <code>ux</code> modules against the
+           Baja API — services, drivers and integrations to systems that have no stock
+           Niagara support.</p>
+      </div>
+      <div class="card">
+        <h3>Workbench tooling</h3>
+        <p>Bulk point renaming, station audits, provisioning and migration helpers — the
+           repetitive engineering that eats project hours.</p>
+      </div>
+      <div class="card">
+        <h3>Niagara 5 porting</h3>
+        <p>Java 8 → 21 refactor, re-signing, dependency audit and a regression pass on an
+           existing module, plus a readiness statement you can publish.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Niagara 5 readiness</h2>
+    <p class="sub">Because integrators have started asking, and silence reads badly.</p>
+    <table>
+      <tr><th>Item</th><th>Position</th></tr>
+      <tr><td>Java 21</td><td>New work is written to compile clean under Java 21. Nothing depends on
+        <code>SecurityManager</code>, which N5 removes.</td></tr>
+      <tr><td>Signing</td><td>Modules are signed. N5 makes a valid signature mandatory with no grace
+        period, so unsigned and abandoned modules will simply not load.</td></tr>
+      <tr><td>Native code</td><td>None. Pure Java plus JS/CSS resources, so a module runs on QNX/ARM
+        JACE hardware and on x86 Supervisors without a separate build.</td></tr>
+      <tr><td>Version stamping</td><td>Modules are stamped to the oldest Niagara version they must
+        support, so one build installs across a mixed estate rather than forcing an upgrade.</td></tr>
+      <tr><td>N4 today</td><td>Current work targets 4.14 and 4.15 and keeps running there. N4 reaches
+        end of life in 2028; there is no need to move everything at once.</td></tr>
+    </table>
+    <p class="note" style="margin-top:26px">
+      <b>On the JACE 9000 migration.</b> Niagara 5 does not run on JACE-8000 hardware at all,
+      so migration is a controller swap at every node rather than a software update — and
+      every third-party module on those stations has to be recompiled and re-signed before it
+      will load. If you are scoping that work across an estate, an audit of which modules
+      actually survive the move is a sensible first step, and a short one.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>How we work</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Written spec first</h3>
+        <p>Scope, target Niagara version and target hardware agreed in writing before a price.
+           No hourly billing.</p>
+      </div>
+      <div class="card">
+        <h3>Your station, your points</h3>
+        <p>Built against your actual point naming and tagging, so it does not need rework
+           on handover.</p>
+      </div>
+      <div class="card">
+        <h3>Patch compatibility</h3>
+        <p>A stated commitment against Niagara point releases. A module that quietly breaks
+           on a security update is not finished work.</p>
+      </div>
+      <div class="card">
+        <h3>Source on request</h3>
+        <p>Bespoke work can be delivered with source, so you are not dependent on us to
+           keep it alive.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="contact"><b>Get in touch</b> — <a href="mailto:REPLACE@EXAMPLE.COM">REPLACE@EXAMPLE.COM</a></p>
+    <p>Tell us the Niagara version, the target hardware and what the module has to do, and
+       you will get a fixed price.</p>
+    <p style="margin-top:22px; color:#4b5563">
+      Niagara, Niagara Framework, JACE and Tridium are trademarks of Tridium, Inc.
+      This is an independent development practice and is not affiliated with or endorsed by Tridium.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
