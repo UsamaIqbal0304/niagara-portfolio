@@ -73,6 +73,45 @@ instructions list five. Use what the console shows you, not a remembered set.
 
 ## 3 — The website, on GitHub Pages
 
+Squarespace's DNS page shows a banner: *"This domain is managed by Google
+Workspace. Any changes to the settings could impact its functionality."*
+
+**Proceed anyway.** It is a blanket caution shown on every Workspace-linked
+domain, not a lock, and the records it is protecting are not the ones being
+changed here. Mail and web live in different record *types* and cannot affect
+each other:
+
+| Record type | What it controls | Touch it? |
+|---|---|---|
+| `MX` → `smtp.google.com` | where mail is delivered | **no** |
+| `TXT` → `v=spf1 include:_spf.google.com ~all` | which servers may send as you | **no** |
+| `TXT` at `google._domainkey` | DKIM signing key | **no** |
+| `A` at `@` | which server answers the website | **yes — replace** |
+| `CNAME` at `www` | same, for the www host | **yes — replace** |
+
+Deleting an `A` record cannot break Gmail; resolvers ask for `MX` when routing
+mail and never look at `A`. The four `198.x` addresses currently at the apex
+are Squarespace's parking page ("Coming Soon"), which came with the domain.
+They are not Google's and nothing depends on them.
+
+Confirmed present and correct as of 2026-09-22 — leave all three alone:
+
+```sh
+dig +short plantroomlabs.com MX                      # 1 smtp.google.com.
+dig +short plantroomlabs.com TXT                     # v=spf1 include:_spf.google.com ~all
+dig +short google._domainkey.plantroomlabs.com TXT   # v=DKIM1; k=rsa; p=...
+```
+
+(The zone is Google Cloud DNS behind Squarespace-branded nameservers — the
+`SOA` hostmaster is `cloud-dns-hostmaster.google.com`. Squarespace's panel is
+still the place to edit it.)
+
+If the parking `A` records are not listed as editable rows, they are
+Squarespace's implicit default rather than real records: adding the four
+GitHub `A` records below is enough, and the default stops being served.
+
+### The records to set
+
 | Type | Name | Value |
 |---|---|---|
 | A | *(empty / `@`)* | 185.199.108.153 |
