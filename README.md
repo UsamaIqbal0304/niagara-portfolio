@@ -34,6 +34,7 @@ python3 -m http.server 8098 -d .
 | `assets/demo/demo-runtime.js` | minimal AMD + bajaux shim so a real widget runs unmodified |
 | `assets/demo/<module>/` | widget source copied verbatim from `~/niagara/ux/nmodule/<module>/rc` |
 | `img/` | still captures from the preview harness in `~/niagara/ux` |
+| `brand/` | the logo kit — its own README; the site copies the badge and favicons out of it, so change geometry there, never in `build.py` |
 
 Twelve indexed pages: `/`, `/services/` + six service pages, `/work/`,
 `/faq/`, `/about/`, `/contact/`.
