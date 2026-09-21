@@ -28,7 +28,9 @@ ORIGIN = SITE + BASE
 
 BRAND      = "Plantroom Labs"
 TAGLINE    = "Niagara Framework engineering"
-EMAIL      = "hello@plantroomlabs.com"
+# The one published address. A Workspace alias on the admin mailbox rather
+# than its own seat, so it costs nothing; the seat is what gets billed.
+EMAIL      = "info@plantroomlabs.com"
 TODAY      = date.today().isoformat()
 OUT        = os.path.dirname(os.path.abspath(__file__))
 

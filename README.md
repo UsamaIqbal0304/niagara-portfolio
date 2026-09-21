@@ -68,9 +68,11 @@ DNS at the registrar must be:
 Then in the repo's Settings → Pages: custom domain `plantroomlabs.com`, and
 tick **Enforce HTTPS** once the certificate has been issued.
 
-**`EMAIL = "hello@plantroomlabs.com"` is published on every page and in the
-JSON-LD.** That mailbox has to exist before the site is promoted anywhere —
-a contact address that bounces is worse than none.
+**`EMAIL = "info@plantroomlabs.com"` is published on every page and in the
+JSON-LD.** It is an alias on the `admin@` Workspace mailbox, not a seat of
+its own — Workspace bills per seat and gives aliases away, so a second
+address costs nothing. Whatever it points at has to be receiving before the
+site is promoted anywhere: a contact address that bounces is worse than none.
 
 ## The live demos
 
