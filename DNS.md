@@ -4,17 +4,25 @@ Everything that has to exist in the domain's DNS zone, in one place. Add these
 at the **registrar** — the company that sold the domain — not in this repo.
 Nothing here can be done from the repo; GitHub only serves the files.
 
-Status when this was written (2026-09-21): the `.com` registry returns
-`No match for domain "PLANTROOMLABS.COM"`. The domain is not registered, so
-there is no DNS zone yet and none of the below can be entered anywhere.
-Check that first:
+Status, re-checked 2026-09-22: **the domain is registered and live.** It
+answers on Squarespace nameservers (`nse1`–`nse4.squarespacedns.com`) and
+currently serves Squarespace's "Coming Soon" parking page from
+`198.49.23.144/145` and `198.185.159.144/145`.
+
+So the DNS panel to use is **Squarespace's**, reached through the Google
+Workspace / Google Domains account that sold the domain — Squarespace bought
+Google Domains in 2023 and inherited the zone. Every record below goes there.
+
+An earlier note in this file said the domain was unregistered, based on a
+Verisign whois that returned `No match`. That was the registration not having
+propagated to the registry's whois yet; it was wrong within the hour. Re-check
+with a resolver rather than whois:
 
 ```sh
-exec 3<>/dev/tcp/whois.verisign-grs.com/43 && printf 'domain plantroomlabs.com\r\n' >&3 && head -3 <&3
+dig +short plantroomlabs.com NS A
 ```
 
-`No match` means not registered. A block of registrar/creation-date lines
-means it exists and the panel is ready.
+Nameservers plus addresses means the zone exists and the panel is ready.
 
 ## 1 — Google Workspace domain verification
 
@@ -50,6 +58,11 @@ instructions list five. Use what the console shows you, not a remembered set.
 
 `www` is the literal word, not `www.plantroomlabs.com` — the form appends the
 domain itself.
+
+**Delete Squarespace's own A records first.** The zone currently points the
+apex at `198.49.23.144/145` and `198.185.159.144/145`, which is the parking
+page. Left in place alongside the four GitHub addresses, the domain answers
+from whichever of the eight a visitor happens to hit.
 
 Then in the repo: Settings → Pages → custom domain `plantroomlabs.com`, and
 tick **Enforce HTTPS** once the certificate has been issued (it can take an
