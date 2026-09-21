@@ -24,6 +24,31 @@ dig +short plantroomlabs.com NS A
 
 Nameservers plus addresses means the zone exists and the panel is ready.
 
+## 0 — ICANN registrant verification (do this first, it has a deadline)
+
+Separate from, and prior to, everything below. Squarespace emails a "verify
+your contact information or the domain will be suspended" notice on every new
+`.com` registration; it is ICANN's Registrar Accreditation Agreement, clause
+3.7.7.2, not a Squarespace upsell and not phishing. Click the link in the
+email, or verify from the domain's panel.
+
+The window is **15 days from registration**. RDAP puts creation at
+2026-09-21T19:17:15Z, so the deadline is around **2026-10-06**. Missing it
+suspends the domain: the site stops resolving and mail stops being delivered.
+
+Domain-verification phishing is common and looks exactly like the real thing,
+so confirm the current state from the registrar rather than from an email. The
+registry's own view:
+
+```sh
+curl -s -H 'Accept: application/rdap+json' \
+  https://rdap.verisign.com/com/v1/domain/plantroomlabs.com | python3 -m json.tool | grep -A6 status
+```
+
+A `client hold` or `server hold` in `status` means it has already been
+suspended. As of 2026-09-22 the status is `client delete prohibited` and
+`client transfer prohibited` — both normal registrar locks, nothing wrong.
+
 ## 1 — Google Workspace domain verification
 
 One TXT record. Google also offers a CNAME as an alternative; do **not** add
