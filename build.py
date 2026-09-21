@@ -44,16 +44,29 @@ def e(s):
     return html.escape(s, quote=False)
 
 # -------------------------------------------------------------------- mark
-# A serpentine heat-exchanger coil inside a rounded frame. It reads as HVAC to
-# the people this site is for, and as a monogram to everyone else.
+# A plumbed heat-exchanger coil inside a rounded frame: inlet stub low-left,
+# two 180-degree bends through the bank, outlet stub high-right. It reads as
+# HVAC to the people this site is for and as a mark to everyone else. The
+# stubs are what stop it resolving into a letter — closed, the same figure
+# reads as a "2" or an "N" depending on the turn count.
+#
+# The geometry is generated from brand/ by ~/niagara-site/brand/mklogo.py.
+# Change it there, not here, then copy the path across; the brand files are
+# the ones that go out to third parties.
+COIL_D  = "M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5"
+COIL_A  = (5, 22)
+COIL_B  = (27, 10)
 
 def mark(size=30, fg="var(--pl-accent)", frame="var(--gx-run-soft)"):
+    # Scaled to 0.86 about the centre so the stub ends clear the frame stroke.
     return f'''<svg class="pl-brand__mark" width="{size}" height="{size}" viewBox="0 0 32 32" \
 fill="none" aria-hidden="true" focusable="false">
 <rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="{frame}" stroke-width="1.5"/>
-<path d="M8 10h11a3.5 3.5 0 0 1 0 7H13a3.5 3.5 0 0 0 0 7h11" stroke="{fg}" stroke-width="2.4" \
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="{COIL_D}" stroke="{fg}" stroke-width="3.4" \
 stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="8" cy="10" r="1.9" fill="{fg}"/><circle cx="24" cy="24" r="1.9" fill="{fg}"/></svg>'''
+<circle cx="{COIL_A[0]}" cy="{COIL_A[1]}" r="2.2" fill="{fg}"/>\
+<circle cx="{COIL_B[0]}" cy="{COIL_B[1]}" r="2.2" fill="{fg}"/></g></svg>'''
 
 ICONS = {
   "module":  '<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/>',
@@ -211,6 +224,8 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
 <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
 <link rel="icon" href="{href('assets/mark.svg')}" type="image/svg+xml">
+<link rel="icon" href="{href('assets/favicon.ico')}" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="{href('assets/apple-touch-icon.png')}">
 <link rel="alternate" type="text/plain" href="{href('llms.txt')}" title="llms.txt — site summary for language models">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1661,15 +1676,21 @@ unaffiliated.
 
 
 def build_mark():
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-<rect width="32" height="32" rx="8" fill="#0e1116"/>
-<path d="M8 10h11a3.5 3.5 0 0 1 0 7H13a3.5 3.5 0 0 0 0 7h11" stroke="#9b85ff" stroke-width="2.4"
-      fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="8" cy="10" r="1.9" fill="#9b85ff"/><circle cx="24" cy="24" r="1.9" fill="#9b85ff"/>
-</svg>
-'''
-    os.makedirs(os.path.join(OUT, "assets"), exist_ok=True)
-    open(os.path.join(OUT, "assets", "mark.svg"), "w").write(svg)
+    """assets/mark.svg plus the favicon set, copied out of brand/.
+
+    brand/ is the master: those files are what a client or a directory gets
+    sent. The site just consumes them, so the two can never drift.
+    """
+    assets = os.path.join(OUT, "assets")
+    os.makedirs(assets, exist_ok=True)
+    brand = os.path.join(OUT, "brand")
+    for src, dst in (("badge-dark.svg",            "mark.svg"),
+                     ("badge-dark-small.svg",      "mark-small.svg"),
+                     ("png/favicon.ico",           "favicon.ico"),
+                     ("png/apple-touch-icon.png",  "apple-touch-icon.png"),
+                     ("png/icon-192.png",          "icon-192.png"),
+                     ("png/icon-512.png",          "icon-512.png")):
+        shutil.copyfile(os.path.join(brand, src), os.path.join(assets, dst))
 
 
 def build_og_card():
@@ -1698,11 +1719,7 @@ def build_og_card():
  .mono{{font-family:'JetBrains Mono',monospace;color:#9b85ff;font-size:17px}}
 </style></head><body>
 <div class="r brand">
-  <svg width="52" height="52" viewBox="0 0 32 32" fill="none">
-    <rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,.42)" stroke-width="1.5"/>
-    <path d="M8 10h11a3.5 3.5 0 0 1 0 7H13a3.5 3.5 0 0 0 0 7h11" stroke="#9b85ff" stroke-width="2.4"
-          stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="8" cy="10" r="1.9" fill="#9b85ff"/><circle cx="24" cy="24" r="1.9" fill="#9b85ff"/></svg>
+  {mark(52, "#9b85ff", "rgba(155,133,255,.42)")}
   <b>{BRAND}<span>{TAGLINE}</span></b>
 </div>
 <div class="r">
