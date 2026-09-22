@@ -102,6 +102,18 @@ Systems integrators and controls contractors who need a module or a widget set t
 **Are you affiliated with Tridium?**
 No. This is an independent development practice. Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium, Inc., used here only to describe what the work is compatible with.
 
+## Notes (technical knowledge base)
+
+Long-form answers to narrow Niagara questions, written from the framework itself rather
+than from memory, and free to quote. Index at https://plantroomlabs.com/notes/.
+
+- [Which Niagara version to stamp a module for](https://plantroomlabs.com/notes/niagara-module-version-stamping/): A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.
+- [What a station checks before loading a module](https://plantroomlabs.com/notes/niagara-module-signing/): Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.
+- [Pure Java, or it will not run on a JACE](https://plantroomlabs.com/notes/what-runs-on-a-jace/): A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.
+- [Renaming and tagging points in bulk](https://plantroomlabs.com/notes/bulk-point-renaming-and-tagging/): Point names arrive from the field device and there is no standard. What to use to select, rename and tag in bulk — and what a rename quietly breaks.
+- [Getting data out of a Niagara station](https://plantroomlabs.com/notes/getting-data-out-of-a-niagara-station/): REST, MQTT, a relational history database, file export or an HTTP client. Which suits which consumer, and what each one costs you to run.
+- [Scheduled station backups, and the gap](https://plantroomlabs.com/notes/scheduled-niagara-station-backups/): A Supervisor can back up every station in its Niagara Network on a schedule. The station it does not cover that way is its own.
+
 ## Honest limits
 
 - No client case studies, logos or deployment counts are published, because there are
@@ -119,3 +131,4 @@ No. This is an independent development practice. Niagara, Niagara Framework, JAC
 - [FAQ](https://plantroomlabs.com/faq/): signing modes, JACE support, source code, pricing, Niagara 5.
 - [About](https://plantroomlabs.com/about/): why the practice exists, capability table, what is not claimed.
 - [Contact](https://plantroomlabs.com/contact/): what to include in a first email.
+- [Notes](https://plantroomlabs.com/notes/): technical knowledge base, one page per question.

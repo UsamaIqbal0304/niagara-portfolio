@@ -108,6 +108,16 @@ for rel, src in docs:
     for img in re.findall(r"<img\b[^>]*>", src):
         check("alt=" in img, f"{rel}: <img> without alt: {img[:60]}")
 
+# Every nav item carries the viewport width it is hidden below, and the rule
+# that hides it lives in the stylesheet. A threshold set in build.py with no
+# matching media query is a link that never drops and pushes the bar off the
+# right edge — invisible until someone opens the site on a phone.
+css = open(os.path.join(ROOT, "assets", "css", "plantroom.css"), encoding="utf-8").read()
+styled = set(re.findall(r"\.pl-nav__item--drop-(\d+)", css))
+for rel, src_html in docs:
+    for w in set(re.findall(r"pl-nav__item--drop-(\d+)", src_html)):
+        check(w in styled, f"{rel}: nav drop width {w} has no CSS rule")
+
 # The sitemap has to list exactly the indexable pages: a page missing from it
 # is a page nobody crawls, and a noindex page in it is a contradiction.
 sitemap = open(os.path.join(ROOT, "sitemap.xml"), encoding="utf-8").read()

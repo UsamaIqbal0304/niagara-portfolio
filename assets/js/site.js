@@ -2,9 +2,10 @@
  * site.js — the only script on the marketing pages.
  *
  * Three jobs: relay a theme toggle into each demo iframe, reflect what the
- * demo reports back into its status chip, and track the section tab bar on
- * the landing page. Everything else on the site works with JavaScript off,
- * and the tab bar degrades to plain anchor links that still jump correctly.
+ * demo reports back into its status chip, and track which section the landing
+ * page is scrolled to so the header can mark it. Everything else on the site
+ * works with JavaScript off, and the header degrades to plain anchor links
+ * that still jump to the right place.
  */
 (function () {
   'use strict';
@@ -38,20 +39,21 @@
     }
   });
 
-  // ---------------------------------------------------------------- tabs
-  // The section bar on the landing page. Marks the section you are in and
-  // slides the ink bar to it.
+  // ------------------------------------------------------------ section spy
+  // On the landing page the header is also the section bar: its links point
+  // at sections, and this marks the one you are in and slides the ink bar to
+  // it. One row, not two.
   //
   // Deliberately not IntersectionObserver: these sections are taller than
   // the viewport, so more than one is intersecting most of the time and
   // "which am I in" still has to be decided by position. Reading scroll
   // position directly answers it once, and is cheap enough inside rAF.
-  (function tabs() {
-    var bar = document.querySelector('.pl-tabs');
+  (function sectionSpy() {
+    var bar = document.querySelector('.pl-nav--tabs');
     if (!bar) { return; }
 
-    var ink = bar.querySelector('.pl-tabs__ink'),
-        list = bar.querySelector('.pl-tabs__list'),
+    var ink = bar.querySelector('.pl-nav__ink'),
+        list = bar.querySelector('.pl-nav__links'),
         links = [].slice.call(bar.querySelectorAll('[data-tab]')),
         current = null,
         queued = false;
@@ -60,12 +62,13 @@
       return { link: a, el: document.getElementById(a.getAttribute('data-tab')) };
     }).filter(function (t) { return t.el; });
 
-    if (!targets.length) { return; }
+    if (!ink || !targets.length) { return; }
 
     function moveInk(a) {
+      // A link dropped at this width has no box to point at, so leave the
+      // ink where it is rather than collapsing it onto the left edge.
+      if (!a.offsetParent) { ink.classList.remove('is-on'); return; }
       ink.style.width = a.offsetWidth + 'px';
-      // offsetLeft is inside the scrolling list, so subtract how far it has
-      // scrolled or the ink drifts once the bar itself scrolls on a phone.
       ink.style.transform = 'translateX(' + (a.offsetLeft - list.scrollLeft) + 'px)';
       ink.classList.add('is-on');
     }
@@ -76,26 +79,16 @@
       current = t;
       t.link.setAttribute('aria-current', 'true');
       moveInk(t.link);
-
-      // Keep the active tab in view when the bar is narrower than its
-      // contents, which is the normal case on a phone.
-      if (list.scrollWidth > list.clientWidth) {
-        var l = t.link.offsetLeft, r = l + t.link.offsetWidth;
-        if (l < list.scrollLeft) { list.scrollLeft = l - 12; }
-        else if (r > list.scrollLeft + list.clientWidth) {
-          list.scrollLeft = r - list.clientWidth + 12;
-        }
-      }
     }
 
     function update() {
       queued = false;
       // A section becomes current once its top passes a line set a little
-      // below the sticky bars, rather than exactly at them. Two reasons: it
-      // reads better, activating as a section arrives instead of once its
-      // heading is already gone; and clicking a tab leaves the section a
-      // short distance below the bar, which an exact line would score as
-      // still being in the previous section.
+      // below the header, rather than exactly at it. Two reasons: it reads
+      // better, activating as a section arrives instead of once its heading
+      // is already gone; and clicking a link leaves the section a short
+      // distance below the bar, which an exact line would score as still
+      // being in the previous section.
       var box = bar.getBoundingClientRect(),
           line = box.bottom + (window.innerHeight - box.bottom) * 0.25,
           found = targets[0];
@@ -123,11 +116,8 @@
       if (current) { moveInk(current.link); }
       onScroll();
     });
-    list.addEventListener('scroll', function () {
-      if (current) { moveInk(current.link); }
-    }, { passive: true });
 
-    // Fonts land after first paint and change tab widths under the ink.
+    // Fonts land after first paint and change link widths under the ink.
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(function () { if (current) { moveInk(current.link); } });
     }

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which Niagara Version to Stamp a Module For</title>
+<meta name="description" content="A module&#x27;s declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-module-version-stamping/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Which Niagara Version to Stamp a Module For">
+<meta property="og:description" content="A module&#x27;s declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-module-version-stamping/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Which Niagara Version to Stamp a Module For">
+<meta name="twitter:description" content="A module&#x27;s declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/niagara-module-version-stamping/#article",
+   "headline": "Which Niagara version to stamp a module for",
+   "description": "A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.",
+   "url": "https://plantroomlabs.com/notes/niagara-module-version-stamping/",
+   "inLanguage": "en-GB",
+   "keywords": "Module development, Mixed estates, Build tooling",
+   "isAccessibleForFree": true,
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-module-version-stamping/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Version stamping"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Version stamping</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>Which Niagara version to stamp a module for</h1>
+    <p class="pl-lede">A module that refuses to install with a dependency error is usually not incompatible. It is <strong>stamped too high</strong> — and the fix is a build flag, not a port.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Module development</li><li class="pl-chip pl-chip--on-dark">Mixed estates</li><li class="pl-chip pl-chip--on-dark">Build tooling</li></ul>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+<h2>The failure this prevents</h2>
+<div class="pl-body">
+  <p>You build a module on a development machine, sign it, push it to a controller, and
+     the Software Manager refuses it with a dependency error naming a Niagara version
+     higher than the one the controller runs. Nothing is wrong with the code. The module
+     has simply declared that it needs a newer framework than it actually needs.</p>
+  <p>This is the single most common reason a perfectly good module will not install on
+     an estate that was not all commissioned in the same year — and most estates were
+     not.</p>
+</div>
+
+<h2>What the declared version actually means</h2>
+<div class="pl-body">
+  <p>A module declares what it needs in <code>module.xml</code>, as a set of dependencies
+     each carrying a vendor version. That version is a <strong>minimum</strong>. It says
+     "do not load me on anything older than this". It does not say "load me only on
+     this".</p>
+  <p>So a module stamped at the version of the SDK that happened to be installed on the
+     build machine will install on that version and everything newer, and be refused
+     everywhere older. Stamp the same module at the oldest version in the estate and it
+     installs across the whole estate, including everything newer.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>The rule.</strong> Compile against the newest SDK you have. Stamp for the
+     oldest station the module has to run on. These are two separate decisions and the
+     build should let you make them separately.</p>
+</div>
+
+<h2>Why compiling on a newer SDK is usually safe</h2>
+<div class="pl-body">
+  <p>The instinct is that building on a newer framework must produce something the older
+     one cannot load. Within a single Niagara generation that is rarely true, for two
+     reasons.</p>
+  <p>The first is the Java level: it is constant across the generation, so the bytecode a
+     newer SDK emits is bytecode an older station's JVM already understands. The second
+     is that most module code touches a small, old, stable part of the API — component
+     and property declarations, ORD resolution, BQL, the driver framework. That surface
+     has barely moved.</p>
+  <p>The claim is checkable rather than hopeful. Walk the constant pool of the built jar,
+     list every framework class and method it references, and compare that against the
+     API present in the oldest target. If the list contains nothing introduced after the
+     floor version, the module will load. If it does contain something newer, you have
+     found the real incompatibility instead of guessing at one.</p>
+</div>
+
+<h2>Where it does bite</h2>
+<div class="pl-body">
+  <p>Two places, in practice.</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Area</th><th scope="col">What to watch</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Browser CSS</th>
+        <td>Workbench embeds a browser engine, and an older Workbench embeds an older
+            one. A <code>ux</code> widget using recent CSS — container queries, modern
+            selector features — can look correct in a current browser and broken inside
+            an older Workbench. The station is not the constraint here; the viewing
+            engine is.</td></tr>
+    <tr><th scope="row">New API</th>
+        <td>If the code genuinely calls something that did not exist at the floor
+            version, no stamp will save it. Either guard the call and degrade, or ship
+            two builds. Knowing which of the two you are in is the point of checking the
+            jar's API surface.</td></tr>
+  </tbody>
+</table>
+
+<h2>How to make this routine</h2>
+<div class="pl-body">
+  <p>Make the target version an argument to the build rather than something inherited
+     from whatever is installed. A build that defaults to the developer's own
+     installation will quietly produce a module that only works on the developer's own
+     installation, and nobody finds out until it is in front of a customer.</p>
+  <p>Then record the floor version in the delivery note, so that when the estate gains a
+     controller two generations older than anything else on site, the question "will this
+     load" has a written answer.</p>
+</div>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span>
+        <h3><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></h3>
+        <p>Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l8 4v6c0 4.6-3.3 8.3-8 9.5-4.7-1.2-8-4.9-8-9.5v-6z"/><path d="M9 12l2.2 2.2L15.5 10"/></svg></span>
+        <h3><a href="/services/niagara-5-migration/">Niagara 5 migration</a></h3>
+        <p>Niagara 5 readiness audits and migration: which third-party modules survive the new runtime and mandatory signing, and porting your modules so they load.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
+      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
+      <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/bulk-point-renaming-and-tagging/">Renaming and tagging points in bulk</a></h3>
+      <p>Point names arrive from the field device and there is no standard. What to use to select, rename and tag in bulk — and what a rename quietly breaks.</p>
+      <ul class="pl-chips"><li class="pl-chip">Bulk engineering</li><li class="pl-chip">Tagging</li><li class="pl-chip">Workbench</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

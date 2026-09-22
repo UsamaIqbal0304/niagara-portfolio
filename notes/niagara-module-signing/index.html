@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a Station Checks Before Loading a Module</title>
+<meta name="description" content="Niagara&#x27;s three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-module-signing/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="What a Station Checks Before Loading a Module">
+<meta property="og:description" content="Niagara&#x27;s three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-module-signing/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What a Station Checks Before Loading a Module">
+<meta name="twitter:description" content="Niagara&#x27;s three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/niagara-module-signing/#article",
+   "headline": "What a station checks before loading a module",
+   "description": "Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.",
+   "url": "https://plantroomlabs.com/notes/niagara-module-signing/",
+   "inLanguage": "en-GB",
+   "keywords": "Module signing, Certificates, Deployment",
+   "isAccessibleForFree": true,
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-module-signing/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Module signing"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Module signing</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>What a station checks before loading a module</h1>
+    <p class="pl-lede">Signing is not a formality bolted on at the end. It is a load-time gate with three settings, and <strong>the default one refuses unsigned code</strong>.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Module signing</li><li class="pl-chip pl-chip--on-dark">Certificates</li><li class="pl-chip pl-chip--on-dark">Deployment</li></ul>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+<h2>The three modes</h2>
+<div class="pl-body">
+  <p>A Niagara host decides how strict to be about module signatures with a single
+     system property, <code>niagara.moduleVerificationMode</code>. It takes three
+     values, and the distinction between them is about the <em>certificate</em>, not
+     about whether a signature exists.</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Mode</th><th scope="col">What the host requires</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">low</th>
+        <td>Warnings only — an unsigned module still loads. Documented as an option that
+            will be removed in a future release, so anything depending on it has a
+            deadline whether or not anyone has written it down.</td></tr>
+    <tr><th scope="row">medium</th>
+        <td>The current default. Modules must be signed by a <strong>valid, trusted</strong>
+            certificate. Trusted means present in that host's trust store — which is a
+            per-host fact, not a property of your certificate.</td></tr>
+    <tr><th scope="row">high</th>
+        <td>Valid, trusted <strong>and CA-issued</strong>. An internal CA is acceptable,
+            so this does not automatically mean buying a certificate, but it does rule
+            out a bare self-signed key.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Default is medium, and that is the number that matters.</strong> An unsigned
+     module does not install on a stock station or a stock controller. Not "warns", not
+     "logs" — refused.</p>
+</div>
+
+<h2>Trusted is a property of the host</h2>
+<div class="pl-body">
+  <p>The most common surprise is a module that installs on one host and is refused by
+     the next, with the same jar and the same signature. Nothing about the module
+     changed; the second host does not have the signing certificate in its trust store.</p>
+  <p>This is why "is it signed?" is the wrong question when something will not install.
+     The question is "is this certificate trusted <em>by this host</em>, and does this
+     host demand a CA behind it?" The answer is per host, and on an estate assembled
+     over several years the answer varies across the estate.</p>
+</div>
+
+<h2>You cannot talk a station out of it at the command line</h2>
+<div class="pl-body">
+  <p>There is a matching property, a command-line property blacklist, whose job is to
+     stop somebody setting the verification mode — among other security-relevant
+     properties — as a launch argument. The intent is plain: the strictness of module
+     verification is a decision made in the host's configuration by whoever administers
+     it, not something a process can lower for itself on the way up.</p>
+  <p>Treat a plan that involves relaxing verification as a plan that will be rejected
+     during commissioning.</p>
+</div>
+
+<h2>Program objects are gated separately</h2>
+<div class="pl-body">
+  <p>Modules are not the only executable thing in a station. Program objects have their
+     own signing requirement, with its own property, defaulting to permissive — unsigned
+     program objects run. A site that has tightened module verification and left program
+     objects alone has a gap it very likely does not know about, and closing it is a
+     one-line configuration change plus the work of signing what is already there.</p>
+</div>
+
+<h2>Practical consequences</h2>
+<ol class="pl-steps">
+  <li><div><strong>Sign in development, not at the end.</strong> A build that produces
+      unsigned jars for months and signs once before delivery discovers every trust and
+      packaging problem on the day of delivery.</div></li>
+  <li><div><strong>Decide self-signed or CA early.</strong> Self-signed with the
+      certificate distributed to the estate's trust stores is coherent for an internal
+      estate. Anything sold or shipped to third parties needs a CA behind it, and
+      obtaining a code-signing certificate now requires hardware key storage — which
+      takes lead time and money, so it belongs in the plan, not the last week.</div></li>
+  <li><div><strong>Record which certificate signed which release.</strong> When a
+      certificate expires or is replaced, the question "what is out there signed by the
+      old one" needs an answer that is not an estate-wide search.</div></li>
+</ol>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span>
+        <h3><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></h3>
+        <p>Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
+      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
+      <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/bulk-point-renaming-and-tagging/">Renaming and tagging points in bulk</a></h3>
+      <p>Point names arrive from the field device and there is no standard. What to use to select, rename and tag in bulk — and what a rename quietly breaks.</p>
+      <ul class="pl-chips"><li class="pl-chip">Bulk engineering</li><li class="pl-chip">Tagging</li><li class="pl-chip">Workbench</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

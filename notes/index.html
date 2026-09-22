@@ -3,23 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>About Plantroom Labs — Independent Niagara Developers</title>
-<meta name="description" content="An independent Niagara Framework development practice: why it exists, how the work is approached, the ground covered, and what is deliberately not claimed.">
-<link rel="canonical" href="https://plantroomlabs.com/about/">
+<title>Niagara Engineering Notes &amp; Technical Guides</title>
+<meta name="description" content="Practical notes on Niagara module signing, version stamping, JACE limits, bulk tagging, getting data out of a station and scheduled backups.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/">
 <meta name="author" content="Plantroom Labs">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Plantroom Labs">
-<meta property="og:title" content="About Plantroom Labs — Independent Niagara Developers">
-<meta property="og:description" content="An independent Niagara Framework development practice: why it exists, how the work is approached, the ground covered, and what is deliberately not claimed.">
-<meta property="og:url" content="https://plantroomlabs.com/about/">
+<meta property="og:title" content="Niagara Engineering Notes &amp; Technical Guides">
+<meta property="og:description" content="Practical notes on Niagara module signing, version stamping, JACE limits, bulk tagging, getting data out of a station and scheduled backups.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/">
 <meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="About Plantroom Labs — Independent Niagara Developers">
-<meta name="twitter:description" content="An independent Niagara Framework development practice: why it exists, how the work is approached, the ground covered, and what is deliberately not claimed.">
+<meta name="twitter:title" content="Niagara Engineering Notes &amp; Technical Guides">
+<meta name="twitter:description" content="Practical notes on Niagara module signing, version stamping, JACE limits, bulk tagging, getting data out of a station and scheduled backups.">
 <meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
 
 <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
@@ -84,11 +84,45 @@
    }
   },
   {
-   "@type": "AboutPage",
-   "url": "https://plantroomlabs.com/about/",
-   "mainEntity": {
-    "@id": "https://plantroomlabs.com/#org"
-   }
+   "@type": "ItemList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "url": "https://plantroomlabs.com/notes/niagara-module-version-stamping/",
+     "name": "Which Niagara version to stamp a module for"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "url": "https://plantroomlabs.com/notes/niagara-module-signing/",
+     "name": "What a station checks before loading a module"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "url": "https://plantroomlabs.com/notes/what-runs-on-a-jace/",
+     "name": "Pure Java, or it will not run on a JACE"
+    },
+    {
+     "@type": "ListItem",
+     "position": 4,
+     "url": "https://plantroomlabs.com/notes/bulk-point-renaming-and-tagging/",
+     "name": "Renaming and tagging points in bulk"
+    },
+    {
+     "@type": "ListItem",
+     "position": 5,
+     "url": "https://plantroomlabs.com/notes/getting-data-out-of-a-niagara-station/",
+     "name": "Getting data out of a Niagara station"
+    },
+    {
+     "@type": "ListItem",
+     "position": 6,
+     "url": "https://plantroomlabs.com/notes/scheduled-niagara-station-backups/",
+     "name": "Scheduled station backups, and the gap"
+    }
+   ]
   },
   {
    "@type": "BreadcrumbList",
@@ -102,7 +136,7 @@
     {
      "@type": "ListItem",
      "position": 2,
-     "name": "About"
+     "name": "Notes"
     }
    ]
   }
@@ -122,7 +156,7 @@
       <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
     </a>
     <ul class="pl-nav__links">
-      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/" aria-current="page">About</a></li>
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
       <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
     </ul>
   </div>
@@ -131,85 +165,55 @@
 
 <section class="pl-band pl-hero pl-hero--page">
   <div class="pl-wrap">
-    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li>About</li></ol></nav>
-    <p class="pl-eyebrow">About</p>
-    <h1>An independent Niagara development practice</h1>
-    <p class="pl-lede">Small, remote, and focused on one framework rather than on being
-       available for anything. The work is Niagara: modules, widgets, graphics, stations
-       and migrations.</p>
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li>Notes</li></ol></nav>
+    <p class="pl-eyebrow">Notes</p>
+    <h1>Niagara engineering notes</h1>
+    <p class="pl-lede">Answers to the narrow questions that cost a day each and are
+       written down almost nowhere. No product pitch in them — if a note saves you
+       hiring anyone, it has done its job.</p>
   </div>
 </section>
 
 <section class="pl-section">
   <div class="pl-wrap">
-    <div class="pl-body pl-prose">
-      <h2>Why this exists</h2>
-      <p>The Niagara ecosystem has a strange shape. It runs a very large number of buildings,
-         it has a capable and open module architecture, and yet the market for third-party
-         modules is served by a handful of vendors. Most integrators who need something outside
-         the stock catalogue either do without, or pay for a bespoke build from whoever is
-         nearest, and then discover three years later that nobody holds the source.</p>
-      <p>This practice exists in that gap: build the thing properly, sign it, stamp it so it
-         installs across a mixed estate, document it for the engineer who has to commission it,
-         and hand over the source so the module outlives the supplier.</p>
-
-      <h2>How the work is approached</h2>
-      <p>The constraints on this page are not marketing copy — they are the reasons Niagara work
-         tends to fail. No native code, because a native library will not load on an ARM
-         controller. Stamped to the floor version, because a module stamped too high is refused
-         outright. Signed, because verification modes tighten in every release and become
-         absolute in Niagara&nbsp;5. Small, because a JACE has far less headroom than the laptop
-         it was developed on.</p>
-      <p>The same discipline applies to the front end. The widgets shown in the
-         <a href="/work/">demos</a> are built on a documented token layer — the same one
-         this website is built on — so a client theme is a re-point rather than a rewrite, and a
-         view that must also render inside Workbench is written to the browser engine Workbench
-         actually embeds rather than to whatever shipped in Chrome last month.</p>
-
-      <h2>What is deliberately not claimed</h2>
-      <p>No client logos, no case studies and no deployment counts appear on this site, because
-         there are none to show honestly yet. The demonstration station behind the widget demos
-         was built for this portfolio. The screenshots are of that station. When there is client
-         work that can be named, it will be named, with permission.</p>
-      <p>There is no Tridium affiliation, no Niagara certification claimed, and no listing on
-         the Niagara Marketplace. What there is: working, signed, data-bound modules you can
-         interact with on this site before speaking to anybody.</p>
-
-      <h2>Working together</h2>
-      <p>Engagements are remote and quoted as a fixed price per deliverable against a written
-         specification. The first conversation is usually half an hour and frequently ends with
-         a recommendation that costs nothing — a stock feature you had not found, or a
-         configuration change that removes the need for a module at all.</p>
-    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
+      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
+      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
+      <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/bulk-point-renaming-and-tagging/">Renaming and tagging points in bulk</a></h3>
+      <p>Point names arrive from the field device and there is no standard. What to use to select, rename and tag in bulk — and what a rename quietly breaks.</p>
+      <ul class="pl-chips"><li class="pl-chip">Bulk engineering</li><li class="pl-chip">Tagging</li><li class="pl-chip">Workbench</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/getting-data-out-of-a-niagara-station/">Getting data out of a Niagara station</a></h3>
+      <p>REST, MQTT, a relational history database, file export or an HTTP client. Which suits which consumer, and what each one costs you to run.</p>
+      <ul class="pl-chips"><li class="pl-chip">Integration</li><li class="pl-chip">Histories</li><li class="pl-chip">MQTT</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/scheduled-niagara-station-backups/">Scheduled station backups, and the gap</a></h3>
+      <p>A Supervisor can back up every station in its Niagara Network on a schedule. The station it does not cover that way is its own.</p>
+      <ul class="pl-chips"><li class="pl-chip">Backups</li><li class="pl-chip">Provisioning</li><li class="pl-chip">Supervisor</li></ul>
+    </div></div>
   </div>
 </section>
 
 <section class="pl-section pl-section--sunk">
   <div class="pl-wrap">
     <div class="pl-section__head">
-      <p class="pl-eyebrow">Capability</p>
-      <h2>Technical ground covered</h2>
+      <p class="pl-eyebrow">Why these exist</p>
+      <h2>Written from the framework, not from memory</h2>
+      <p class="pl-sub">Every claim here is checkable against a stock Niagara
+         installation — the documentation modules, the default properties, the shipped
+         drivers — or is flagged as an opinion. Where the honest answer is "it depends",
+         the note says what it depends on instead of picking a side.</p>
     </div>
-    <table class="pl-spec">
-      <tbody>
-        <tr><th scope="row">Framework</th><td>Niagara 4 and Niagara 5; Baja API;
-            <code>rt</code>, <code>wb</code> and <code>ux</code> module profiles; module
-            signing and version stamping.</td></tr>
-        <tr><th scope="row">Front end</th><td>bajaux, BajaScript, PX graphics and standard
-            sheet sets, ORD binding, BQL history queries, responsive token-driven component
-            systems, light and dark theming.</td></tr>
-        <tr><th scope="row">Hardware</th><td>JACE controllers on ARM, Supervisor and PC
-            stations on x86.</td></tr>
-        <tr><th scope="row">Protocols</th><td>BACnet/IP and MS/TP, Modbus TCP and RTU, MQTT,
-            REST and vendor APIs by specification.</td></tr>
-        <tr><th scope="row">Station work</th><td>Platform commissioning, TLS and certificates,
-            user and role models, tagging, histories, alarm classes, schedules, Niagara Network
-            and provisioning, backup and verified restore.</td></tr>
-        <tr><th scope="row">Migration</th><td>Java 8 to 21 porting, dependency auditing,
-            re-signing, module inventory and readiness assessment, JACE-8000 to JACE-9000
-            sequencing.</td></tr>
-      </tbody>
-    </table>
   </div>
 </section>
 

@@ -142,39 +142,38 @@ NAV = [
     ("services/",             "Services",  None),
     ("work/",                 "Work",      420),
     ("services/niagara-5-migration/", "Niagara 5", 520),
+    ("notes/",                "Notes",     560),
     ("faq/",                  "FAQ",       680),
     ("about/",                "About",     680),
 ]
 
-def tabs_html(tabs):
-    """The section bar that sits under the main nav on the landing page.
+def nav_html(active, sections=None):
+    """The header. One row, and on the landing page it is also the section bar.
 
-    Plain anchor links, not an ARIA tablist: a tablist promises panels that
-    show and hide, and these just scroll. aria-current marks the section you
-    are in, which site.js updates as you pass each one. With JavaScript off
-    the links still jump to the right place, they simply stop tracking.
-
-    The ink bar is one absolutely positioned element that slides between
-    tabs rather than a border per tab, so the movement reads as the same
-    indicator travelling along.
+    Two rows of the same-looking links — a nav, and a tab strip under it —
+    read as a mistake, so the landing page has no second row: its header links
+    point at sections, carry data-tab, and site.js slides an ink bar along them
+    as you scroll. Everywhere else the same row is ordinary page navigation
+    with the current page marked. Either way there is exactly one row telling
+    you where you are.
     """
-    links = "".join(
-        f'<li><a href="#{i}" data-tab="{i}">{e(label)}</a></li>' for i, label in tabs)
-    return f'''<nav class="pl-tabs" aria-label="Sections">
-  <div class="pl-wrap pl-tabs__inner">
-    <ul class="pl-tabs__list">{links}</ul>
-    <span class="pl-tabs__ink" aria-hidden="true"></span>
-  </div>
-</nav>'''
-
-
-def nav_html(active):
     items = []
-    for path, label, drop in NAV:
-        cur = ' aria-current="page"' if path == active else ""
-        cls = f' class="pl-nav__item--drop-{drop}"' if drop else ""
-        items.append(f'<li{cls}><a href="{href(path)}"{cur}>{label}</a></li>')
-    return f'''<nav class="pl-nav" aria-label="Primary">
+    if sections:
+        for sid, label, drop in sections:
+            cls = f' class="pl-nav__item--drop-{drop}"' if drop else ""
+            items.append(f'<li{cls}><a href="#{sid}" data-tab="{sid}">{e(label)}</a></li>')
+        # Pages with no section of their own still need a way in from here.
+        for path, label in (("faq/", "FAQ"), ("about/", "About")):
+            items.append(f'<li class="pl-nav__item--drop-940">'
+                         f'<a href="{href(path)}">{label}</a></li>')
+    else:
+        for path, label, drop in NAV:
+            cur = ' aria-current="page"' if path == active else ""
+            cls = f' class="pl-nav__item--drop-{drop}"' if drop else ""
+            items.append(f'<li{cls}><a href="{href(path)}"{cur}>{label}</a></li>')
+    ink = '\n    <span class="pl-nav__ink" aria-hidden="true"></span>' if sections else ""
+    klass = "pl-nav pl-nav--tabs" if sections else "pl-nav"
+    return f'''<nav class="{klass}" aria-label="Primary">
   <div class="pl-wrap pl-nav__inner">
     <a class="pl-brand" href="{href()}">
       {mark()}
@@ -183,9 +182,10 @@ def nav_html(active):
     <ul class="pl-nav__links">
       {"".join(items)}
       <li><a class="pl-btn pl-btn--primary" href="{href('contact/')}" style="color:var(--pl-invert)">Get a quote</a></li>
-    </ul>
+    </ul>{ink}
   </div>
 </nav>'''
+
 
 FOOTER = f'''<footer class="pl-footer">
   <div class="pl-wrap">
@@ -218,6 +218,7 @@ FOOTER = f'''<footer class="pl-footer">
         <h2>More</h2>
         <ul>
           <li><a href="{href('work/')}">Work</a></li>
+          <li><a href="{href('notes/')}">Notes</a></li>
           <li><a href="{href('about/')}">About</a></li>
           <li><a href="{href('faq/')}">FAQ</a></li>
           <li><a href="{href('contact/')}">Contact</a></li>
@@ -246,7 +247,8 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
     filename overrides that target for the one page that is not a directory —
     404.html, which the server hands back under whatever path was asked for.
     listed=False keeps a page out of the sitemap and the llms.txt inventory.
-    tabs is a list of (section id, label) and adds the sticky section bar."""
+    tabs is a list of (section id, label, drop_below): where a page has one,
+    the header links point at those sections and track scrolling."""
     canonical = url(slug)
     graph = list(schema or [])
     if crumbs:
@@ -310,7 +312,7 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
 </head>
 <body>
 <a class="pl-skip" href="#main">Skip to content</a>
-{nav_html(active if active is not None else slug)}{chr(10) + tabs_html(tabs) if tabs else ""}
+{nav_html(active if active is not None else slug, tabs)}
 <main id="main">
 {body.replace("{{CRUMBS}}", crumb_nav)}
 </main>
@@ -799,6 +801,25 @@ def service_page(s):
         <p>{e(o["desc"].split(".")[0])}.</p></div>'''
         for o in SERVICES if o["slug"] != s["slug"])
 
+    # Notes that name this service are the cheapest internal links on the site:
+    # each one is a page that can rank on its own and hand the visitor here.
+    mine = [n for n in NOTES if s["slug"] in n["related"]]
+    notes_band = ""
+    if mine:
+        notes_band = f'''
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Notes</p>
+      <h2>Written up in more detail</h2>
+      <p class="pl-sub">The engineering behind this service, in public, with no pitch
+         attached. <a href="{href('notes/')}">All notes</a>.</p>
+    </div>
+    <div class="pl-grid pl-grid--3">{"".join(note_card(n) for n in mine)}</div>
+  </div>
+</section>
+'''
+
     body = f'''
 <section class="pl-band pl-hero pl-hero--page">
   <div class="pl-wrap">
@@ -842,7 +863,7 @@ def service_page(s):
     <div class="pl-grid pl-grid--3">{others}</div>
   </div>
 </section>
-
+{notes_band}
 {CTA}
 '''
     page(s["slug"], s["title"], s["desc"], body,
@@ -1046,6 +1067,19 @@ def build_home():
   </div>
 </section>
 
+<section class="pl-section pl-anchor" id="notes">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Notes</p>
+      <h2>The answers we got tired of re-deriving</h2>
+      <p class="pl-sub">Narrow Niagara questions, written from the framework rather than
+         from memory. No pitch in them — if a note means you do not need to hire anyone,
+         that is a good outcome. <a href="{href('notes/')}">All notes &rarr;</a></p>
+    </div>
+    <div class="pl-grid pl-grid--3">{"".join(note_card(n) for n in NOTES[:3])}</div>
+  </div>
+</section>
+
 {CTA}
 '''
     page("", f"Custom Niagara Modules & bajaux Widgets | {BRAND}",
@@ -1058,8 +1092,9 @@ def build_home():
              "inLanguage": "en",
          }] + [SERVICE_LD(s["h1"], s["desc"], s["slug"], s["type_"]) for s in SERVICES],
          crumbs=[("Home", None)], active="",
-         tabs=[("services", "Services"), ("demos", "Demos"), ("how", "How we work"),
-               ("niagara-5", "Niagara 5"), ("contact", "Contact")])
+         tabs=[("services", "Services", None), ("demos", "Demos", 700),
+               ("how", "How we work", 1080), ("niagara-5", "Niagara 5", 620),
+               ("notes", "Notes", 520)])
 
 
 def build_services_index():
@@ -1676,6 +1711,8 @@ def build_llms_txt():
     demos = "\n".join(
         f"- {d['title']}: {d['blurb']}" for d in DEMOS)
     faq = "\n\n".join(f"**{q}**\n{re.sub(r'<[^>]+>', '', a)}" for q, a in FAQS)
+    notes = "\n".join(
+        f"- [{n['h1']}]({url(n['slug'])}): {n['desc']}" for n in NOTES)
 
     body = f"""# {BRAND}
 
@@ -1740,6 +1777,13 @@ unaffiliated.
 
 {faq}
 
+## Notes (technical knowledge base)
+
+Long-form answers to narrow Niagara questions, written from the framework itself rather
+than from memory, and free to quote. Index at {url('notes/')}.
+
+{notes}
+
 ## Honest limits
 
 - No client case studies, logos or deployment counts are published, because there are
@@ -1757,6 +1801,7 @@ unaffiliated.
 - [FAQ]({url('faq/')}): signing modes, JACE support, source code, pricing, Niagara 5.
 - [About]({url('about/')}): why the practice exists, capability table, what is not claimed.
 - [Contact]({url('contact/')}): what to include in a first email.
+- [Notes]({url('notes/')}): technical knowledge base, one page per question.
 """
     open(os.path.join(OUT, "llms.txt"), "w", encoding="utf-8").write(body)
 
@@ -1834,6 +1879,689 @@ def build_og_card():
     path = os.path.join(OUT, "assets", "og-card.html")
     open(path, "w", encoding="utf-8").write(card)
     return path
+
+
+# ============================================================================
+#  Notes — the knowledge base
+# ============================================================================
+#
+# Long-form technical writing is the only content type this practice can
+# publish honestly: there are no client deployments to describe and no
+# certifications to list, but the engineering is real and almost none of it
+# is written down anywhere findable. Every claim below is either checkable
+# against a stock Niagara installation or stated as an opinion.
+#
+# Each note is a page in its own right, targeting the phrasing an engineer
+# actually types into a search box rather than the vocabulary of a brochure.
+
+NOTES = [
+
+ dict(
+  slug="notes/niagara-module-version-stamping/",
+  nav="Version stamping",
+  title="Which Niagara Version to Stamp a Module For",
+  desc=("A module's declared dependency version is a floor, not a pin. Build against the "
+        "newest SDK you have and stamp for the oldest station it has to load on."),
+  h1="Which Niagara version to stamp a module for",
+  lede=("A module that refuses to install with a dependency error is usually not "
+        "incompatible. It is <strong>stamped too high</strong> — and the fix is a build "
+        "flag, not a port."),
+  tags=["Module development", "Mixed estates", "Build tooling"],
+  body="""
+<h2>The failure this prevents</h2>
+<div class="pl-body">
+  <p>You build a module on a development machine, sign it, push it to a controller, and
+     the Software Manager refuses it with a dependency error naming a Niagara version
+     higher than the one the controller runs. Nothing is wrong with the code. The module
+     has simply declared that it needs a newer framework than it actually needs.</p>
+  <p>This is the single most common reason a perfectly good module will not install on
+     an estate that was not all commissioned in the same year — and most estates were
+     not.</p>
+</div>
+
+<h2>What the declared version actually means</h2>
+<div class="pl-body">
+  <p>A module declares what it needs in <code>module.xml</code>, as a set of dependencies
+     each carrying a vendor version. That version is a <strong>minimum</strong>. It says
+     "do not load me on anything older than this". It does not say "load me only on
+     this".</p>
+  <p>So a module stamped at the version of the SDK that happened to be installed on the
+     build machine will install on that version and everything newer, and be refused
+     everywhere older. Stamp the same module at the oldest version in the estate and it
+     installs across the whole estate, including everything newer.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>The rule.</strong> Compile against the newest SDK you have. Stamp for the
+     oldest station the module has to run on. These are two separate decisions and the
+     build should let you make them separately.</p>
+</div>
+
+<h2>Why compiling on a newer SDK is usually safe</h2>
+<div class="pl-body">
+  <p>The instinct is that building on a newer framework must produce something the older
+     one cannot load. Within a single Niagara generation that is rarely true, for two
+     reasons.</p>
+  <p>The first is the Java level: it is constant across the generation, so the bytecode a
+     newer SDK emits is bytecode an older station's JVM already understands. The second
+     is that most module code touches a small, old, stable part of the API — component
+     and property declarations, ORD resolution, BQL, the driver framework. That surface
+     has barely moved.</p>
+  <p>The claim is checkable rather than hopeful. Walk the constant pool of the built jar,
+     list every framework class and method it references, and compare that against the
+     API present in the oldest target. If the list contains nothing introduced after the
+     floor version, the module will load. If it does contain something newer, you have
+     found the real incompatibility instead of guessing at one.</p>
+</div>
+
+<h2>Where it does bite</h2>
+<div class="pl-body">
+  <p>Two places, in practice.</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Area</th><th scope="col">What to watch</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Browser CSS</th>
+        <td>Workbench embeds a browser engine, and an older Workbench embeds an older
+            one. A <code>ux</code> widget using recent CSS — container queries, modern
+            selector features — can look correct in a current browser and broken inside
+            an older Workbench. The station is not the constraint here; the viewing
+            engine is.</td></tr>
+    <tr><th scope="row">New API</th>
+        <td>If the code genuinely calls something that did not exist at the floor
+            version, no stamp will save it. Either guard the call and degrade, or ship
+            two builds. Knowing which of the two you are in is the point of checking the
+            jar's API surface.</td></tr>
+  </tbody>
+</table>
+
+<h2>How to make this routine</h2>
+<div class="pl-body">
+  <p>Make the target version an argument to the build rather than something inherited
+     from whatever is installed. A build that defaults to the developer's own
+     installation will quietly produce a module that only works on the developer's own
+     installation, and nobody finds out until it is in front of a customer.</p>
+  <p>Then record the floor version in the delivery note, so that when the estate gains a
+     controller two generations older than anything else on site, the question "will this
+     load" has a written answer.</p>
+</div>
+""",
+  related=["services/niagara-modules/", "services/niagara-5-migration/"],
+ ),
+
+ dict(
+  slug="notes/niagara-module-signing/",
+  nav="Module signing",
+  title="What a Station Checks Before Loading a Module",
+  desc=("Niagara's three module verification modes, what each one demands of your "
+        "certificate, and why the setting cannot be relaxed from the command line."),
+  h1="What a station checks before loading a module",
+  lede=("Signing is not a formality bolted on at the end. It is a load-time gate with "
+        "three settings, and <strong>the default one refuses unsigned code</strong>."),
+  tags=["Module signing", "Certificates", "Deployment"],
+  body="""
+<h2>The three modes</h2>
+<div class="pl-body">
+  <p>A Niagara host decides how strict to be about module signatures with a single
+     system property, <code>niagara.moduleVerificationMode</code>. It takes three
+     values, and the distinction between them is about the <em>certificate</em>, not
+     about whether a signature exists.</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Mode</th><th scope="col">What the host requires</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">low</th>
+        <td>Warnings only — an unsigned module still loads. Documented as an option that
+            will be removed in a future release, so anything depending on it has a
+            deadline whether or not anyone has written it down.</td></tr>
+    <tr><th scope="row">medium</th>
+        <td>The current default. Modules must be signed by a <strong>valid, trusted</strong>
+            certificate. Trusted means present in that host's trust store — which is a
+            per-host fact, not a property of your certificate.</td></tr>
+    <tr><th scope="row">high</th>
+        <td>Valid, trusted <strong>and CA-issued</strong>. An internal CA is acceptable,
+            so this does not automatically mean buying a certificate, but it does rule
+            out a bare self-signed key.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Default is medium, and that is the number that matters.</strong> An unsigned
+     module does not install on a stock station or a stock controller. Not "warns", not
+     "logs" — refused.</p>
+</div>
+
+<h2>Trusted is a property of the host</h2>
+<div class="pl-body">
+  <p>The most common surprise is a module that installs on one host and is refused by
+     the next, with the same jar and the same signature. Nothing about the module
+     changed; the second host does not have the signing certificate in its trust store.</p>
+  <p>This is why "is it signed?" is the wrong question when something will not install.
+     The question is "is this certificate trusted <em>by this host</em>, and does this
+     host demand a CA behind it?" The answer is per host, and on an estate assembled
+     over several years the answer varies across the estate.</p>
+</div>
+
+<h2>You cannot talk a station out of it at the command line</h2>
+<div class="pl-body">
+  <p>There is a matching property, a command-line property blacklist, whose job is to
+     stop somebody setting the verification mode — among other security-relevant
+     properties — as a launch argument. The intent is plain: the strictness of module
+     verification is a decision made in the host's configuration by whoever administers
+     it, not something a process can lower for itself on the way up.</p>
+  <p>Treat a plan that involves relaxing verification as a plan that will be rejected
+     during commissioning.</p>
+</div>
+
+<h2>Program objects are gated separately</h2>
+<div class="pl-body">
+  <p>Modules are not the only executable thing in a station. Program objects have their
+     own signing requirement, with its own property, defaulting to permissive — unsigned
+     program objects run. A site that has tightened module verification and left program
+     objects alone has a gap it very likely does not know about, and closing it is a
+     one-line configuration change plus the work of signing what is already there.</p>
+</div>
+
+<h2>Practical consequences</h2>
+<ol class="pl-steps">
+  <li><div><strong>Sign in development, not at the end.</strong> A build that produces
+      unsigned jars for months and signs once before delivery discovers every trust and
+      packaging problem on the day of delivery.</div></li>
+  <li><div><strong>Decide self-signed or CA early.</strong> Self-signed with the
+      certificate distributed to the estate's trust stores is coherent for an internal
+      estate. Anything sold or shipped to third parties needs a CA behind it, and
+      obtaining a code-signing certificate now requires hardware key storage — which
+      takes lead time and money, so it belongs in the plan, not the last week.</div></li>
+  <li><div><strong>Record which certificate signed which release.</strong> When a
+      certificate expires or is replaced, the question "what is out there signed by the
+      old one" needs an answer that is not an estate-wide search.</div></li>
+</ol>
+""",
+  related=["services/niagara-modules/", "services/station-engineering/"],
+ ),
+]
+NOTES += [
+
+ dict(
+  slug="notes/what-runs-on-a-jace/",
+  nav="What runs on a JACE",
+  title="Pure Java or It Will Not Run: Inside a JACE",
+  desc=("A controller is an ARM host with a fraction of a server's memory. Native "
+        "libraries, JNI and heavyweight dependencies do not survive the move from a PC."),
+  h1="Pure Java, or it will not run on a JACE",
+  lede=("A module that works beautifully on a Supervisor can be structurally incapable "
+        "of running on a controller. The reasons are <strong>architecture</strong> and "
+        "<strong>budget</strong>, and neither is negotiable at install time."),
+  tags=["JACE", "Controllers", "Module development"],
+  body="""
+<h2>A controller is not a small Supervisor</h2>
+<div class="pl-body">
+  <p>It is tempting to treat a JACE as a Supervisor with less of everything. It is not:
+     it is a different processor architecture running a different operating system, with
+     a memory and flash budget measured in a way a server's never is. Code that assumes
+     otherwise does not run slowly. It does not run.</p>
+</div>
+
+<h2>Native code is the hard stop</h2>
+<div class="pl-body">
+  <p>Controllers are ARM hosts. A development machine almost certainly is not. Any
+     dependency that carries a compiled binary — a bundled shared library, a JNI layer,
+     a library that unpacks a platform-specific native blob at runtime — was compiled
+     for the wrong architecture and the wrong operating system, and will fail on the
+     controller however cleanly it behaved in testing.</p>
+  <p>This rules out a surprising amount of ordinary Java library choice: some
+     compression, imaging, cryptography and database libraries ship native fast paths.
+     The test is not "does it work on my machine"; it is "does this jar, or anything it
+     drags in, contain anything that is not bytecode".</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>The rule.</strong> Modules for a controller are pure Java plus resources —
+     JavaScript, CSS, images, lexicons. If a dependency cannot meet that, the dependency
+     is out, not the platform.</p>
+</div>
+
+<h2>The budget is real, and it is shared</h2>
+<div class="pl-body">
+  <p>The second constraint is quieter and does more damage over time, because nothing
+     fails outright. Every module installed occupies flash and heap whether or not it is
+     doing anything, and the station is sharing that headroom with drivers, histories,
+     alarms and the actual control logic that justifies the panel existing.</p>
+  <p>Consequences worth designing for:</p>
+  <ul class="pl-prose">
+    <li><strong>Few modules, small jars.</strong> One utility method is not worth hauling
+        in a framework. Prefer a hundred lines of your own to a megabyte of somebody
+        else's.</li>
+    <li><strong>Watch the file count in a view.</strong> A browser-facing widget that
+        serves twenty unbundled scripts makes the controller answer twenty requests to
+        draw one page, and it does that for every operator who opens it.</li>
+    <li><strong>Assume concurrent operators.</strong> A dashboard that is comfortable
+        with one session open can be the reason a controller struggles with six.</li>
+  </ul>
+</div>
+
+<h2>Who renders what</h2>
+<div class="pl-body">
+  <p>One clarification that saves a lot of misplaced optimisation: the browser rendering
+     a graphic is the <em>operator's</em>, not the controller's. Client-side rendering
+     cost is the operator's laptop problem, and the compatibility target is whatever
+     browsers the site actually uses. The exception is viewing inside Workbench, which
+     renders in its own embedded engine, typically older than the browsers on the same
+     desks.</p>
+  <p>What the controller pays for is serving the files and answering the data
+     subscriptions behind them. Optimise those.</p>
+</div>
+
+<h2>Checking before you ship</h2>
+<ol class="pl-steps">
+  <li><div><strong>Inventory the jar.</strong> Anything in the archive that is not a
+      class, a resource or metadata deserves an explanation.</div></li>
+  <li><div><strong>Inventory the dependencies.</strong> Transitive dependencies are where
+      native code hides, because nobody chose them deliberately.</div></li>
+  <li><div><strong>Measure the installed size</strong> and compare it against what the
+      target has free, before the commissioning visit rather than during it.</div></li>
+</ol>
+""",
+  related=["services/niagara-modules/", "services/bajaux-widgets/"],
+ ),
+
+ dict(
+  slug="notes/bulk-point-renaming-and-tagging/",
+  nav="Bulk renaming",
+  title="Renaming Thousands of Niagara Points Safely",
+  desc=("Point names arrive from the field device and there is no standard. What to use "
+        "to select, rename and tag in bulk — and what a rename quietly breaks."),
+  h1="Renaming and tagging points in bulk",
+  lede=("Every integrator renames points by hand because the names arrive from somebody "
+        "else's controller. It is the most repetitive work in Niagara engineering and "
+        "<strong>almost all of it is mechanical</strong>."),
+  tags=["Bulk engineering", "Tagging", "Workbench"],
+  body="""
+<h2>Why the problem exists at all</h2>
+<div class="pl-body">
+  <p>Points are discovered from field devices, and their names are whatever the device
+     vendor chose — abbreviations, instance numbers, a naming scheme that made sense
+     inside that product and nowhere else. Niagara does not impose a convention, and
+     neither does the industry, so every integrator applies their own. On a large job
+     that is thousands of manual edits, done under time pressure, by whoever is
+     available.</p>
+  <p>The result is predictable: names that are nearly consistent. Nearly is the
+     expensive part, because it defeats every query written against them afterwards.</p>
+</div>
+
+<h2>Renaming and tagging are different jobs</h2>
+<div class="pl-body">
+  <p>Conflating them is the root mistake. A name is a label for a human reading a tree.
+     A tag is machine-readable meaning attached to a point — this is a zone temperature,
+     this belongs to that AHU, this is a setpoint. Graphics, queries, analytics and
+     navigation should lean on tags; only people should lean on names.</p>
+  <p>Estates that tag well can afford imperfect names. Estates that only rename have to
+     get the names perfect, forever, because every downstream thing is parsing them.</p>
+</div>
+
+<div class="pl-note pl-note--info">
+  <p>If you are about to rename four thousand points so a graphic can find them, tag them
+     instead. The graphic binds to the tag, and the next engineer's naming preference
+     stops being a breaking change.</p>
+</div>
+
+<h2>What a rename can break</h2>
+<div class="pl-body">
+  <p>Renaming is not free, and the damage is usually discovered later by somebody else.
+     Three things to check before a bulk pass:</p>
+  <ul class="pl-prose">
+    <li><strong>Bindings that address by path.</strong> An ORD written as a slot path
+        names the component by name. Rename the component and the path no longer
+        resolves. Bindings written to resolve by handle are unaffected. Which style your
+        graphics use decides how dangerous a rename is.</li>
+    <li><strong>History already collected.</strong> Existing history records keep the
+        identity they were created under. Renaming the point does not retroactively
+        rename its history, so a careless pass can orphan trend data from the point that
+        produced it.</li>
+    <li><strong>Anything outside the station.</strong> Reports, exports, dashboards and
+        integrations that were written against the old names, which nobody in the room
+        remembers exist.</li>
+  </ul>
+</div>
+
+<h2>The tooling that makes it repeatable</h2>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Step</th><th scope="col">What does the work</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Select</th>
+        <td>A query, not a person scrolling. Niagara's own query language can express
+            "every writable point under this device whose name starts with that" far
+            more reliably than a multi-select, and it produces the same set twice.</td></tr>
+    <tr><th scope="row">Act</th>
+        <td>A batch job, so the operation is recorded, resumable and reviewable, rather
+            than a sequence of edits with no log. On a Supervisor, provisioning applies
+            the same idea across every station in the network at once.</td></tr>
+    <tr><th scope="row">Mean</th>
+        <td>A tag dictionary, so the vocabulary is defined once and applied, instead of
+            each engineer inventing tags as they go.</td></tr>
+    <tr><th scope="row">Verify</th>
+        <td>Re-run the selecting query afterwards and check the count is what you
+            intended. A bulk operation without an after-count is a hope.</td></tr>
+  </tbody>
+</table>
+
+<h2>Do it once, keep the recipe</h2>
+<div class="pl-body">
+  <p>The value is not in the single pass. It is that the selection query and the job
+     definition survive, so the next building, the next phase and the next contractor's
+     handover get the same treatment in minutes. Bulk work done by hand produces a tidy
+     station; bulk work done as a recorded job produces a tidy station and a standard.</p>
+</div>
+""",
+  related=["services/workbench-tooling/", "services/station-engineering/"],
+ ),
+]
+NOTES += [
+
+ dict(
+  slug="notes/getting-data-out-of-a-niagara-station/",
+  nav="Getting data out",
+  title="Five Ways to Get Data Out of a Niagara Station",
+  desc=("REST, MQTT, a relational history database, file export or an HTTP client. "
+        "Which suits which consumer, and what each one costs you to run."),
+  h1="Getting data out of a Niagara station",
+  lede=("Six separate third-party products exist to push station data somewhere else, "
+        "which tells you how often this comes up — and that "
+        "<strong>the stock answers are not well known</strong>."),
+  tags=["Integration", "Histories", "MQTT"],
+  body="""
+<h2>Answer four questions first</h2>
+<div class="pl-body">
+  <p>Most bad integrations are a good mechanism chosen for the wrong shape of problem.
+     Before picking one, settle: <strong>who consumes it</strong> (a person, a dashboard,
+     a data team, another control system), <strong>push or pull</strong>, <strong>live
+     values or history</strong>, and <strong>how often</strong>. Those four answers
+     usually eliminate three of the five options immediately.</p>
+</div>
+
+<h2>The five routes</h2>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Route</th><th scope="col">Suits</th><th scope="col">Costs you</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">REST / oBIX</th>
+        <td>Another system that wants to <em>ask</em> for values, on its own schedule.
+            Standardised, so the consumer may already speak it.</td>
+        <td>Verbose, and every consumer is one more thing authenticating against the
+            station. Poor fit for high-frequency polling.</td></tr>
+    <tr><th scope="row">MQTT</th>
+        <td>Push to a broker, and from there to anything. The natural fit for cloud
+            platforms and for many consumers of the same data.</td>
+        <td>A broker to run and secure, and a topic and payload design that you will
+            live with far longer than you expect.</td></tr>
+    <tr><th scope="row">History to a database</th>
+        <td>Reporting and analytics over long periods. A data team that already has SQL
+            tooling wants this and nothing else.</td>
+        <td>A database to own, and a real decision about retention on both sides so the
+            same trend is not stored twice forever.</td></tr>
+    <tr><th scope="row">File / CSV export</th>
+        <td>One-off extracts, hand-offs, and the finance or operations person who wants
+            a spreadsheet and is right to.</td>
+        <td>Nothing is live, and files quietly become an interface that somebody starts
+            depending on.</td></tr>
+    <tr><th scope="row">Outbound HTTP</th>
+        <td>Events rather than data: an alarm into a chat channel, a condition into a
+            ticketing system, a webhook into somebody's API.</td>
+        <td>Retry, failure and back-pressure behaviour are yours to design. A station
+            that blocks on a slow endpoint is a control problem, not an IT one.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note">
+  <p><strong>Events are not telemetry.</strong> The most common mistake is pushing every
+     point change into a channel built for notifications. Route state changes worth a
+     human's attention over HTTP; route data over MQTT or into a database.</p>
+</div>
+
+<h2>What to decide before the first message</h2>
+<ol class="pl-steps">
+  <li><div><strong>Naming and topic structure.</strong> Whatever you emit first is what
+      the consumer builds against, and changing it later is a coordinated release across
+      two systems. Derive it from tags rather than point names — see
+      <a href="/notes/bulk-point-renaming-and-tagging/">renaming and tagging in
+      bulk</a>.</div></li>
+  <li><div><strong>Units and timestamps.</strong> Send the unit and send time as UTC.
+      Ambiguity here is discovered months later, in a report, by someone who cannot tell
+      whether the building really used that much.</div></li>
+  <li><div><strong>Change-of-value, not polling.</strong> Publishing on change with a
+      heartbeat gives the consumer both liveness and a fraction of the traffic. A timer
+      loop is easier to write and worse at everything else.</div></li>
+  <li><div><strong>What happens when the far end is down.</strong> Queue, drop, or block
+      — pick deliberately. The default is usually the one you would not have
+      chosen.</div></li>
+</ol>
+
+<h2>On the controller specifically</h2>
+<div class="pl-body">
+  <p>If the station doing the publishing is a controller rather than a Supervisor, the
+     budget from <a href="/notes/what-runs-on-a-jace/">what runs on a JACE</a> applies to
+     the integration too. Aggregating at a Supervisor and publishing once is usually
+     better than every controller holding its own connection to a broker or a cloud
+     endpoint.</p>
+</div>
+""",
+  related=["services/niagara-modules/", "services/station-engineering/"],
+ ),
+
+ dict(
+  slug="notes/scheduled-niagara-station-backups/",
+  nav="Scheduled backups",
+  title="Scheduled Niagara Backups, and the Supervisor Gap",
+  desc=("A Supervisor can back up every station in its Niagara Network on a schedule. "
+        "The station it does not cover that way is its own."),
+  h1="Scheduled station backups, and the gap",
+  lede=("Niagara ships scheduled backups for the stations a Supervisor watches over. "
+        "<strong>The Supervisor itself is the exception</strong> — and it is the host "
+        "holding the histories, the graphics and the hierarchy."),
+  tags=["Backups", "Provisioning", "Supervisor"],
+  body="""
+<h2>"Backup" means three different things</h2>
+<div class="pl-body">
+  <p>Before scheduling anything, be precise about which of these you mean, because they
+     restore differently and are not interchangeable.</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Kind</th><th scope="col">Contains</th><th scope="col">Restores to</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Station copy</th>
+        <td>The station database, histories and alarms.</td>
+        <td>Any host, including a different controller model. The portable one.</td></tr>
+    <tr><th scope="row">Backup distribution</th>
+        <td>The above plus references to modules, the runtime and OS version, and
+            platform configuration.</td>
+        <td>A host you are rebuilding to match. Downgrading needs a clean distribution
+            first.</td></tr>
+    <tr><th scope="row">Clone</th>
+        <td>Everything, including copies of the modules, the runtime, the OS image and
+            the platform configuration.</td>
+        <td>The same model of controller only. Self-contained, and much larger.</td></tr>
+  </tbody>
+</table>
+
+<h2>What is scheduled out of the box</h2>
+<div class="pl-body">
+  <p>A Supervisor's Niagara Network carries a provisioning extension, and that extension
+     has a schedule component wired to a start-backup action. Set the schedule and every
+     station in the network is backed up together, without anyone opening Workbench.</p>
+  <p>Provisioning does considerably more than backups — installing software, updating
+     licences, distributing certificates, changing default credentials, applying
+     templates and running custom jobs — all driven from the Supervisor against the
+     stations beneath it. If you are only using it for backups you are using a small
+     corner of it.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>The built-in schedule does not scale.</strong> Niagara's own documentation
+     advises against it on a larger enterprise system, because it fires a backup of every
+     subordinate station at the same moment. On a sizeable estate, use job prototypes so
+     the work is batched and staggered instead.</p>
+</div>
+
+<h2>The gap</h2>
+<div class="pl-body">
+  <p>All of that provisioning work is performed <em>by</em> the Supervisor <em>against</em>
+     the stations in its Niagara Network. Its own station is not one of them.</p>
+  <p>Which is awkward, because the Supervisor is usually the host that matters most: the
+     consolidated histories, the graphics, the hierarchy, the users, the reports. A site
+     can have every controller backed up nightly and the single most valuable station on
+     the estate backed up whenever somebody last remembered.</p>
+  <p>That gap is why a market exists for third-party scheduled-backup modules, some
+     priced in the thousands. It is a genuine hole, and paying to fill it is a legitimate
+     answer — but it is worth knowing you are paying for one missing schedule rather than
+     for backup as a capability.</p>
+</div>
+
+<h2>What to put in place</h2>
+<ol class="pl-steps">
+  <li><div><strong>Schedule the subordinates properly</strong> — job prototypes rather
+      than the convenience schedule, staggered, with the results actually
+      reviewed.</div></li>
+  <li><div><strong>Decide explicitly how the Supervisor gets backed up.</strong> A
+      third-party module, a scheduled job that drives the backup, or a documented manual
+      procedure with an owner and a date. Any of the three beats the usual answer, which
+      is silence.</div></li>
+  <li><div><strong>Get the files off the host.</strong> A backup stored only on the
+      machine it protects is not a backup.</div></li>
+  <li><div><strong>Restore one, once.</strong> Onto spare hardware, before you need it.
+      An untested backup is an assumption with a filename.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/workbench-tooling/"],
+ ),
+]
+
+NOTE_LOOKUP = {n["slug"]: n for n in NOTES}
+SERVICE_LOOKUP = {s["slug"]: s for s in SERVICES}
+
+def note_card(n, level=3):
+    h = f"h{level}"
+    tags = "".join(f'<li class="pl-chip">{e(t)}</li>' for t in n["tags"])
+    return f'''<div class="pl-card pl-card--link">
+      <{h}><a href="{href(n["slug"])}">{e(n["h1"])}</a></{h}>
+      <p>{e(n["desc"])}</p>
+      <ul class="pl-chips">{tags}</ul>
+    </div>'''
+
+def note_page(n):
+    """One note. The same page furniture as a service page, so a visitor who
+    arrives on a note from a search result lands somewhere that looks like the
+    rest of the site rather than a stray blog post."""
+    links = []
+    for slug in n["related"]:
+        s = SERVICE_LOOKUP.get(slug)
+        if s:
+            links.append(f'''<div class="pl-card pl-card--link">{icon(s["icon"])}
+        <h3><a href="{href(s["slug"])}">{e(s["nav"])}</a></h3>
+        <p>{e(s["desc"].split(".")[0])}.</p></div>''')
+    others = [o for o in NOTES if o["slug"] != n["slug"]][:3]
+    more = "".join(note_card(o) for o in others)
+
+    body = f'''
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    {{{{CRUMBS}}}}
+    <p class="pl-eyebrow">Note</p>
+    <h1>{e(n["h1"])}</h1>
+    <p class="pl-lede">{n["lede"]}</p>
+    <ul class="pl-chips">{"".join(f'<li class="pl-chip pl-chip--on-dark">{e(t)}</li>' for t in n["tags"])}</ul>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">{n["body"]}</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3">{"".join(links)}</div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3">{more}</div>
+  </div>
+</section>
+
+{CTA}
+'''
+    article = {
+        "@type": "TechArticle",
+        "@id": url(n["slug"]) + "#article",
+        "headline": n["h1"],
+        "description": n["desc"],
+        "url": url(n["slug"]),
+        "inLanguage": "en-GB",
+        "keywords": ", ".join(n["tags"]),
+        "isAccessibleForFree": True,
+        "author": {"@id": url() + "#org"},
+        "publisher": {"@id": url() + "#org"},
+        "mainEntityOfPage": url(n["slug"]),
+    }
+    page(n["slug"], n["title"], n["desc"], body,
+         schema=[ORG, article],
+         crumbs=[("Home", ""), ("Notes", "notes/"), (n["nav"], None)],
+         active="notes/", og_type="article")
+
+def build_notes_index():
+    cards = "".join(note_card(n) for n in NOTES)
+    listing = {
+        "@type": "ItemList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": i + 1, "url": url(n["slug"]), "name": n["h1"]}
+            for i, n in enumerate(NOTES)
+        ],
+    }
+    body = f'''
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    {{{{CRUMBS}}}}
+    <p class="pl-eyebrow">Notes</p>
+    <h1>Niagara engineering notes</h1>
+    <p class="pl-lede">Answers to the narrow questions that cost a day each and are
+       written down almost nowhere. No product pitch in them — if a note saves you
+       hiring anyone, it has done its job.</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-grid pl-grid--3">{cards}</div>
+  </div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Why these exist</p>
+      <h2>Written from the framework, not from memory</h2>
+      <p class="pl-sub">Every claim here is checkable against a stock Niagara
+         installation — the documentation modules, the default properties, the shipped
+         drivers — or is flagged as an opinion. Where the honest answer is "it depends",
+         the note says what it depends on instead of picking a side.</p>
+    </div>
+  </div>
+</section>
+
+{CTA}
+'''
+    page("notes/", "Niagara Engineering Notes & Technical Guides",
+         "Practical notes on Niagara module signing, version stamping, JACE limits, "
+         "bulk tagging, getting data out of a station and scheduled backups.",
+         body, schema=[ORG, listing],
+         crumbs=[("Home", ""), ("Notes", None)], active="notes/")
 
 
 def build_404():
@@ -1922,6 +2650,9 @@ def main():
     build_faq()
     build_about()
     build_contact()
+    build_notes_index()
+    for n in NOTES:
+        note_page(n)
     for d in DEMOS:
         build_demo(d)
 
