@@ -1729,11 +1729,20 @@ def build_mark():
 
 
 def build_og_card():
-    """The 1200x630 social card, as HTML so it can be screenshotted by Chrome."""
+    """The 1200x630 social card, as HTML so it can be screenshotted by Chrome.
+
+    The fonts are the same self-hosted woff2 files the site itself uses, by
+    relative path — this file sits in assets/ alongside fonts/. It used to
+    pull them from fonts.googleapis.com, which made rendering the card depend
+    on network access: offline, or behind a blocked request, Chrome fell back
+    to a system sans and produced a wrong-looking brand image with no error.
+    Nothing warns you, because a screenshot always succeeds."""
     card = f'''<!DOCTYPE html><html><head><meta charset="utf-8">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
+ @font-face{{font-family:Inter;src:url(fonts/inter-var.woff2)format('woff2');
+   font-weight:100 900;font-display:block}}
+ @font-face{{font-family:'JetBrains Mono';src:url(fonts/jetbrains-mono-var.woff2)format('woff2');
+   font-weight:100 800;font-display:block}}
  *{{box-sizing:border-box;margin:0}}
  body{{width:1200px;height:630px;background:#0e1116;color:#fff;overflow:hidden;position:relative;
    font-family:Inter,sans-serif;-webkit-font-smoothing:antialiased;display:flex;
@@ -1877,6 +1886,11 @@ def main():
     print("\n  robots.txt  sitemap.xml  llms.txt  assets/mark.svg  assets/og-card.html")
     if cname:
         print(f"  CNAME -> {cname}")
+    print("\n  assets/og.png is NOT rebuilt here — og-card.html has to be")
+    print("  screenshotted at exactly 1200x630 after any change to the card:")
+    print("    chrome --headless --screenshot=assets/og.png --window-size=1200,630 \\")
+    print("      --hide-scrollbars assets/og-card.html")
+    print("  Check the result is in Inter, not a fallback. It renders either way.")
 
 
 if __name__ == "__main__":
