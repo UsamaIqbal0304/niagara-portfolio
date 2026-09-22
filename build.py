@@ -1635,6 +1635,18 @@ Sitemap: {url('sitemap.xml')}
     open(os.path.join(OUT, "robots.txt"), "w").write(body)
 
 
+# IndexNow lets us tell Bing, Yandex, DuckDuckGo and Seznam that a page
+# changed, instead of waiting to be crawled. The protocol is: host a file at
+# /<key>.txt containing the key, then POST the URL list. Google does not
+# participate — nothing here reaches Google, which only takes a sitemap and
+# Search Console.
+INDEXNOW_KEY = "65d322c488b72b3c8f6fae5c95466836"
+
+
+def build_indexnow_key():
+    open(os.path.join(OUT, INDEXNOW_KEY + ".txt"), "w").write(INDEXNOW_KEY + "\n")
+
+
 def build_sitemap():
     prio = {"": "1.0", "services/": "0.9", "work/": "0.9", "contact/": "0.8", "faq/": "0.7"}
     urls = "".join(f"""  <url>
@@ -1915,6 +1927,7 @@ def main():
 
     build_404()
     build_robots()
+    build_indexnow_key()
     build_sitemap()
     build_llms_txt()
     cname = build_cname()
