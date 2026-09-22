@@ -14,7 +14,7 @@ Last updated: 2026-09-22
 Niagara Framework (Tridium) software engineering, specifically:
 
 - [Custom Niagara modules and drivers](https://plantroomlabs.com/services/niagara-modules/): Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.
-- [bajaux widgets and dashboards](https://plantroomlabs.com/services/bajaux-widgets/): Custom bajaux and BajaScript widgets for Niagara: dashboards, navigation, equipment views and charts, bound to live station ORDs and BQL history.
+- [bajaux web widgets and dashboards](https://plantroomlabs.com/services/bajaux-widgets/): Custom Niagara web widgets built with bajaux and BajaScript: HTML5 dashboards, navigation, equipment views and charts, bound to live station ORDs and BQL.
 - [PX graphics and standard sheets](https://plantroomlabs.com/services/px-graphics/): Niagara PX graphics as a reusable template set: standard sheets per plant type, relative-ORD binding, navigation hierarchy and a graphics standard.
 - [Station engineering and new controller setup](https://plantroomlabs.com/services/station-engineering/): Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.
 - [Workbench tooling and bulk engineering](https://plantroomlabs.com/services/workbench-tooling/): Custom Workbench views and tools for repetitive Niagara work: bulk renaming and retagging, station audits, provisioning helpers and module inventories.

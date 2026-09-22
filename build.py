@@ -468,15 +468,15 @@ SERVICES = [
  dict(
   slug="services/bajaux-widgets/", icon="widget",
   nav="bajaux widgets",
-  h1="bajaux widgets and dashboards",
-  title="bajaux Widget Development & HTML5 Dashboards for Niagara",
-  desc=("Custom bajaux and BajaScript widgets for Niagara: dashboards, navigation, equipment "
-        "views and charts, bound to live station ORDs and BQL history."),
+  h1="bajaux web widgets and dashboards",
+  title="Niagara Web Widgets & bajaux Development | HTML5 UI",
+  desc=("Custom Niagara web widgets built with bajaux and BajaScript: HTML5 dashboards, "
+        "navigation, equipment views and charts, bound to live station ORDs and BQL."),
   type_="User interface development",
-  lede=("Browser-native widgets that live in your PX views and in your station's web UI. "
+  lede=("Browser-native web widgets that live in your PX views and in your station's web UI. "
         "Bound to real ORDs and BQL history, <strong>responsive by construction</strong>, "
         "and themed so the graphics look like your company rather than like 2011."),
-  chips=["bajaux", "BajaScript", "Responsive", "Live ORD binding", "BQL history", "Light + dark"],
+  chips=["bajaux", "BajaScript", "HTML5", "Live ORD binding", "BQL history", "Light + dark"],
   body="""
 <h2>Why bajaux rather than more PX widgets</h2>
 <div class="pl-body" style="margin-top:var(--pl-s-7)">
