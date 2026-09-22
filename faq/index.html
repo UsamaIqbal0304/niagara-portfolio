@@ -92,7 +92,7 @@
      "name": "Do you work on Niagara 4 or Niagara 5?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Both. Current production work targets Niagara 4.14 and 4.15, because that is what is installed. New code is written to compile clean under Java 21 so the same source builds for Niagara 5 when you need it. Modules are stamped to the oldest Niagara version you have to support, not to the newest one available."
+      "text": "Both. Most production work is on Niagara 4, because that is what is installed. New code is written so the same source also builds for Niagara 5 when you need it. Modules are stamped to the oldest Niagara version you have to support, not to the newest one available, so one build covers a mixed estate."
      }
     },
     {
@@ -100,7 +100,7 @@
      "name": "Will a module you build run on a JACE-8000?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Yes. Everything is pure Java plus JavaScript and CSS resources, with no native code, so one build runs on a QNX/ARMv7 JACE-8000 and on an x86 Supervisor without a separate compile. Modules are kept small deliberately, because a JACE is a single-core ARM controller with a fraction of a laptop's memory."
+      "text": "Yes. Everything is pure Java plus JavaScript and CSS resources, with no native code, so one build runs on an ARM JACE and on an x86 Supervisor without a separate compile. Modules are kept small deliberately, because a JACE has a fraction of a laptop's processor and memory."
      }
     },
     {
@@ -108,7 +108,7 @@
      "name": "Are the modules signed?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Yes. Niagara 4.14 and 4.15 ship with niagara.moduleVerificationMode=medium, which requires a certificate the host trusts, and hardened sites run high, which requires a CA-issued one. Niagara 5 makes a valid signature mandatory with no grace period. Tell us which mode your hosts run and the signing arrangement is matched to it before delivery, not after."
+      "text": "Yes. Niagara 4 ships with niagara.moduleVerificationMode=medium, which requires a certificate the host trusts, and hardened sites run high, which requires a CA-issued one. Niagara 5 makes a valid signature mandatory with no grace period. Tell us which mode your hosts run and the signing arrangement is matched to it before delivery, not after."
      }
     },
     {
@@ -238,13 +238,13 @@
   <div class="pl-wrap">
     <div class="pl-faq"><details>
       <summary>Do you work on Niagara 4 or Niagara 5?</summary>
-      <div class="pl-faq__body"><p>Both. Current production work targets Niagara 4.14 and 4.15, because that is what is installed. New code is written to compile clean under Java 21 so the same source builds for Niagara 5 when you need it. Modules are stamped to the oldest Niagara version you have to support, not to the newest one available.</p></div>
+      <div class="pl-faq__body"><p>Both. Most production work is on Niagara 4, because that is what is installed. New code is written so the same source also builds for Niagara 5 when you need it. Modules are stamped to the oldest Niagara version you have to support, not to the newest one available, so one build covers a mixed estate.</p></div>
     </details><details>
       <summary>Will a module you build run on a JACE-8000?</summary>
-      <div class="pl-faq__body"><p>Yes. Everything is pure Java plus JavaScript and CSS resources, with no native code, so one build runs on a QNX/ARMv7 JACE-8000 and on an x86 Supervisor without a separate compile. Modules are kept small deliberately, because a JACE is a single-core ARM controller with a fraction of a laptop's memory.</p></div>
+      <div class="pl-faq__body"><p>Yes. Everything is pure Java plus JavaScript and CSS resources, with no native code, so one build runs on an ARM JACE and on an x86 Supervisor without a separate compile. Modules are kept small deliberately, because a JACE has a fraction of a laptop's processor and memory.</p></div>
     </details><details>
       <summary>Are the modules signed?</summary>
-      <div class="pl-faq__body"><p>Yes. Niagara 4.14 and 4.15 ship with <code>niagara.moduleVerificationMode=medium</code>, which requires a certificate the host trusts, and hardened sites run <code>high</code>, which requires a CA-issued one. Niagara 5 makes a valid signature mandatory with no grace period. Tell us which mode your hosts run and the signing arrangement is matched to it before delivery, not after.</p></div>
+      <div class="pl-faq__body"><p>Yes. Niagara 4 ships with <code>niagara.moduleVerificationMode=medium</code>, which requires a certificate the host trusts, and hardened sites run <code>high</code>, which requires a CA-issued one. Niagara 5 makes a valid signature mandatory with no grace period. Tell us which mode your hosts run and the signing arrangement is matched to it before delivery, not after.</p></div>
     </details><details>
       <summary>Do we get the source code?</summary>
       <div class="pl-faq__body"><p>For bespoke work, yes, on request and in scope. The reason is self-interested as much as generous: the single most expensive problem in this market is a module whose author has disappeared and whose source nobody holds, and we would rather not add to the pile.</p></div>

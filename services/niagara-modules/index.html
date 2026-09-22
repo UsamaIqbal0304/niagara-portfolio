@@ -199,11 +199,12 @@
           per architecture, and will not load on a QNX/ARM JACE at all. One build runs on the
           controller and on an x86 Supervisor.</td></tr>
   <tr><th scope="row">Stamped to the oldest version it must support</th>
-      <td>A module's declared dependency is a minimum, not a pin. Stamped at 4.10 it installs
-          on 4.10 and everything above; stamped at 4.15 it is refused outright on a 4.14
-          station. Stamping to your floor means one build covers a mixed estate.</td></tr>
+      <td>A module's declared dependency is a minimum, not a pin. Stamped to the oldest
+          version in your estate it installs there and on everything above it; stamped to a
+          newer one it is refused outright by the older stations. Stamping to your floor
+          means one build covers a mixed estate.</td></tr>
   <tr><th scope="row">Signed</th>
-      <td>Every module ships signed. Niagara 4.14 and 4.15 default to
+      <td>Every module ships signed. Niagara 4 defaults to
           <code>moduleVerificationMode=medium</code>, which requires a trusted certificate;
           hardened sites run <code>high</code>, which requires a CA-issued one. Niagara 5
           makes a valid signature mandatory with no grace period.</td></tr>
@@ -212,7 +213,7 @@
           <code>SecurityManager</code>, which Niagara 5 removes. The same source keeps
           building for Niagara 4.</td></tr>
   <tr><th scope="row">Small</th>
-      <td>A JACE-8000 is a single-core ARM with a fraction of a laptop's memory. Few modules,
+      <td>A JACE is an ARM controller with a fraction of a laptop's memory. Few modules,
           small jars, no framework hauled in for one utility method.</td></tr>
  </tbody>
 </table>

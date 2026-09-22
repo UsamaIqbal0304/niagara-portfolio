@@ -401,11 +401,12 @@ SERVICES = [
           per architecture, and will not load on a QNX/ARM JACE at all. One build runs on the
           controller and on an x86 Supervisor.</td></tr>
   <tr><th scope="row">Stamped to the oldest version it must support</th>
-      <td>A module's declared dependency is a minimum, not a pin. Stamped at 4.10 it installs
-          on 4.10 and everything above; stamped at 4.15 it is refused outright on a 4.14
-          station. Stamping to your floor means one build covers a mixed estate.</td></tr>
+      <td>A module's declared dependency is a minimum, not a pin. Stamped to the oldest
+          version in your estate it installs there and on everything above it; stamped to a
+          newer one it is refused outright by the older stations. Stamping to your floor
+          means one build covers a mixed estate.</td></tr>
   <tr><th scope="row">Signed</th>
-      <td>Every module ships signed. Niagara 4.14 and 4.15 default to
+      <td>Every module ships signed. Niagara 4 defaults to
           <code>moduleVerificationMode=medium</code>, which requires a trusted certificate;
           hardened sites run <code>high</code>, which requires a CA-issued one. Niagara 5
           makes a valid signature mandatory with no grace period.</td></tr>
@@ -414,7 +415,7 @@ SERVICES = [
           <code>SecurityManager</code>, which Niagara 5 removes. The same source keeps
           building for Niagara 4.</td></tr>
   <tr><th scope="row">Small</th>
-      <td>A JACE-8000 is a single-core ARM with a fraction of a laptop's memory. Few modules,
+      <td>A JACE is an ARM controller with a fraction of a laptop's memory. Few modules,
           small jars, no framework hauled in for one utility method.</td></tr>
  </tbody>
 </table>
@@ -475,9 +476,9 @@ SERVICES = [
 </div>
 
 <div class="pl-note" style="margin-top:var(--pl-s-11)">
-  <p><b>On browser support.</b> Workbench embeds its own browser engine, and it is older than
-     the one on your desk — the engine in Niagara 4.14 predates CSS <code>:has()</code> and
-     container queries. Widgets meant to be viewed inside Workbench are written to that floor
+  <p><b>On browser support.</b> Workbench embeds its own browser engine, and it lags the
+     one on your desk — current releases predate CSS <code>:has()</code> and container
+     queries. Widgets meant to be viewed inside Workbench are written to that floor
      rather than to whatever Chrome shipped last month, which is the usual reason a widget
      looks right in a browser and broken in a PX editor.</p>
 </div>
@@ -918,10 +919,10 @@ def build_home():
       JACE as readily as on a Supervisor.
     </p>
     <ul class="pl-chips">
-      <li class="pl-chip pl-chip--on-dark">Niagara 4.14 &amp; 4.15</li>
-      <li class="pl-chip pl-chip--on-dark">Niagara 5 ready</li>
+      <li class="pl-chip pl-chip--on-dark">Niagara 4 and Niagara 5</li>
       <li class="pl-chip pl-chip--on-dark">bajaux / BajaScript</li>
-      <li class="pl-chip pl-chip--on-dark">JACE-8000 (QNX / ARMv7)</li>
+      <li class="pl-chip pl-chip--on-dark">PX graphics</li>
+      <li class="pl-chip pl-chip--on-dark">JACE and Supervisor</li>
       <li class="pl-chip pl-chip--on-dark">Signed modules</li>
       <li class="pl-chip pl-chip--on-dark">Fixed price per deliverable</li>
     </ul>
@@ -1196,19 +1197,19 @@ def build_work():
 
 FAQS = [
  ("Do you work on Niagara 4 or Niagara 5?",
-  "Both. Current production work targets Niagara 4.14 and 4.15, because that is what is "
-  "installed. New code is written to compile clean under Java 21 so the same source builds "
-  "for Niagara 5 when you need it. Modules are stamped to the oldest Niagara version you "
-  "have to support, not to the newest one available."),
+  "Both. Most production work is on Niagara 4, because that is what is installed. New "
+  "code is written so the same source also builds for Niagara 5 when you need it. Modules "
+  "are stamped to the oldest Niagara version you have to support, not to the newest one "
+  "available, so one build covers a mixed estate."),
 
  ("Will a module you build run on a JACE-8000?",
   "Yes. Everything is pure Java plus JavaScript and CSS resources, with no native code, so "
-  "one build runs on a QNX/ARMv7 JACE-8000 and on an x86 Supervisor without a separate "
-  "compile. Modules are kept small deliberately, because a JACE is a single-core ARM "
-  "controller with a fraction of a laptop's memory."),
+  "one build runs on an ARM JACE and on an x86 Supervisor without a separate compile. "
+  "Modules are kept small deliberately, because a JACE has a fraction of a laptop's "
+  "processor and memory."),
 
  ("Are the modules signed?",
-  "Yes. Niagara 4.14 and 4.15 ship with <code>niagara.moduleVerificationMode=medium</code>, "
+  "Yes. Niagara 4 ships with <code>niagara.moduleVerificationMode=medium</code>, "
   "which requires a certificate the host trusts, and hardened sites run <code>high</code>, "
   "which requires a CA-issued one. Niagara 5 makes a valid signature mandatory with no grace "
   "period. Tell us which mode your hosts run and the signing arrangement is matched to it "
@@ -1371,14 +1372,14 @@ def build_about():
     </div>
     <table class="pl-spec">
       <tbody>
-        <tr><th scope="row">Framework</th><td>Niagara 4.14, 4.15 and Niagara 5; Baja API;
+        <tr><th scope="row">Framework</th><td>Niagara 4 and Niagara 5; Baja API;
             <code>rt</code>, <code>wb</code> and <code>ux</code> module profiles; module
             signing and version stamping.</td></tr>
         <tr><th scope="row">Front end</th><td>bajaux, BajaScript, PX graphics and standard
             sheet sets, ORD binding, BQL history queries, responsive token-driven component
             systems, light and dark theming.</td></tr>
-        <tr><th scope="row">Hardware</th><td>JACE-8000 (<code>titan-am335x</code>, QNX 7.1 on
-            ARMv7), JACE-9000, Supervisor and PC stations.</td></tr>
+        <tr><th scope="row">Hardware</th><td>JACE controllers on ARM, Supervisor and PC
+            stations on x86.</td></tr>
         <tr><th scope="row">Protocols</th><td>BACnet/IP and MS/TP, Modbus TCP and RTU, MQTT,
             REST and vendor APIs by specification.</td></tr>
         <tr><th scope="row">Station work</th><td>Platform commissioning, TLS and certificates,
@@ -1426,10 +1427,10 @@ def build_contact():
           <h2>Four things that get you a real answer</h2>
         </div>
         <ol class="pl-steps">
-          <li><div><h3>Your Niagara version</h3><p>4.10, 4.13, 4.14, 4.15 — and whether the
-            estate is mixed. This determines what a module can be stamped to.</p></div></li>
-          <li><div><h3>The target hardware</h3><p>JACE-8000, JACE-9000, Supervisor, PC station.
-            It decides what can be built at all.</p></div></li>
+          <li><div><h3>Your Niagara version</h3><p>Whichever you are on, and whether the estate
+            is mixed. This determines what a module can be stamped to.</p></div></li>
+          <li><div><h3>The target hardware</h3><p>JACE, Supervisor or PC station. It decides
+            what can be built at all.</p></div></li>
           <li><div><h3>What it has to do</h3><p>In your words. A paragraph is plenty. What
             exists now, what should be true afterwards, and what currently prevents it.</p></div></li>
           <li><div><h3>Your verification mode</h3><p>If you know whether hosts run
@@ -1651,17 +1652,17 @@ Niagara Framework (Tridium) software engineering, specifically:
 
 ## Technical scope
 
-- Niagara versions: 4.14, 4.15, and Niagara 5 (Java 21).
+- Niagara versions: Niagara 4 and Niagara 5.
 - Module profiles: `rt` (station runtime), `wb` (Workbench), `ux` (browser/HTML5).
 - Front end: bajaux, BajaScript, PX graphics, ORD binding, BQL history queries.
-- Hardware: JACE-8000 (`titan-am335x`, QNX 7.1 on ARMv7), JACE-9000, Supervisor, PC stations.
+- Hardware: JACE controllers on ARM, Supervisor and PC stations on x86.
 - Protocols: BACnet/IP and MS/TP, Modbus TCP and RTU, MQTT, REST and vendor APIs.
 - Station work: platform commissioning, TLS and certificates, user and role models,
   tagging, histories, alarm classes, schedules, Niagara Network, provisioning,
   backup and verified restore.
 - Engineering constraints held on every module: no native code (pure Java plus JS/CSS,
-  so one build runs on QNX/ARM and on x86); stamped to the oldest Niagara version the
-  customer must support; signed; compiles clean under Java 21.
+  so one build runs on ARM and on x86); stamped to the oldest Niagara version the
+  customer must support; signed.
 
 ## Live demos
 
@@ -1778,10 +1779,10 @@ def build_og_card():
      and Niagara&nbsp;5 migration.</p>
 </div>
 <div class="r chips">
-  <span class="chip">Niagara 4.14 &amp; 4.15</span>
-  <span class="chip">Niagara 5 ready</span>
+  <span class="chip">Niagara 4 and Niagara 5</span>
   <span class="chip">bajaux</span>
-  <span class="chip">JACE-8000 · QNX/ARMv7</span>
+  <span class="chip">PX graphics</span>
+  <span class="chip">JACE and Supervisor</span>
   <span class="chip">Signed modules</span>
   <span class="chip mono">{EMAIL}</span>
 </div>

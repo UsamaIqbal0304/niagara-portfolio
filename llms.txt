@@ -22,17 +22,17 @@ Niagara Framework (Tridium) software engineering, specifically:
 
 ## Technical scope
 
-- Niagara versions: 4.14, 4.15, and Niagara 5 (Java 21).
+- Niagara versions: Niagara 4 and Niagara 5.
 - Module profiles: `rt` (station runtime), `wb` (Workbench), `ux` (browser/HTML5).
 - Front end: bajaux, BajaScript, PX graphics, ORD binding, BQL history queries.
-- Hardware: JACE-8000 (`titan-am335x`, QNX 7.1 on ARMv7), JACE-9000, Supervisor, PC stations.
+- Hardware: JACE controllers on ARM, Supervisor and PC stations on x86.
 - Protocols: BACnet/IP and MS/TP, Modbus TCP and RTU, MQTT, REST and vendor APIs.
 - Station work: platform commissioning, TLS and certificates, user and role models,
   tagging, histories, alarm classes, schedules, Niagara Network, provisioning,
   backup and verified restore.
 - Engineering constraints held on every module: no native code (pure Java plus JS/CSS,
-  so one build runs on QNX/ARM and on x86); stamped to the oldest Niagara version the
-  customer must support; signed; compiles clean under Java 21.
+  so one build runs on ARM and on x86); stamped to the oldest Niagara version the
+  customer must support; signed.
 
 ## Live demos
 
@@ -67,13 +67,13 @@ unaffiliated.
 ## Frequently asked questions
 
 **Do you work on Niagara 4 or Niagara 5?**
-Both. Current production work targets Niagara 4.14 and 4.15, because that is what is installed. New code is written to compile clean under Java 21 so the same source builds for Niagara 5 when you need it. Modules are stamped to the oldest Niagara version you have to support, not to the newest one available.
+Both. Most production work is on Niagara 4, because that is what is installed. New code is written so the same source also builds for Niagara 5 when you need it. Modules are stamped to the oldest Niagara version you have to support, not to the newest one available, so one build covers a mixed estate.
 
 **Will a module you build run on a JACE-8000?**
-Yes. Everything is pure Java plus JavaScript and CSS resources, with no native code, so one build runs on a QNX/ARMv7 JACE-8000 and on an x86 Supervisor without a separate compile. Modules are kept small deliberately, because a JACE is a single-core ARM controller with a fraction of a laptop's memory.
+Yes. Everything is pure Java plus JavaScript and CSS resources, with no native code, so one build runs on an ARM JACE and on an x86 Supervisor without a separate compile. Modules are kept small deliberately, because a JACE has a fraction of a laptop's processor and memory.
 
 **Are the modules signed?**
-Yes. Niagara 4.14 and 4.15 ship with niagara.moduleVerificationMode=medium, which requires a certificate the host trusts, and hardened sites run high, which requires a CA-issued one. Niagara 5 makes a valid signature mandatory with no grace period. Tell us which mode your hosts run and the signing arrangement is matched to it before delivery, not after.
+Yes. Niagara 4 ships with niagara.moduleVerificationMode=medium, which requires a certificate the host trusts, and hardened sites run high, which requires a CA-issued one. Niagara 5 makes a valid signature mandatory with no grace period. Tell us which mode your hosts run and the signing arrangement is matched to it before delivery, not after.
 
 **Do we get the source code?**
 For bespoke work, yes, on request and in scope. The reason is self-interested as much as generous: the single most expensive problem in this market is a module whose author has disappeared and whose source nobody holds, and we would rather not add to the pile.
