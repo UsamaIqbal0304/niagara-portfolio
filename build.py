@@ -195,8 +195,13 @@ FOOTER = f'''<footer class="pl-footer">
 
 # ------------------------------------------------------------------- shell
 
-def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type="website"):
-    """Render one page to <slug>/index.html (or index.html for the root)."""
+def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type="website",
+         filename=None, listed=True):
+    """Render one page to <slug>/index.html (or index.html for the root).
+
+    filename overrides that target for the one page that is not a directory —
+    404.html, which the server hands back under whatever path was asked for.
+    listed=False keeps a page out of the sitemap and the llms.txt inventory."""
     canonical = url(slug)
     graph = list(schema or [])
     if crumbs:
@@ -231,7 +236,7 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
 <title>{e(title)}</title>
 <meta name="description" content="{html.escape(desc, quote=True)}">
 <link rel="canonical" href="{canonical}">
-<meta name="author" content="{BRAND}">
+<meta name="author" content="{BRAND}">{"" if listed else chr(10) + '<meta name="robots" content="noindex, follow">'}
 
 <meta property="og:type" content="{og_type}">
 <meta property="og:site_name" content="{BRAND}">
@@ -269,11 +274,15 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
 </body>
 </html>
 '''
-    target = os.path.join(OUT, slug, "index.html") if slug else os.path.join(OUT, "index.html")
+    if filename:
+        target = os.path.join(OUT, filename)
+    else:
+        target = os.path.join(OUT, slug, "index.html") if slug else os.path.join(OUT, "index.html")
     os.makedirs(os.path.dirname(target), exist_ok=True)
     with open(target, "w", encoding="utf-8") as fh:
         fh.write(doc)
-    PAGES.append((slug, title, desc))
+    if listed:
+        PAGES.append((slug, title, desc))
     return doc
 
 PAGES = []
@@ -1761,6 +1770,61 @@ def build_og_card():
     return path
 
 
+def build_404():
+    """/404.html — what GitHub Pages serves for any path that does not exist.
+
+    It is served from the requested URL, not from /404.html, so every link and
+    asset reference in it has to be root-relative. href() already is, which is
+    why this can be an ordinary page() call rather than a special case.
+
+    Most 404s here will be a stale link to a service page, so the useful thing
+    to offer is the list of them rather than an apology."""
+    links = "".join(
+        f'      <li><a href="{href(s["slug"])}">{e(s["nav"])}</a></li>\n'
+        for s in SERVICES)
+    body = f'''
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <p class="pl-eyebrow">404</p>
+    <h1>That page is not here</h1>
+    <p class="pl-lede">The link is either out of date or slightly wrong. Nothing has been
+       taken down — the site is small enough that everything on it is one of the links
+       below.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--primary" href="{href()}" style="color:var(--pl-invert)">Go to the home page</a>
+      <a class="pl-btn pl-btn--quiet" href="{href('contact/')}">Ask us directly</a>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-body pl-prose">
+      <h2>What we build</h2>
+      <ul>
+{links}      </ul>
+
+      <h2>Everything else</h2>
+      <ul>
+        <li><a href="{href('work/')}">Work &amp; live demos</a></li>
+        <li><a href="{href('faq/')}">FAQ</a></li>
+        <li><a href="{href('about/')}">About</a></li>
+        <li><a href="{href('contact/')}">Contact</a></li>
+        <li><a href="{href('sitemap.xml')}">sitemap.xml</a></li>
+      </ul>
+
+      <p>If you followed a link from somewhere else and it landed here, tell us where it
+         was — <a href="mailto:{EMAIL}">{EMAIL}</a> — and we will get it pointed at the
+         right place.</p>
+    </div>
+  </div>
+</section>
+'''
+    page("404.html", "Page not found | " + BRAND,
+         "That page does not exist. Links to everything on the Plantroom Labs site.",
+         body, active="", filename="404.html", listed=False)
+
+
 def build_cname():
     """GitHub Pages reads the custom domain from this file, and drops the
     setting if the file disappears. Deriving it from SITE keeps the two from
@@ -1795,6 +1859,7 @@ def main():
     for d in DEMOS:
         build_demo(d)
 
+    build_404()
     build_robots()
     build_sitemap()
     build_llms_txt()
