@@ -70,6 +70,30 @@ stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="{COIL_A[0]}" cy="{COIL_A[1]}" r="2.2" fill="{fg}"/>\
 <circle cx="{COIL_B[0]}" cy="{COIL_B[1]}" r="2.2" fill="{fg}"/></g></svg>'''
 
+# ------------------------------------------------------------------- shots
+# Screenshots ship as WebP with the PNG kept as the fallback source. The PNGs
+# are 1.3 MB between them and the WebPs are 338 KB for the same pixels; a
+# <picture> lets a browser that cannot decode WebP still get an image, at no
+# cost to one that can. width/height are always set so the page does not
+# reflow as each one arrives.
+SHOTS = {
+  "01-desktop-expanded.png":      (1440, 1024),
+  "02-collapsed-rail-flyout.png": (1440, 1024),
+  "03-iphone.png":                (1000, 1780),
+  "rgx-01-level1.png":            (1600, 1000),
+  "rgx-02-commissioning.png":     (1600, 1000),
+  "rgx-03-tooltip.png":           (1600, 1000),
+}
+
+def shot(name, alt, lazy=True, cls=""):
+    w, h = SHOTS[name]
+    return (f'<picture>'
+            f'<source type="image/webp" srcset="{href("img/" + name[:-4] + ".webp")}">'
+            f'<img src="{href("img/" + name)}" alt="{e(alt)}" width="{w}" height="{h}"'
+            f'{" loading=\"lazy\" decoding=\"async\"" if lazy else ""}'
+            f'{f" class=\"{cls}\"" if cls else ""}></picture>')
+
+
 ICONS = {
   "module":  '<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/>',
   "widget":  '<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/>'
@@ -854,7 +878,7 @@ def demo_block(d):
     <iframe src="{href('demos/' + d['id'] + '/')}" title="{e(d['title'])} — interactive demo"
             loading="lazy" sandbox="allow-scripts" data-demo-frame="{d["id"]}"></iframe>
     <noscript>
-      <img src="{href('img/' + d['shot'])}" alt="{e(d['title'])} — screenshot of the interactive demo">
+      {shot(d['shot'], d['title'] + ' — screenshot of the interactive demo', lazy=False)}
     </noscript>
   </div>
 </article>'''
@@ -1108,25 +1132,21 @@ def build_work():
     </div>
     <div class="pl-grid pl-grid--2">
       <figure class="pl-figure">
-        <img src="{href('img/rgx-02-commissioning.png')}" loading="lazy" width="1600" height="1000"
-             alt="Building summary dashboard in a dark theme with a floor selector open on the left and full ORD paths displayed beneath each KPI tile.">
+        {shot('rgx-02-commissioning.png', "Building summary dashboard in a dark theme with a floor selector open on the left and full ORD paths displayed beneath each KPI tile.")}
         <figcaption><b>Commissioning mode.</b> Full ORD paths surfaced under each tile, so the
           engineer commissioning the job can see exactly what each value is bound to.</figcaption>
       </figure>
       <figure class="pl-figure">
-        <img src="{href('img/rgx-03-tooltip.png')}" loading="lazy" width="1600" height="1000"
-             alt="Building summary dashboard with an information callout tooltip open over a KPI tile.">
+        {shot('rgx-03-tooltip.png', "Building summary dashboard with an information callout tooltip open over a KPI tile.")}
         <figcaption><b>Callouts.</b> Contextual detail without leaving the view.</figcaption>
       </figure>
       <figure class="pl-figure pl-figure--phone">
-        <img src="{href('img/03-iphone.png')}" loading="lazy" width="1000" height="1780"
-             alt="The AHU dashboard rendered on a phone, with cards stacked vertically and navigation collapsed to an icon rail.">
+        {shot('03-iphone.png', "The AHU dashboard rendered on a phone, with cards stacked vertically and navigation collapsed to an icon rail.")}
         <figcaption><b>Same widgets, phone.</b> One responsive component set rather than a
           separate mobile view to maintain.</figcaption>
       </figure>
       <figure class="pl-figure">
-        <img src="{href('img/01-desktop-expanded.png')}" loading="lazy" width="1440" height="1024"
-             alt="Dark-themed Niagara AHU dashboard showing supply and return air temperature, fan power, zone CO2, a fan-speed dial, a 12-hour demand chart, a set point slider, plant command toggles and an active alarm list.">
+        {shot('01-desktop-expanded.png', "Dark-themed Niagara AHU dashboard showing supply and return air temperature, fan power, zone CO2, a fan-speed dial, a 12-hour demand chart, a set point slider, plant command toggles and an active alarm list.")}
         <figcaption><b>Plant dashboard.</b> The desktop view at full width.</figcaption>
       </figure>
     </div>
