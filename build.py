@@ -130,6 +130,28 @@ NAV = [
     ("about/",                "About",     680),
 ]
 
+def tabs_html(tabs):
+    """The section bar that sits under the main nav on the landing page.
+
+    Plain anchor links, not an ARIA tablist: a tablist promises panels that
+    show and hide, and these just scroll. aria-current marks the section you
+    are in, which site.js updates as you pass each one. With JavaScript off
+    the links still jump to the right place, they simply stop tracking.
+
+    The ink bar is one absolutely positioned element that slides between
+    tabs rather than a border per tab, so the movement reads as the same
+    indicator travelling along.
+    """
+    links = "".join(
+        f'<li><a href="#{i}" data-tab="{i}">{e(label)}</a></li>' for i, label in tabs)
+    return f'''<nav class="pl-tabs" aria-label="Sections">
+  <div class="pl-wrap pl-tabs__inner">
+    <ul class="pl-tabs__list">{links}</ul>
+    <span class="pl-tabs__ink" aria-hidden="true"></span>
+  </div>
+</nav>'''
+
+
 def nav_html(active):
     items = []
     for path, label, drop in NAV:
@@ -202,12 +224,13 @@ FOOTER = f'''<footer class="pl-footer">
 # ------------------------------------------------------------------- shell
 
 def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type="website",
-         filename=None, listed=True):
+         filename=None, listed=True, tabs=None):
     """Render one page to <slug>/index.html (or index.html for the root).
 
     filename overrides that target for the one page that is not a directory —
     404.html, which the server hands back under whatever path was asked for.
-    listed=False keeps a page out of the sitemap and the llms.txt inventory."""
+    listed=False keeps a page out of the sitemap and the llms.txt inventory.
+    tabs is a list of (section id, label) and adds the sticky section bar."""
     canonical = url(slug)
     graph = list(schema or [])
     if crumbs:
@@ -271,7 +294,7 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
 </head>
 <body>
 <a class="pl-skip" href="#main">Skip to content</a>
-{nav_html(active if active is not None else slug)}
+{nav_html(active if active is not None else slug)}{chr(10) + tabs_html(tabs) if tabs else ""}
 <main id="main">
 {body.replace("{{CRUMBS}}", crumb_nav)}
 </main>
@@ -820,7 +843,7 @@ def service_page(s):
 # ----------------------------------------------------------------- shared
 
 CTA = f'''
-<section class="pl-band pl-section">
+<section class="pl-band pl-section pl-anchor" id="contact">
   <div class="pl-wrap pl-cta">
     <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
     <h2>Tell us the version, the hardware, and what it has to do.</h2>
@@ -933,7 +956,7 @@ def build_home():
   </div>
 </section>
 
-<section class="pl-section">
+<section class="pl-section pl-anchor" id="services">
   <div class="pl-wrap">
     <div class="pl-section__head">
       <p class="pl-eyebrow">Services</p>
@@ -945,7 +968,7 @@ def build_home():
   </div>
 </section>
 
-<section class="pl-section pl-section--sunk">
+<section class="pl-section pl-section--sunk pl-anchor" id="demos">
   <div class="pl-wrap">
     <div class="pl-section__head">
       <p class="pl-eyebrow">Proof</p>
@@ -960,7 +983,7 @@ def build_home():
   </div>
 </section>
 
-<section class="pl-section">
+<section class="pl-section pl-anchor" id="how">
   <div class="pl-wrap">
     <div class="pl-section__head">
       <p class="pl-eyebrow">How we work</p>
@@ -983,7 +1006,7 @@ def build_home():
   </div>
 </section>
 
-<section class="pl-section pl-section--sunk">
+<section class="pl-section pl-section--sunk pl-anchor" id="niagara-5">
   <div class="pl-wrap">
     <div class="pl-section__head">
       <p class="pl-eyebrow">Niagara 5</p>
@@ -1025,7 +1048,9 @@ def build_home():
              "name": BRAND, "publisher": {"@id": url() + "#org"},
              "inLanguage": "en",
          }] + [SERVICE_LD(s["h1"], s["desc"], s["slug"], s["type_"]) for s in SERVICES],
-         crumbs=[("Home", None)], active="")
+         crumbs=[("Home", None)], active="",
+         tabs=[("services", "Services"), ("demos", "Demos"), ("how", "How we work"),
+               ("niagara-5", "Niagara 5"), ("contact", "Contact")])
 
 
 def build_services_index():

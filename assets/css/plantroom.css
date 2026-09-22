@@ -157,6 +157,7 @@
   --pl-max:1120px;
   --pl-max-prose:72ch;
   --pl-nav-h:60px;
+  --pl-tabs-h:46px;
 
   /* --- radii + elevation, verbatim from product ------------------------ */
 
@@ -594,6 +595,59 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
   .pl-spec tbody th, .pl-spec tbody td { display:block; width:auto; border-bottom:0; padding-block:var(--pl-s-2); }
   .pl-spec tbody tr { display:block; border-bottom:1px solid var(--pl-line); padding-block:var(--pl-s-5); }
   .pl-spec thead { display:none; }
+}
+
+/* ------------------------------------------------------ section tab bar */
+/* Sticks directly under .pl-nav, so its top offset is the nav's height and
+   its z-index one below. Sections tracked by it carry .pl-anchor, whose
+   scroll-margin-top clears both bars — that is done per section rather than
+   with scroll-padding-top on html because only this page has the bar. */
+
+.pl-tabs {
+  position:sticky; top:var(--pl-nav-h); z-index:39;
+  background:var(--pl-surface); border-bottom:1px solid var(--pl-line);
+  height:var(--pl-tabs-h);
+}
+.pl-tabs__inner { position:relative; display:flex; align-items:stretch; height:100%; }
+.pl-tabs__list {
+  display:flex; align-items:stretch; gap:var(--pl-s-1);
+  margin:0; padding:0; list-style:none;
+  overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
+  overscroll-behavior-x:contain;
+}
+.pl-tabs__list::-webkit-scrollbar { display:none; }
+.pl-tabs__list a {
+  display:flex; align-items:center; height:100%; white-space:nowrap;
+  padding-inline:var(--pl-s-4);
+  font-size:var(--pl-fs-sm); font-weight:var(--pl-fw-medium);
+  color:var(--pl-text-muted); text-decoration:none;
+  border-bottom:2px solid transparent;
+}
+.pl-tabs__list a:hover { color:var(--pl-text-strong); text-decoration:none; }
+.pl-tabs__list a[aria-current="true"] { color:var(--pl-accent-deep); }
+
+/* One indicator that slides, rather than a border appearing under each tab.
+   Hidden until site.js has measured a tab, so it never sits at 0 first. */
+.pl-tabs__ink {
+  position:absolute; bottom:-1px; left:0; height:2px; width:0;
+  background:var(--pl-accent); border-radius:2px;
+  opacity:0; transform:translateX(0);
+  transition:transform .28s cubic-bezier(.4,0,.2,1), width .28s cubic-bezier(.4,0,.2,1), opacity .2s;
+}
+.pl-tabs__ink.is-on { opacity:1; }
+
+/* html already sets scroll-padding-top for the nav, and the two add up, so
+   this only has to contribute the tab bar on top of it. */
+.pl-anchor { scroll-margin-top:var(--pl-tabs-h); }
+
+/* All five tabs fit a phone at the smaller step; below that the list
+   scrolls, and site.js keeps the active tab in view. */
+@media (max-width:560px) {
+  .pl-tabs__list a { padding-inline:var(--pl-s-3); font-size:var(--pl-fs-xs); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-tabs__ink { transition:none; }
 }
 
 /* Progressive nav. .pl-nav__inner is one non-wrapping row at a fixed 60px
