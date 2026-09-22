@@ -45,6 +45,22 @@ def href(path=""):
 def e(s):
     return html.escape(s, quote=False)
 
+def meta_desc(text, limit=155):
+    """Trim a description to what Google actually renders, at a sentence end.
+
+    Google cuts the snippet around 155 characters. Cutting there mid-word
+    reads as broken, and an ellipsis on a sentence that had already finished
+    reads as truncated when it was not — so fall back to the last full stop,
+    and only to a word boundary if there is no sentence to cut at.
+    """
+    if len(text) <= limit:
+        return text
+    head = text[:limit]
+    stop = head.rfind(". ")
+    if stop > limit * 0.6:
+        return head[:stop + 1]
+    return head[:head.rfind(" ")].rstrip(",;:") + "\u2026"
+
 # -------------------------------------------------------------------- mark
 # A plumbed heat-exchanger coil inside a rounded frame: inlet stub low-left,
 # two 180-degree bends through the bank, outlet stub high-right. It reads as
@@ -381,10 +397,9 @@ SERVICES = [
   slug="services/niagara-modules/", icon="module",
   nav="Custom modules & drivers",
   h1="Custom Niagara modules and drivers",
-  title="Custom Niagara Module & Driver Development | Niagara 4 and Niagara 5",
-  desc=("Bespoke Niagara Framework modules: rt, wb and ux components written against the "
-        "Baja API. Drivers for equipment with no stock Niagara support, custom services, "
-        "and integrations. Pure Java, signed, and stamped to run on JACE hardware."),
+  title="Custom Niagara Module & Driver Development | Niagara 4 & 5",
+  desc=("Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure "
+        "Java, signed, and stamped to install across a mixed estate."),
   type_="Custom software development",
   lede=("When the driver you need does not exist, or the stock one does not do the thing "
         "the job actually requires. <strong>rt</strong>, <strong>wb</strong> and "
@@ -454,10 +469,9 @@ SERVICES = [
   slug="services/bajaux-widgets/", icon="widget",
   nav="bajaux widgets",
   h1="bajaux widgets and dashboards",
-  title="bajaux Widget Development for Niagara | Custom HTML5 Dashboards",
-  desc=("Custom bajaux and BajaScript widgets for Niagara 4 and Niagara 5: responsive "
-        "dashboards, navigation, equipment views and charts, bound to live station ORDs "
-        "and BQL history, themed to your brand and usable in PX and in a browser."),
+  title="bajaux Widget Development & HTML5 Dashboards for Niagara",
+  desc=("Custom bajaux and BajaScript widgets for Niagara: dashboards, navigation, equipment "
+        "views and charts, bound to live station ORDs and BQL history."),
   type_="User interface development",
   lede=("Browser-native widgets that live in your PX views and in your station's web UI. "
         "Bound to real ORDs and BQL history, <strong>responsive by construction</strong>, "
@@ -517,10 +531,9 @@ SERVICES = [
   slug="services/px-graphics/", icon="px",
   nav="PX graphics",
   h1="PX graphics and standard sheets",
-  title="Niagara PX Graphics Development & Standard PX Sheet Templates",
-  desc=("Niagara PX graphics built as a reusable, bindable template set: standard PX sheets "
-        "per plant type, relative-ORD binding so one sheet serves every unit, navigation "
-        "hierarchy, and a graphics standard your engineers can apply without redrawing."),
+  title="Niagara PX Graphics & Standard PX Sheet Templates",
+  desc=("Niagara PX graphics as a reusable template set: standard sheets per plant type, "
+        "relative-ORD binding, navigation hierarchy and a graphics standard."),
   type_="Graphics engineering",
   lede=("Most PX estates are not a graphics problem, they are a <strong>duplication</strong> "
         "problem: eighty sheets that were copied, hand-edited and now disagree. The fix is a "
@@ -583,10 +596,9 @@ SERVICES = [
   slug="services/station-engineering/", icon="station",
   nav="Station engineering",
   h1="Station engineering and new controller setup",
-  title="Niagara Station Setup, Commissioning & JACE Controller Engineering",
-  desc=("New Niagara station and JACE controller setup end to end: platform commissioning, "
-        "TLS and certificate configuration, user and role model, BACnet and Modbus driver "
-        "integration, point naming and tagging, histories, alarms, schedules and backups."),
+  title="Niagara Station Setup, Commissioning & JACE Engineering",
+  desc=("Niagara station and controller setup end to end: platform commissioning, TLS, users "
+        "and roles, BACnet and Modbus, tagging, histories, alarms, backups."),
   type_="Systems engineering",
   lede=("Standing up a new station or a new controller, properly, from platform "
         "commissioning to a handover pack. <strong>The boring half done right</strong> — "
@@ -646,9 +658,8 @@ SERVICES = [
   nav="Workbench tooling",
   h1="Workbench tooling and bulk engineering",
   title="Niagara Workbench Tools & Bulk Engineering Automation",
-  desc=("Custom Workbench views and tools that remove repetitive Niagara engineering: bulk "
-        "point renaming and retagging, station audits, provisioning helpers, mass alarm and "
-        "history configuration, and pre-migration module inventories."),
+  desc=("Custom Workbench views and tools for repetitive Niagara work: bulk renaming and "
+        "retagging, station audits, provisioning helpers and module inventories."),
   type_="Engineering automation",
   lede=("The repetitive work that quietly eats project hours — renaming four thousand points, "
         "applying tags by hand, auditing a station before a migration. "
@@ -705,10 +716,9 @@ SERVICES = [
   slug="services/niagara-5-migration/", icon="n5",
   nav="Niagara 5 migration",
   h1="Niagara 5 readiness and migration",
-  title="Niagara 5 Migration & Readiness Audit | Java 21, Signing, JACE 9000",
-  desc=("Niagara 5 readiness audits and migration work: which third-party modules survive "
-        "Java 21 and mandatory signing, what a JACE-8000 to JACE-9000 controller swap "
-        "actually involves, and porting existing modules so they load on Niagara 5."),
+  title="Niagara 5 Migration & Module Readiness Audit",
+  desc=("Niagara 5 readiness audits and migration: which third-party modules survive the new "
+        "runtime and mandatory signing, and porting your modules so they load."),
   type_="Migration and porting",
   lede=("Niagara 5 changes three things that break modules: <strong>Java 21</strong>, "
         "<strong>mandatory signatures with no grace period</strong>, and "
@@ -1038,10 +1048,9 @@ def build_home():
 
 {CTA}
 '''
-    page("", f"{BRAND} — Custom Niagara Modules, bajaux Widgets & PX Graphics",
-         "Independent Niagara Framework engineering: custom modules and drivers, bajaux widgets, "
-         "PX graphics, station setup and Niagara 5 migration. Live interactive widget demos, "
-         "fixed price per deliverable.",
+    page("", f"Custom Niagara Modules & bajaux Widgets | {BRAND}",
+         "Independent Niagara Framework engineering: custom modules and drivers, bajaux "
+         "widgets, PX graphics, station setup and Niagara 5 migration. Live demos.",
          body,
          schema=[ORG, {
              "@type": "WebSite", "@id": url() + "#website", "url": url(),
@@ -1095,10 +1104,9 @@ def build_services_index():
 
 {CTA}
 '''
-    page("services/", "Niagara Framework Services — Modules, Widgets, PX, Station Engineering",
-         "Niagara Framework services: custom module and driver development, bajaux widgets, PX "
-         "graphics standards, station setup and commissioning, Workbench tooling and Niagara 5 "
-         "migration. Fixed price per deliverable.",
+    page("services/", "Niagara Framework Services — Modules, Widgets, PX, Stations",
+         "Niagara services: custom module and driver development, bajaux widgets, PX graphics "
+         "standards, station commissioning, Workbench tooling and migration.",
          body,
          schema=[ORG, {
              "@type": "ItemList", "name": "Niagara Framework services",
@@ -1202,9 +1210,8 @@ def build_work():
 {CTA}
 '''
     page("work/", "Live Niagara Widget Demos — Interactive bajaux Dashboards",
-         "Interactive demos of custom Niagara bajaux widgets running in your browser: AHU plant "
-         "dashboard, building summary and navigation rail, driven by a simulated station with "
-         "live ORD resolution and writable points.",
+         "Interactive demos of custom Niagara bajaux widgets in your browser: AHU dashboard, "
+         "building summary and navigation rail, on a simulated station.",
          body,
          schema=[ORG] + [{
              "@type": "SoftwareApplication",
@@ -1316,8 +1323,8 @@ def build_faq():
 
 {CTA}
 '''
-    page("faq/", "Niagara Development FAQ — Signing, JACE Support, Pricing, Niagara 5",
-         "Answers on Niagara module signing modes, JACE-8000 support, source code, fixed-price "
+    page("faq/", "Niagara Development FAQ — Signing, JACE Support, Pricing",
+         "Answers on Niagara module signing modes, JACE support, source code, fixed-price "
          "quoting, PX versus bajaux, and what a Niagara 5 readiness audit produces.",
          body,
          schema=[ORG, {
@@ -1420,9 +1427,9 @@ def build_about():
 
 {CTA}
 '''
-    page("about/", f"About {BRAND} — Independent Niagara Framework Developers",
+    page("about/", f"About {BRAND} — Independent Niagara Developers",
          "An independent Niagara Framework development practice: why it exists, how the work is "
-         "approached, the technical ground covered, and what is deliberately not claimed.",
+         "approached, the ground covered, and what is deliberately not claimed.",
          body, schema=[ORG, {"@type": "AboutPage", "url": url("about/"),
                              "mainEntity": {"@id": url() + "#org"}}],
          crumbs=[("Home", ""), ("About", None)], active="about/")
@@ -1502,9 +1509,9 @@ def build_contact():
   </div>
 </section>
 '''
-    page("contact/", f"Contact {BRAND} — Niagara Module & Widget Development Enquiries",
+    page("contact/", f"Contact {BRAND} — Niagara Development Enquiries",
          f"Get a written scope and a fixed price for Niagara Framework work. Email {EMAIL} with "
-         "your Niagara version, target hardware and what the module has to do.",
+         "your Niagara version, target hardware and the job.",
          body,
          schema=[ORG, {"@type": "ContactPage", "url": url("contact/"),
                        "mainEntity": {"@id": url() + "#org"}}],
@@ -1561,7 +1568,7 @@ def build_demo(d):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(d["title"])} — live demo | {BRAND}</title>
-<meta name="description" content="{html.escape(d["blurb"][:180], quote=True)}">
+<meta name="description" content="{html.escape(meta_desc(d["blurb"]), quote=True)}">
 <link rel="canonical" href="{url('demos/' + d['id'] + '/')}">
 <meta name="robots" content="noindex, follow">
 <link rel="icon" href="{href('assets/mark.svg')}" type="image/svg+xml">

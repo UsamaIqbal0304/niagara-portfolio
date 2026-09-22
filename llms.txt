@@ -13,12 +13,12 @@ Last updated: 2026-09-22
 
 Niagara Framework (Tridium) software engineering, specifically:
 
-- [Custom Niagara modules and drivers](https://plantroomlabs.com/services/niagara-modules/): Bespoke Niagara Framework modules: rt, wb and ux components written against the Baja API. Drivers for equipment with no stock Niagara support, custom services, and integrations. Pure Java, signed, and stamped to run on JACE hardware.
-- [bajaux widgets and dashboards](https://plantroomlabs.com/services/bajaux-widgets/): Custom bajaux and BajaScript widgets for Niagara 4 and Niagara 5: responsive dashboards, navigation, equipment views and charts, bound to live station ORDs and BQL history, themed to your brand and usable in PX and in a browser.
-- [PX graphics and standard sheets](https://plantroomlabs.com/services/px-graphics/): Niagara PX graphics built as a reusable, bindable template set: standard PX sheets per plant type, relative-ORD binding so one sheet serves every unit, navigation hierarchy, and a graphics standard your engineers can apply without redrawing.
-- [Station engineering and new controller setup](https://plantroomlabs.com/services/station-engineering/): New Niagara station and JACE controller setup end to end: platform commissioning, TLS and certificate configuration, user and role model, BACnet and Modbus driver integration, point naming and tagging, histories, alarms, schedules and backups.
-- [Workbench tooling and bulk engineering](https://plantroomlabs.com/services/workbench-tooling/): Custom Workbench views and tools that remove repetitive Niagara engineering: bulk point renaming and retagging, station audits, provisioning helpers, mass alarm and history configuration, and pre-migration module inventories.
-- [Niagara 5 readiness and migration](https://plantroomlabs.com/services/niagara-5-migration/): Niagara 5 readiness audits and migration work: which third-party modules survive Java 21 and mandatory signing, what a JACE-8000 to JACE-9000 controller swap actually involves, and porting existing modules so they load on Niagara 5.
+- [Custom Niagara modules and drivers](https://plantroomlabs.com/services/niagara-modules/): Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.
+- [bajaux widgets and dashboards](https://plantroomlabs.com/services/bajaux-widgets/): Custom bajaux and BajaScript widgets for Niagara: dashboards, navigation, equipment views and charts, bound to live station ORDs and BQL history.
+- [PX graphics and standard sheets](https://plantroomlabs.com/services/px-graphics/): Niagara PX graphics as a reusable template set: standard sheets per plant type, relative-ORD binding, navigation hierarchy and a graphics standard.
+- [Station engineering and new controller setup](https://plantroomlabs.com/services/station-engineering/): Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.
+- [Workbench tooling and bulk engineering](https://plantroomlabs.com/services/workbench-tooling/): Custom Workbench views and tools for repetitive Niagara work: bulk renaming and retagging, station audits, provisioning helpers and module inventories.
+- [Niagara 5 readiness and migration](https://plantroomlabs.com/services/niagara-5-migration/): Niagara 5 readiness audits and migration: which third-party modules survive the new runtime and mandatory signing, and porting your modules so they load.
 
 ## Technical scope
 
