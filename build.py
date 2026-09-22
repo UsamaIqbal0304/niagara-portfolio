@@ -254,9 +254,8 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
 <link rel="apple-touch-icon" href="{href('assets/apple-touch-icon.png')}">
 <link rel="alternate" type="text/plain" href="{href('llms.txt')}" title="llms.txt — site summary for language models">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="preload" as="font" type="font/woff2" href="{href('assets/fonts/inter-var.woff2')}" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="{href('assets/fonts/jetbrains-mono-var.woff2')}" crossorigin>
 <link rel="stylesheet" href="{href('assets/css/plantroom.css')}">{ld}
 </head>
 <body>
@@ -1519,9 +1518,8 @@ def build_demo(d):
 <link rel="canonical" href="{url('demos/' + d['id'] + '/')}">
 <meta name="robots" content="noindex, follow">
 <link rel="icon" href="{href('assets/mark.svg')}" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="preload" as="font" type="font/woff2" href="{href('assets/fonts/inter-var.woff2')}" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="{href('assets/fonts/jetbrains-mono-var.woff2')}" crossorigin>
 {chr(10).join(css_links)}
 <style>
   html,body{{height:100%;margin:0;background:{"#0e1116" if d["theme"] == "dark" else "#f7f8fc"};

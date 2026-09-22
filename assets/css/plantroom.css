@@ -15,6 +15,29 @@
    Nothing below Layer 1 hard-codes a colour, a radius or a duration.
    ========================================================================= */
 
+/* ------------------------------------------------------------------ fonts
+   Self-hosted rather than loaded from fonts.googleapis.com. Two reasons: the
+   Google stylesheet is a render-blocking request to a third party before any
+   text can paint, and it hands a UK visitor's IP address to Google on every
+   page load, which is a data-protection question this site does not need to
+   answer.
+
+   Both files are the variable font subset to latin plus the punctuation the
+   copy actually uses (see assets/fonts/README.md). One 62 KB file covers
+   every Inter weight the site asks for; one 39 KB file covers the mono.
+
+   font-display:swap so text is readable in the fallback face immediately and
+   reflows once, rather than being invisible while the font downloads. */
+
+@font-face {
+  font-family:"Inter"; font-style:normal; font-weight:100 900;
+  font-display:swap; src:url("../fonts/inter-var.woff2") format("woff2");
+}
+@font-face {
+  font-family:"JetBrains Mono"; font-style:normal; font-weight:100 800;
+  font-display:swap; src:url("../fonts/jetbrains-mono-var.woff2") format("woff2");
+}
+
 /* ---------------------------------------------------------------- LAYER 1 */
 
 :root {
