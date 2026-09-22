@@ -68,7 +68,13 @@
   --pl-text:        var(--gx-n-80);
   --pl-text-strong: var(--gx-n-95);
   --pl-text-muted:  var(--gx-n-70);
-  --pl-text-faint:  var(--gx-n-60);
+  /* Not --gx-n-60: at the 11px these labels are set in (brand tagline,
+     eyebrows, table headers, captions) #7d8798 gives 3.3-3.6:1 depending on
+     the surface under it, against a 4.5 floor. This is only a shade lighter
+     than --pl-text-muted, which is the honest answer — at 11px there is no
+     grey that is both faint and legible. The step down from muted is carried
+     by size, weight and uppercasing instead of by colour. */
+  --pl-text-faint:  #656f7f;   /* 4.62 on the darkest surface it lands on */
   --pl-invert:      var(--gx-n-00);
 
   --pl-line:        rgba(37,42,49,0.10);
@@ -78,6 +84,29 @@
   --pl-accent-deep: var(--gx-run-deep);
   --pl-accent-tint: var(--gx-run-tint);
   --pl-accent-2:    var(--gx-info-deep);
+
+  /* --- contrast-safe variants of the anchors above ---------------------
+     The --gx-* block is the product's palette copied verbatim and stays
+     that way. Four of those anchors miss the WCAG AA 4.5:1 floor at the
+     12px this site sets chips and buttons in:
+
+       white on --gx-run          4.20   (primary button)
+       --gx-ok-deep   on its tint 4.25
+       --gx-info-deep on its tint 3.39
+       --gx-warn-deep on its tint 3.09
+
+     The product gets away with it because its chips sit in a dense
+     operator UI on a commissioned monitor. A marketing page is read once,
+     often on a phone outdoors, and the people reading it are frequently
+     doing so in a plant room. Each value below is the same hue dropped in
+     lightness until it clears the floor — the largest shift is 8% and none
+     is visible side by side. Used only where the colour carries text. */
+
+  --pl-accent-fill: #7257ff;   /* 4.64 with white on top */
+  --pl-ok-ink:      #247b41;   /* 4.71 on --gx-ok-tint   */
+  --pl-info-ink:    #00788d;   /* 4.64 on --gx-info-tint */
+  --pl-warn-ink:    #9b6200;   /* 4.65 on --gx-warn-tint */
+  --pl-run-ink:     var(--gx-run-deep);  /* 5.76, already clears it */
 
   --pl-focus-ring: 0 0 0 2px var(--pl-canvas), 0 0 0 4px var(--gx-run);
 
@@ -89,7 +118,7 @@
   --pl-dark-line:    rgba(255,255,255,0.09);
   --pl-dark-text:    #dfe4ec;
   --pl-dark-muted:   #97a2b3;
-  --pl-dark-faint:   #6f7b8d;
+  --pl-dark-faint:   #737f91;   /* 4.66 on --pl-dark; #6f7b8d was 4.41 */
   --pl-dark-accent:  #9b85ff;
   --pl-dark-mesh-a:  rgba(123,97,255,0.20);
   --pl-dark-mesh-b:  rgba(0,184,217,0.15);
@@ -190,6 +219,21 @@ img { max-width:100%; height:auto; }
 a { color:var(--pl-accent-deep); text-decoration:none; }
 a:hover { text-decoration:underline; text-underline-offset:2px; }
 
+/* Links inside running text are underlined always, not only on hover. The
+   accent sits at 1.22:1 against muted body text, so to a reader who does not
+   separate those two hues there is nothing marking the link at all, and
+   hover does not exist on a phone (WCAG 1.4.1).
+
+   Scoped to prose containers on purpose: nav items, buttons, cards and
+   crumbs are recognisable as controls by shape and position, and underlining
+   them would be noise. Anything carrying .pl-btn is a button wherever it
+   happens to sit. */
+:is(p, dd, figcaption, blockquote) a:not(.pl-btn):not(.pl-brand):not(.pl-contact-email),
+.pl-prose li a {
+  text-decoration:underline; text-underline-offset:2px;
+  text-decoration-thickness:from-font;
+}
+
 code, kbd, samp {
   font-family:var(--pl-font-mono); font-size:0.875em;
   background:var(--pl-surface-sunk); border:1px solid var(--pl-line);
@@ -286,7 +330,7 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
 }
 .pl-btn:hover { text-decoration:none; transform:translateY(-1px); }
 .pl-btn:active { transform:translateY(0); }
-.pl-btn--primary { background:var(--pl-accent); color:var(--pl-invert); box-shadow:var(--pl-e-2); }
+.pl-btn--primary { background:var(--pl-accent-fill); color:var(--pl-invert); box-shadow:var(--pl-e-2); }
 .pl-btn--primary:hover { background:var(--pl-accent-deep); box-shadow:var(--pl-e-3); }
 .pl-btn--ghost { background:var(--pl-surface); color:var(--pl-text-strong); border-color:var(--pl-line-strong); box-shadow:var(--pl-e-1); }
 .pl-btn--ghost:hover { border-color:var(--pl-accent); color:var(--pl-accent-deep); }
@@ -305,10 +349,10 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
   border-radius:var(--pl-r-pill); padding:var(--pl-s-3) var(--pl-s-6); box-shadow:var(--pl-e-1);
 }
 .pl-chip--on-dark { background:rgba(255,255,255,0.05); border-color:var(--pl-dark-line); color:var(--pl-dark-muted); box-shadow:none; }
-.pl-chip--ok   { color:var(--gx-ok-deep);   background:var(--gx-ok-tint);   border-color:var(--gx-ok-soft); }
-.pl-chip--run  { color:var(--gx-run-deep);  background:var(--gx-run-tint);  border-color:var(--gx-run-soft); }
-.pl-chip--warn { color:var(--gx-warn-deep); background:var(--gx-warn-tint); border-color:var(--gx-warn-soft); }
-.pl-chip--info { color:var(--gx-info-deep); background:var(--gx-info-tint); border-color:var(--gx-info-soft); }
+.pl-chip--ok   { color:var(--pl-ok-ink);    background:var(--gx-ok-tint);   border-color:var(--gx-ok-soft); }
+.pl-chip--run  { color:var(--pl-run-ink);   background:var(--gx-run-tint);  border-color:var(--gx-run-soft); }
+.pl-chip--warn { color:var(--pl-warn-ink);  background:var(--gx-warn-tint); border-color:var(--gx-warn-soft); }
+.pl-chip--info { color:var(--pl-info-ink);  background:var(--gx-info-tint); border-color:var(--gx-info-soft); }
 
 /* -------------------------------------------------------------- sections */
 
@@ -335,7 +379,13 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
 .pl-band .pl-lede strong { color:var(--pl-invert); }
 .pl-band .pl-eyebrow { color:var(--pl-dark-accent); }
 .pl-band .pl-eyebrow::before { background:var(--pl-dark-accent); }
-.pl-band a { color:var(--pl-dark-accent); }
+/* :not(.pl-btn) because a button already carries its own pair. Without it
+   this rule won on specificity and painted every .pl-btn--on-dark label
+   #9b85ff on its white pill — 2.92:1, the worst contrast on the site, and
+   on the primary call to action of three pages. axe does not catch it:
+   the button sits over a mesh gradient, so it gives up on the background
+   and skips the check rather than failing it. */
+.pl-band a:not(.pl-btn) { color:var(--pl-dark-accent); }
 .pl-band code { background:rgba(255,255,255,0.07); border-color:var(--pl-dark-line); color:var(--pl-dark-text); }
 
 /* ------------------------------------------------------------------- hero */
@@ -372,7 +422,8 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
              transform var(--pl-t-base) var(--pl-ease);
 }
 .pl-card p { color:var(--pl-text-muted); font-size:var(--pl-fs-sm); margin:var(--pl-s-5) 0 0; }
-.pl-card h3 { font-size:var(--pl-fs-lg); }
+/* h2 on /services/, h3 elsewhere — see service_cards() in build.py. */
+.pl-card :is(h2,h3) { font-size:var(--pl-fs-lg); font-weight:var(--pl-fw-semi); letter-spacing:-.012em; }
 .pl-card--link:hover { border-color:var(--gx-run-soft); box-shadow:var(--pl-e-3); transform:translateY(-2px); }
 .pl-card--link a::after { content:''; position:absolute; inset:0; border-radius:inherit; }
 .pl-card--link a { color:inherit; }
@@ -506,8 +557,13 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
 
 .pl-footer { background:var(--pl-dark); color:var(--pl-dark-muted); padding-block:var(--pl-s-12) var(--pl-s-10); font-size:var(--pl-fs-sm); }
 .pl-footer__cols { display:grid; grid-template-columns:2fr 1fr 1fr; gap:var(--pl-s-10); }
-.pl-footer h4 {
+/* h2, not h4: the footer's columns are top-level page sections, so an h4
+   here skips two levels down from the page h1 and a screen reader announces
+   a structure that does not exist. It is set small because it is a label,
+   not because it is deep. */
+.pl-footer h2 {
   color:var(--pl-dark-faint); font-size:var(--pl-fs-micro); letter-spacing:var(--pl-track-eyebrow);
+  font-weight:var(--pl-fw-semi); line-height:var(--pl-lh-snug);
   text-transform:uppercase; margin-bottom:var(--pl-s-6);
 }
 .pl-footer ul { list-style:none; margin:0; padding:0; display:grid; gap:var(--pl-s-4); }
@@ -559,7 +615,9 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
   display:flex; flex-wrap:wrap; gap:var(--pl-s-8); align-items:flex-start;
   justify-content:space-between; margin-bottom:var(--pl-s-7);
 }
-.pl-demo__head h3 { font-size:var(--pl-fs-xl); }
+/* h2 on /work/, h3 on the home page — see demo_block() in build.py. The
+   rank is a document-structure decision; the size is not, so pin both. */
+.pl-demo__head :is(h2,h3) { font-size:var(--pl-fs-xl); font-weight:var(--pl-fw-semi); letter-spacing:-.012em; }
 .pl-demo__head p { margin:var(--pl-s-5) 0 0; color:var(--pl-text-muted); font-size:var(--pl-fs-sm); max-width:62ch; }
 .pl-demo__controls { display:flex; flex-wrap:wrap; gap:var(--pl-s-5); align-items:center; flex:none; }
 .pl-demo__controls .pl-chip { display:inline-flex; align-items:center; gap:var(--pl-s-4); }

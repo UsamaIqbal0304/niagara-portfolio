@@ -160,7 +160,7 @@ FOOTER = f'''<footer class="pl-footer">
         </p>
       </div>
       <div>
-        <h4>Services</h4>
+        <h2>Services</h2>
         <ul>
           <li><a href="{href('services/niagara-modules/')}">Custom modules &amp; drivers</a></li>
           <li><a href="{href('services/bajaux-widgets/')}">bajaux widgets</a></li>
@@ -171,7 +171,7 @@ FOOTER = f'''<footer class="pl-footer">
         </ul>
       </div>
       <div>
-        <h4>More</h4>
+        <h2>More</h2>
         <ul>
           <li><a href="{href('work/')}">Work</a></li>
           <li><a href="{href('about/')}">About</a></li>
@@ -826,10 +826,12 @@ CTA = f'''
   </div>
 </section>'''
 
-def service_cards(band=False):
+def service_cards(band=False, level=3):
+    """level as in demo_block(): h3 under the home page's "Six things" h2,
+    h2 on /services/ where the cards are the page's top-level sections."""
     return "".join(
         f'''<div class="pl-card pl-card--link">{icon(s["icon"])}
-        <h3><a href="{href(s["slug"])}">{e(s["nav"])}</a></h3>
+        <h{level}><a href="{href(s["slug"])}">{e(s["nav"])}</a></h{level}>
         <p>{e(s["desc"].split(". ")[0])}.</p>
         <span class="pl-card__more">Read more</span></div>'''
         for s in SERVICES)
@@ -867,12 +869,16 @@ DEMOS = [
              "width. Click through the sections.")),
 ]
 
-def demo_block(d):
+def demo_block(d, level=3):
+    """level is the heading rank for the demo title, and it has to be passed
+    because the same block sits at two depths: on the home page it follows an
+    h2 section head, on /work/ the demos are the page's own top-level sections
+    and an h3 there skips a level. They render identically either way."""
     return f'''
 <article class="pl-demo" id="demo-{d["id"]}">
   <div class="pl-demo__head">
     <div>
-      <h3>{e(d["title"])}</h3>
+      <h{level}>{e(d["title"])}</h{level}>
       <p>{e(d["blurb"])}</p>
     </div>
     <div class="pl-demo__controls">
@@ -1029,7 +1035,7 @@ def build_services_index():
 
 <section class="pl-section">
   <div class="pl-wrap">
-    <div class="pl-grid pl-grid--2">{service_cards()}</div>
+    <div class="pl-grid pl-grid--2">{service_cards(level=2)}</div>
   </div>
 </section>
 
@@ -1100,7 +1106,7 @@ def build_work():
          than read from real plant, because publishing a live connection to somebody's building
          would be a poor idea. Nothing here is a client site.</p>
     </div>
-    {"".join(demo_block(d) for d in DEMOS)}
+    {"".join(demo_block(d, level=2) for d in DEMOS)}
   </div>
 </section>
 
@@ -1791,8 +1797,8 @@ def build_404():
        taken down — the site is small enough that everything on it is one of the links
        below.</p>
     <div class="pl-btn-row">
-      <a class="pl-btn pl-btn--primary" href="{href()}" style="color:var(--pl-invert)">Go to the home page</a>
-      <a class="pl-btn pl-btn--quiet" href="{href('contact/')}">Ask us directly</a>
+      <a class="pl-btn pl-btn--on-dark" href="{href()}">Go to the home page</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="{href('contact/')}">Ask us directly</a>
     </div>
   </div>
 </section>
