@@ -590,12 +590,22 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
   .pl-section { padding-block:var(--pl-s-11); }
   .pl-hero { padding-block:var(--pl-s-11) var(--pl-s-10); }
   .pl-footer__cols { grid-template-columns:1fr; gap:var(--pl-s-9); }
-  .pl-nav__links--overflow { display:none; }
   .pl-brand__name span { display:none; }
   .pl-spec tbody th, .pl-spec tbody td { display:block; width:auto; border-bottom:0; padding-block:var(--pl-s-2); }
   .pl-spec tbody tr { display:block; border-bottom:1px solid var(--pl-line); padding-block:var(--pl-s-5); }
   .pl-spec thead { display:none; }
 }
+
+/* Progressive nav. .pl-nav__inner is one non-wrapping row at a fixed 60px
+   height, so links cannot reflow — past a point they simply run off the
+   right edge and the whole page gains a horizontal scrollbar. Each item
+   carries the width it is dropped below (set in NAV in build.py), tuned so
+   the bar fits at 320px. Every dropped link is still in the footer, which
+   lists all of them at all widths, and the "Get a quote" button is never
+   dropped. */
+@media (max-width:680px) { .pl-nav__item--drop-680 { display:none; } }
+@media (max-width:520px) { .pl-nav__item--drop-520 { display:none; } }
+@media (max-width:420px) { .pl-nav__item--drop-420 { display:none; } }
 
 @media print {
   .pl-nav, .pl-skip { display:none; }

@@ -117,18 +117,24 @@ def icon(name):
 # --------------------------------------------------------------------- nav
 
 NAV = [
-    ("services/",             "Services"),
-    ("work/",                 "Work"),
-    ("services/niagara-5-migration/", "Niagara 5"),
-    ("faq/",                  "FAQ"),
-    ("about/",                "About"),
+    # (path, label, drop_below) — the nav bar is one non-wrapping row of fixed
+    # width, so every item needs a viewport width under which it is dropped or
+    # the whole page gains a horizontal scrollbar. drop_below=None means the
+    # item always stays. Nothing is lost by dropping: the footer carries the
+    # full navigation at every width, and "Get a quote" is never in this list
+    # because the call to action stays whatever else goes.
+    ("services/",             "Services",  None),
+    ("work/",                 "Work",      420),
+    ("services/niagara-5-migration/", "Niagara 5", 520),
+    ("faq/",                  "FAQ",       680),
+    ("about/",                "About",     680),
 ]
 
 def nav_html(active):
     items = []
-    for path, label in NAV:
+    for path, label, drop in NAV:
         cur = ' aria-current="page"' if path == active else ""
-        cls = ' class="pl-nav__links--overflow"' if path in ("faq/", "about/") else ""
+        cls = f' class="pl-nav__item--drop-{drop}"' if drop else ""
         items.append(f'<li{cls}><a href="{href(path)}"{cur}>{label}</a></li>')
     return f'''<nav class="pl-nav" aria-label="Primary">
   <div class="pl-wrap pl-nav__inner">
