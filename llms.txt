@@ -133,6 +133,7 @@ than from memory, and free to quote. Index at https://plantroomlabs.com/notes/.
 - [Platform or station: two connections, two sets of logins](https://plantroomlabs.com/notes/platform-versus-station/): Two processes, two Java VMs, two logins and two file trees — and most “it works in Workbench but not the browser” starts here. Markdown: https://plantroomlabs.com/notes/platform-versus-station.md
 - [A JACE-8000 has no onboard I/O: using the Nrio driver](https://plantroomlabs.com/notes/nrio-io-on-a-jace-8000/): Remote IO-R modules on RS-485, one network per port, and the conversion list Workbench will happily let you get wrong. Markdown: https://plantroomlabs.com/notes/nrio-io-on-a-jace-8000.md
 - [Conversion links: what a mismatched wire really does](https://plantroomlabs.com/notes/niagara-conversion-links/): Link a boolean to a numeric and Niagara inserts a converter with its own properties. Here is what each one assumes on your behalf. Markdown: https://plantroomlabs.com/notes/niagara-conversion-links.md
+- [Authentication schemes: each Niagara user picks one](https://plantroomlabs.com/notes/niagara-authentication-schemes/): A station can run several login mechanisms at once, and the choice is made per user, not per station. What each scheme is actually for. Markdown: https://plantroomlabs.com/notes/niagara-authentication-schemes.md
 
 ## Honest limits
 
