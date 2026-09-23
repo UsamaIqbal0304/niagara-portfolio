@@ -394,6 +394,7 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
 .pl-hero h1 { max-width:19ch; }
 .pl-hero--page { padding-block:var(--pl-s-12) var(--pl-s-11); }
 .pl-hero--page h1 { font-size:var(--pl-fs-4xl); max-width:24ch; }
+.pl-hero__meta { margin-top:var(--pl-s-7); font-size:var(--pl-fs-xs); color:var(--pl-dark-faint); }
 
 /* ------------------------------------------------------------ breadcrumbs */
 

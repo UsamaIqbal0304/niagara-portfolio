@@ -397,6 +397,7 @@ def SERVICE_LD(name, desc, slug, service_type):
 SERVICES = [
  dict(
   slug="services/niagara-modules/", icon="module",
+  date="2026-09-22",
   nav="Custom modules & drivers",
   h1="Custom Niagara modules and drivers",
   title="Custom Niagara Module & Driver Development | Niagara 4 & 5",
@@ -469,6 +470,7 @@ SERVICES = [
 
  dict(
   slug="services/bajaux-widgets/", icon="widget",
+  date="2026-09-22",
   nav="bajaux widgets",
   h1="bajaux web widgets and dashboards",
   title="Niagara Web Widgets & bajaux Development | HTML5 UI",
@@ -531,6 +533,7 @@ SERVICES = [
 
  dict(
   slug="services/px-graphics/", icon="px",
+  date="2026-09-22",
   nav="PX graphics",
   h1="PX graphics and standard sheets",
   title="Niagara PX Graphics & Standard PX Sheet Templates",
@@ -596,6 +599,7 @@ SERVICES = [
 
  dict(
   slug="services/station-engineering/", icon="station",
+  date="2026-09-22",
   nav="Station engineering",
   h1="Station engineering and new controller setup",
   title="Niagara Station Setup, Commissioning & JACE Engineering",
@@ -657,6 +661,7 @@ SERVICES = [
 
  dict(
   slug="services/workbench-tooling/", icon="tooling",
+  date="2026-09-22",
   nav="Workbench tooling",
   h1="Workbench tooling and bulk engineering",
   title="Niagara Workbench Tools & Bulk Engineering Automation",
@@ -716,6 +721,7 @@ SERVICES = [
 
  dict(
   slug="services/niagara-5-migration/", icon="n5",
+  date="2026-09-22",
   nav="Niagara 5 migration",
   h1="Niagara 5 readiness and migration",
   title="Niagara 5 Migration & Module Readiness Audit",
@@ -906,7 +912,10 @@ DEMOS = [
  dict(id="ahu", title="Plant dashboard \u2014 AHU-01", height=820,
       module="iosUi", widget="IosDashboardWidget", config="dashboard.json",
       theme="dark", shot="01-desktop-expanded.png",
-      props={"fileConfig": "file:^iosUi/dashboard.json", "theme": "dark"},
+      # This widget has no theme property — it is a dark-only view — so the
+      # page must not offer a theme toggle for it. It does carry showOrds.
+      controls=["ords"],
+      props={"fileConfig": "file:^iosUi/dashboard.json", "showOrds": False},
       blurb=("Supply and return air temperature, fan power, zone CO\u2082, a fan-speed dial, "
              "a demand chart, a writable zone set point, plant commands and the alarm queue. "
              "Twelve tiles, each bound to its own station ORD \u2014 and the values are moving "
@@ -915,6 +924,7 @@ DEMOS = [
  dict(id="building", title="Building summary", height=760,
       module="rocketGx", widget="RocketGxDashboardWidget", config="dashboard.json",
       theme="light", shot="rgx-01-level1.png",
+      controls=["theme", "ords"],
       props={"fileConfig": "file:^rocketGx/dashboard.json", "theme": "light",
              "showTopBar": True, "showOrds": False},
       blurb=("The same discipline at building level, light theme: KPI tiles for demand, "
@@ -924,6 +934,7 @@ DEMOS = [
  dict(id="nav", title="Navigation rail", height=600,
       module="rocketGx", widget="RocketGxNavWidget", config="nav.json",
       theme="dark", shot="02-collapsed-rail-flyout.png",
+      controls=["theme"],
       props={"fileConfig": "file:^rocketGx/nav.json", "theme": "dark"},
       blurb=("Site, building and floor navigation. Collapse it and it becomes an icon rail with "
              "flyout menus, so a tight PX viewport or a phone still gives the graphics the full "
@@ -935,6 +946,19 @@ def demo_block(d, level=3):
     because the same block sits at two depths: on the home page it follows an
     h2 section head, on /work/ the demos are the page's own top-level sections
     and an h3 there skips a level. They render identically either way."""
+    # A control is only drawn where the widget declares the property behind
+    # it. A button that cannot change anything is worse than no button.
+    buttons = {
+        "theme": f'''
+      <button class="pl-btn pl-btn--ghost" type="button" data-demo-theme="{d["id"]}"
+              data-theme-init="{d["theme"]}"
+              aria-pressed="{"true" if d["theme"] == "dark" else "false"}">Toggle theme</button>''',
+        "ords": f'''
+      <button class="pl-btn pl-btn--ghost" type="button" data-demo-ords="{d["id"]}"
+              aria-pressed="{str(bool(d["props"].get("showOrds"))).lower()}">Show ORDs</button>''',
+    }
+    controls = "".join(buttons[c] for c in d.get("controls", []))
+
     return f'''
 <article class="pl-demo" id="demo-{d["id"]}">
   <div class="pl-demo__head">
@@ -944,8 +968,7 @@ def demo_block(d, level=3):
     </div>
     <div class="pl-demo__controls">
       <span class="pl-chip pl-chip--ok" data-demo-status="{d["id"]}">
-        <span class="pl-demo__pulse"></span>Simulated station &middot; live</span>
-      <button class="pl-btn pl-btn--ghost" type="button" data-demo-theme="{d["id"]}">Toggle theme</button>
+        <span class="pl-demo__pulse"></span>Simulated station &middot; live</span>{controls}
       <a class="pl-btn pl-btn--ghost" href="{href('demos/' + d['id'] + '/')}" target="_blank" rel="noopener">Open full screen</a>
     </div>
   </div>
@@ -1898,6 +1921,7 @@ NOTES = [
 
  dict(
   slug="notes/niagara-module-version-stamping/",
+  date="2026-09-22",
   nav="Version stamping",
   title="Which Niagara Version to Stamp a Module For",
   desc=("A module's declared dependency version is a floor, not a pin. Build against the "
@@ -1991,6 +2015,7 @@ NOTES = [
 
  dict(
   slug="notes/niagara-module-signing/",
+  date="2026-09-22",
   nav="Module signing",
   title="What a Station Checks Before Loading a Module",
   desc=("Niagara's three module verification modes, what each one demands of your "
@@ -2084,6 +2109,7 @@ NOTES += [
 
  dict(
   slug="notes/what-runs-on-a-jace/",
+  date="2026-09-22",
   nav="What runs on a JACE",
   title="Pure Java or It Will Not Run: Inside a JACE",
   desc=("A controller is an ARM host with a fraction of a server's memory. Native "
@@ -2167,6 +2193,7 @@ NOTES += [
 
  dict(
   slug="notes/bulk-point-renaming-and-tagging/",
+  date="2026-09-22",
   nav="Bulk renaming",
   title="Renaming Thousands of Niagara Points Safely",
   desc=("Point names arrive from the field device and there is no standard. What to use "
@@ -2260,6 +2287,7 @@ NOTES += [
 
  dict(
   slug="notes/getting-data-out-of-a-niagara-station/",
+  date="2026-09-22",
   nav="Getting data out",
   title="Five Ways to Get Data Out of a Niagara Station",
   desc=("REST, MQTT, a relational history database, file export or an HTTP client. "
@@ -2349,6 +2377,7 @@ NOTES += [
 
  dict(
   slug="notes/scheduled-niagara-station-backups/",
+  date="2026-09-22",
   nav="Scheduled backups",
   title="Scheduled Niagara Backups, and the Supervisor Gap",
   desc=("A Supervisor can back up every station in its Niagara Network on a schedule. "
@@ -2459,6 +2488,7 @@ def note_page(n):
         <p>{e(s["desc"].split(".")[0])}.</p></div>''')
     others = [o for o in NOTES if o["slug"] != n["slug"]][:3]
     more = "".join(note_card(o) for o in others)
+    written = date.fromisoformat(n["date"]).strftime("%B %Y")
 
     body = f'''
 <section class="pl-band pl-hero pl-hero--page">
@@ -2468,6 +2498,7 @@ def note_page(n):
     <h1>{e(n["h1"])}</h1>
     <p class="pl-lede">{n["lede"]}</p>
     <ul class="pl-chips">{"".join(f'<li class="pl-chip pl-chip--on-dark">{e(t)}</li>' for t in n["tags"])}</ul>
+    <p class="pl-hero__meta">Written {written}</p>
   </div>
 </section>
 
@@ -2506,6 +2537,8 @@ def note_page(n):
         "inLanguage": "en-GB",
         "keywords": ", ".join(n["tags"]),
         "isAccessibleForFree": True,
+        "datePublished": n["date"],
+        "dateModified": n["date"],
         "author": {"@id": url() + "#org"},
         "publisher": {"@id": url() + "#org"},
         "mainEntityOfPage": url(n["slug"]),

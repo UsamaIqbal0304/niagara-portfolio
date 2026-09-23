@@ -12,21 +12,39 @@
 
   var themes = {};
 
+  // Each control sets a real widget property inside the frame, the way a PX
+  // author would set it, and then reflects the state that produced. A button
+  // is only rendered where the widget declares the property behind it, so
+  // there is no control here that cannot change anything.
   document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
     var id = btn.getAttribute('data-demo-theme'),
         frame = document.querySelector('[data-demo-frame="' + id + '"]');
-    if (!frame) { return; }
+    if (!frame) { btn.parentNode.removeChild(btn); return; }
+
+    // Seeded from the theme the frame was generated with, so the first click
+    // flips rather than re-applying what is already on screen.
+    themes[id] = btn.getAttribute('data-theme-init');
 
     btn.addEventListener('click', function () {
       themes[id] = themes[id] === 'light' ? 'dark' : 'light';
+      btn.setAttribute('aria-pressed', themes[id] === 'dark' ? 'true' : 'false');
       frame.contentWindow.postMessage({ setTheme: themes[id] }, '*');
     });
   });
 
-  // Seed each toggle from the theme the frame was generated with, so the first
-  // click flips rather than re-applying what is already on screen.
-  document.querySelectorAll('[data-demo-frame]').forEach(function (frame) {
-    themes[frame.getAttribute('data-demo-frame')] = null;
+  document.querySelectorAll('[data-demo-ords]').forEach(function (btn) {
+    var id = btn.getAttribute('data-demo-ords'),
+        frame = document.querySelector('[data-demo-frame="' + id + '"]');
+    if (!frame) { btn.parentNode.removeChild(btn); return; }
+
+    btn.textContent = btn.getAttribute('aria-pressed') === 'true' ? 'Hide ORDs' : 'Show ORDs';
+
+    btn.addEventListener('click', function () {
+      var on = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.textContent = on ? 'Hide ORDs' : 'Show ORDs';
+      frame.contentWindow.postMessage({ setProps: { showOrds: on } }, '*');
+    });
   });
 
   window.addEventListener('message', function (ev) {

@@ -138,46 +138,73 @@
     }
 
     var host = document.getElementById('demo-host');
-    var widget = new WidgetCtor();
 
     // Properties come from the PX WebWidget element in a real view; here they
     // come from the demo definition, which is the same data by another route.
-    Object.keys(cfg.properties || {}).forEach(function (k) {
-      widget.properties().setValue(k, cfg.properties[k]);
-    });
+    var props = {};
+    Object.keys(cfg.properties || {}).forEach(function (k) { props[k] = cfg.properties[k]; });
 
     sim.start();
     global.__sim = sim;
-    global.__widget = widget;
 
-    return Promise.resolve(widget.initialize(host))
-      .then(function () {
-        document.body.classList.add('is-live');
-        // Tell the parent page the demo is up, so it can show its status chip.
-        try { parent.postMessage({ demo: cfg.id, status: 'live' }, '*'); } catch (e) {}
-      })
-      .catch(fail);
-
-    function fail(err) {
-      host.innerHTML = '<div class="demo-error"><strong>This demo failed to start.</strong>' +
-        '<pre>' + String(err && err.stack || err).replace(/[<&]/g, function (c) {
-          return c === '<' ? '&lt;' : '&amp;';
-        }) + '</pre>' +
-        '<p>The widget itself is fine — this is the demo harness. ' +
-        'The screenshots on the Work page show the same views.</p></div>';
-      try { parent.postMessage({ demo: cfg.id, status: 'error' }, '*'); } catch (e) {}
+    function mount() {
+      var widget = new WidgetCtor();
+      Object.keys(props).forEach(function (k) {
+        widget.properties().setValue(k, props[k]);
+      });
+      global.__widget = widget;
+      return Promise.resolve(widget.initialize(host))
+        .then(function () {
+          document.body.classList.add('is-live');
+          // Tell the parent page the demo is up, so it can show its status chip.
+          try { parent.postMessage({ demo: cfg.id, status: 'live' }, '*'); } catch (e) {}
+        })
+        .catch(fail);
     }
+
+    /* Changing a property from the parent page. The widgets read their
+       properties at render time and none of them implements a changed()
+       hook, which is normal — in a PX view a property is edited at design
+       time and the view is rebuilt. So this rebuilds it: destroy, clear the
+       host, construct again with the new sheet. The simulator keeps running
+       underneath, so the new instance subscribes to a plant that has been
+       moving the whole time rather than to a freshly seeded one. */
+    global.__setDemoProps = function (patch) {
+      Object.keys(patch || {}).forEach(function (k) { props[k] = patch[k]; });
+      var w = global.__widget,
+          gone = w && w.destroy ? Promise.resolve(w.destroy()) : Promise.resolve();
+      return gone['catch'](function () {}).then(function () {
+        host.innerHTML = '';
+        return mount();
+      });
+    };
+
+    return mount();
   };
 
-  /* Theme toggling from the parent page, so the demo frame and the site chrome
-     stay in step without the frame reloading. */
+  /* Property changes driven from the parent page: the theme toggle and the
+     ORD overlay. Both are real widget properties a PX author would set, so
+     the demo changes them the same way rather than reaching into the DOM.
+     The frame's own background follows the theme, so a light widget never
+     sits in a dark letterbox. */
   global.addEventListener('message', function (ev) {
-    if (!ev.data || ev.data.setTheme === undefined) { return; }
-    var w = global.__widget;
-    if (w && w.properties) {
-      w.properties().setValue('theme', ev.data.setTheme);
-      var root = document.querySelector('[data-theme]');
-      if (root) { root.setAttribute('data-theme', ev.data.setTheme); }
+    var data = ev.data;
+    if (!data || !global.__setDemoProps) { return; }
+
+    var patch = null;
+    if (data.setTheme !== undefined) {
+      patch = { theme: data.setTheme };
+      document.documentElement.setAttribute('data-theme', data.setTheme);
+      document.body.style.background = data.setTheme === 'dark' ? '#0e1116' : '#f7f8fc';
+    } else if (data.setProps) {
+      patch = data.setProps;
     }
+    if (!patch) { return; }
+
+    global.__setDemoProps(patch).then(function () {
+      try {
+        parent.postMessage({ demo: (global.__DEMO__ || {}).id, status: 'applied', props: patch }, '*');
+      } catch (e) {}
+    });
   });
 }(window));
