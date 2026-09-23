@@ -2098,11 +2098,22 @@ Sitemap: {url('sitemap.xml')}
 # /<key>.txt containing the key, then POST the URL list. Google does not
 # participate — nothing here reaches Google, which only takes a sitemap and
 # Search Console.
-INDEXNOW_KEY = "65d322c488b72b3c8f6fae5c95466836"
+# This one was issued by Bing Webmaster Tools rather than invented here, so
+# submissions are attributed to the property instead of arriving anonymous.
+INDEXNOW_KEY = "627f5d4b61ae4766935982388964b259"
+
+# Keys that have been used and are no longer submitted with. Their files stay
+# published: a submission already queued against an old key is validated when
+# the engine gets round to it, which can be days later, and a key file that
+# has stopped existing by then is a 403 and a silently dropped batch.
+INDEXNOW_RETIRED = [
+    "65d322c488b72b3c8f6fae5c95466836",   # self-issued, used 21-24 Sep 2026
+]
 
 
 def build_indexnow_key():
-    open(os.path.join(OUT, INDEXNOW_KEY + ".txt"), "w").write(INDEXNOW_KEY + "\n")
+    for key in [INDEXNOW_KEY] + INDEXNOW_RETIRED:
+        open(os.path.join(OUT, key + ".txt"), "w").write(key + "\n")
 
 
 def build_sitemap():

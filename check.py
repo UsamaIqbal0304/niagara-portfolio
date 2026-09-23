@@ -196,6 +196,18 @@ for rel, src in docs:
 check(not beaconed or not unbeaconed,
       f"analytics beacon on some indexable pages but not others: missing from {unbeaconed[:3]}")
 
+# IndexNow key files. The protocol validates the key by fetching /<key>.txt and
+# reading it back, so a key renamed in build.py without its file republished is
+# a 403 and a whole batch dropped with no error anywhere we would see it. Every
+# *.txt at the root that is named like a key has to contain its own name.
+keyfiles = [f for f in glob.glob(os.path.join(ROOT, "*.txt"))
+            if re.fullmatch(r"[0-9a-f]{8,128}", os.path.basename(f)[:-4] or "")]
+check(bool(keyfiles), "no IndexNow key file at the site root")
+for f in keyfiles:
+    key = os.path.basename(f)[:-4]
+    check(open(f, encoding="utf-8").read().strip() == key,
+          f"{os.path.basename(f)}: does not contain its own key")
+
 # The machine-readable layer: llms.txt, llms-full.txt and a markdown twin per
 # note. An answer engine that fetches the markdown instead of the HTML has to
 # get the same page, and a link into this layer that 404s is worse than not
