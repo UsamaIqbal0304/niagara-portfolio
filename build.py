@@ -464,10 +464,13 @@ SERVICES = [
 <h2>What this covers</h2>
 <div class="pl-grid pl-grid--2" style="margin-top:var(--pl-s-9)">
   <div class="pl-card"><h3>Drivers for unsupported equipment</h3>
-    <p>Plant, meters and controllers with a documented protocol but no Niagara driver —
-       a serial or IP device, a vendor REST or MQTT API, a proprietary register map. Modelled as
-       a proper network / device / point tree so it behaves like any other driver under
-       Workbench, with discovery, ping monitoring and status propagation.</p></div>
+    <p>Plant, meters and controllers with a documented protocol but no Niagara driver. In
+       practice that means one of four things: a legacy field bus from a system that predates
+       Niagara and is still running the building, a serial or IP protocol with a published
+       specification, a vendor REST or MQTT API, or a proprietary register map supplied by the
+       manufacturer. Modelled as a proper network / device / point tree so it behaves like any
+       other driver under Workbench, with discovery, ping monitoring and status
+       propagation.</p></div>
   <div class="pl-card"><h3>Station services</h3>
     <p>Components that live under <code>Services</code> and do work on a schedule or on
        a change of value: exports, reconciliation, derived points, watchdogs,
@@ -1264,8 +1267,8 @@ def build_work():
     <div class="pl-section__head">
       <p class="pl-eyebrow">Under the hood</p>
       <h2>How the demos work</h2>
-      <p class="pl-sub">Worth a paragraph, because the mechanism is the point: if the widget
-         needed rewriting to run here, running here would prove nothing.</p>
+      <p class="pl-sub">The widget's own source runs here unmodified. If it needed rewriting
+         to run in a page like this, running here would prove nothing.</p>
     </div>
     <div class="pl-grid pl-grid--3">
       <div class="pl-card"><h3>The same source</h3>
@@ -1476,8 +1479,8 @@ def build_about():
          and hand over the source so the module outlives the supplier.</p>
 
       <h2>How the work is approached</h2>
-      <p>The constraints on this page are not marketing copy — they are the reasons Niagara work
-         tends to fail. No native code, because a native library will not load on an ARM
+      <p>Each constraint below exists because ignoring it is how Niagara work fails.
+         No native code, because a native library will not load on an ARM
          controller. Stamped to the floor version, because a module stamped too high is refused
          outright. Signed, because verification modes tighten in every release and become
          absolute in Niagara&nbsp;5. Small, because a JACE has far less headroom than the laptop
