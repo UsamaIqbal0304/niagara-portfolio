@@ -132,6 +132,7 @@ than from memory, and free to quote. Index at https://plantroomlabs.com/notes/.
 - [Commissioning a JACE-8000 without locking yourself out](https://plantroomlabs.com/notes/commissioning-a-jace-8000/): The factory address, the passphrase and the account you are made to delete — the commissioning steps that strand a new controller. Markdown: https://plantroomlabs.com/notes/commissioning-a-jace-8000.md
 - [Platform or station: two connections, two sets of logins](https://plantroomlabs.com/notes/platform-versus-station/): Two processes, two Java VMs, two logins and two file trees — and most “it works in Workbench but not the browser” starts here. Markdown: https://plantroomlabs.com/notes/platform-versus-station.md
 - [A JACE-8000 has no onboard I/O: using the Nrio driver](https://plantroomlabs.com/notes/nrio-io-on-a-jace-8000/): Remote IO-R modules on RS-485, one network per port, and the conversion list Workbench will happily let you get wrong. Markdown: https://plantroomlabs.com/notes/nrio-io-on-a-jace-8000.md
+- [Conversion links: what a mismatched wire really does](https://plantroomlabs.com/notes/niagara-conversion-links/): Link a boolean to a numeric and Niagara inserts a converter with its own properties. Here is what each one assumes on your behalf. Markdown: https://plantroomlabs.com/notes/niagara-conversion-links.md
 
 ## Honest limits
 

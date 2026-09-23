@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conversion Links: What a Mismatched Wire Really Does</title>
+<meta name="description" content="Link a boolean to a numeric and Niagara inserts a converter with its own properties. Here is what each one assumes on your behalf.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-conversion-links/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Conversion Links: What a Mismatched Wire Really Does">
+<meta property="og:description" content="Link a boolean to a numeric and Niagara inserts a converter with its own properties. Here is what each one assumes on your behalf.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-conversion-links/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Conversion Links: What a Mismatched Wire Really Does">
+<meta name="twitter:description" content="Link a boolean to a numeric and Niagara inserts a converter with its own properties. Here is what each one assumes on your behalf.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/niagara-conversion-links.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/niagara-conversion-links/#article",
+   "headline": "Conversion links: what a mismatched wire really does",
+   "description": "Link a boolean to a numeric and Niagara inserts a converter with its own properties. Here is what each one assumes on your behalf.",
+   "url": "https://plantroomlabs.com/notes/niagara-conversion-links/",
+   "inLanguage": "en-GB",
+   "keywords": "Station engineering, Wire sheet, Workbench",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-conversion-links/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Conversion links"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Conversion links</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>Conversion links: what a mismatched wire really does</h1>
+    <p class="pl-lede">Drag a wire between two slots of different types and it just works, which is the problem: a converter was inserted, it has <strong>settings you did not choose</strong>, and null does not behave the way you expect.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Station engineering</li><li class="pl-chip pl-chip--on-dark">Wire sheet</li><li class="pl-chip pl-chip--on-dark">Workbench</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#the-wire-that-converts-itself">The wire that converts itself</a></li><li><a href="#not-every-pair-is-allowed">Not every pair is allowed</a></li><li><a href="#booleans-numbers-and-the-false-value-property">Booleans, numbers, and the False Value property</a></li><li><a href="#strings-are-where-it-goes-wrong">Strings are where it goes wrong</a></li><li><a href="#null-is-not-zero">Null is not zero</a></li><li><a href="#times-are-milliseconds-from-three-different-origins">Times are milliseconds, from three different origins</a></li><li><a href="#formatting-on-the-way-to-a-string">Formatting on the way to a string</a></li><li><a href="#the-one-link-you-do-have-to-edit-by-hand">The one link you do have to edit by hand</a></li></ol>
+    </nav>
+<h2 id="the-wire-that-converts-itself">The wire that converts itself</h2>
+<div class="pl-body">
+  <p>Since AX-3.6, linking two slots of dissimilar data types produces a conversion
+     link automatically. Before that the same job needed a Program object, which is why
+     older stations are full of them. The link is not a plain wire: it carries a child
+     Converter component whose type is chosen for you from the pair of types involved,
+     and some of those converters have properties.</p>
+  <p>To see one, right-click the wire on the wire sheet and choose <strong>Edit
+     Link</strong>. If the link shows as a knob rather than a wire — which is what
+     happens when the other end is off-sheet — open the component's link sheet and
+     double-click the row. The Converter appears as an expandable node inside the Edit
+     dialog.</p>
+  <p>This is worth doing deliberately rather than never. A conversion link is not
+     wrong, it is just silent, and the defaults are only right some of the time.</p>
+</div>
+
+<h2 id="not-every-pair-is-allowed">Not every pair is allowed</h2>
+<div class="pl-body">
+  <p>The conversion matrix is wide but not complete, and the holes are the useful part
+     to remember. A link Niagara will not make is one you have to solve with a
+     component, so knowing the gaps saves a wire-sheet argument.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Type</th><th>What it will not do</th></tr></thead>
+  <tbody>
+    <tr><td><code>frozenEnum</code></td>
+        <td>nothing can convert <em>into</em> it — its whole row of the matrix is
+            blank. It converts outwards to everything except ord and the time
+            types</td></tr>
+    <tr><td><code>ord</code></td>
+        <td>exchanges only with string and statusString, both directions, and with no
+            validation in either</td></tr>
+    <tr><td><code>boolean</code></td>
+        <td>no conversion either way with any time type</td></tr>
+    <tr><td><code>statusEnum</code>, <code>dynamicEnum</code></td>
+        <td>reachable from booleans, numbers and other enums, but never from a string
+            or a statusString</td></tr>
+    <tr><td><code>time</code></td>
+        <td>arrives only from the plain number types and absTime — statusNumeric
+            cannot reach it, though it can reach absTime and relTime</td></tr>
+    <tr><td><code>relTime</code></td>
+        <td>arrives from numbers and statusNumeric; leaves as numbers, statusNumeric
+            or a string — never a boolean or an enum</td></tr>
+  </tbody>
+</table>
+
+<h2 id="booleans-numbers-and-the-false-value-property">Booleans, numbers, and the False Value property</h2>
+<div class="pl-body">
+  <p>The everyday case is a boolean driving something numeric. A statusBoolean linked
+     to a statusNumeric gives 1 for active and 0 for inactive, and that is usually
+     what you wanted. Where the target is a plain number type, the Converter carries
+     <strong>True Value</strong> and <strong>False Value</strong> properties, defaulting
+     to 1 and 0 — and those exist because the defaults are frequently useless. Driving
+     a MultiVibrator's Duty Cycle, which runs 0 to 100, means editing them to something
+     like 75 and 25 rather than adding arithmetic downstream.</p>
+  <p>Going the other way, a number linked to a boolean uses a False Value with a
+     default of 0: <em>anything else</em> is true. Worth saying out loud that this
+     includes negative numbers, so a sensor reading -4 is true, not false. If the
+     meaningful off-state is some other value, set False Value to it.</p>
+  <p>Number to number is unremarkable except at the edges, where the result clamps
+     rather than wrapping. A double of 2147484000 into an integer slot lands on
+     2147483647, the integer maximum, with nothing to indicate it happened.</p>
+</div>
+
+<h2 id="strings-are-where-it-goes-wrong">Strings are where it goes wrong</h2>
+<div class="pl-body">
+  <p>String conversions are the ones to be suspicious of, because each failure mode is
+     different and none of them is loud.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Link</th><th>What bad input produces</th></tr></thead>
+  <tbody>
+    <tr><td>string &rarr; double or float</td>
+        <td><code>nan</code> — anything that is not a plain decimal number, blank
+            included</td></tr>
+    <tr><td>string &rarr; long or integer</td>
+        <td>0, or the last non-zero value, if there are any extra characters</td></tr>
+    <tr><td>string &rarr; statusNumeric</td>
+        <td>a <strong>fault</strong> on the target, with the value left unchanged</td></tr>
+    <tr><td>string &rarr; boolean</td>
+        <td>true, for everything except the False Value string (default
+            "<code>false</code>", case insensitive) — and a blank string is
+            <em>true</em></td></tr>
+    <tr><td>string &rarr; absTime</td>
+        <td>null, unless the string is ISO-formatted
+            (<code>yyyy-mm-ddThh:mm:ss.mmm±hh:mm</code>)</td></tr>
+    <tr><td>string &rarr; ord</td>
+        <td>whatever you gave it — there is no ORD validation at all</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>The pattern to notice is that the three numeric targets fail three different ways:
+     one gives a not-a-number, one silently holds its last value, one raises a fault.
+     Only the statusNumeric case is visible on a graphic. If a string from a third-party
+     integration is feeding logic, that is the target type to prefer, purely because it
+     tells you when the parse failed.</p>
+</div>
+
+<h2 id="null-is-not-zero">Null is not zero</h2>
+<div class="pl-body">
+  <p>Every status type can be null, and what a conversion does with null is decided per
+     target type rather than uniformly. This is the trap that produces plant running on
+     stale values after a device goes offline.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Target</th><th>On a null source</th></tr></thead>
+  <tbody>
+    <tr><td>double, float</td><td>becomes <code>nan</code></td></tr>
+    <tr><td>long, integer</td><td><strong>unchanged</strong> — keeps the last value</td></tr>
+    <tr><td>string</td><td><strong>unchanged</strong> — keeps the last text</td></tr>
+    <tr><td>boolean</td><td><strong>unchanged</strong></td></tr>
+    <tr><td>statusBoolean, statusNumeric, statusEnum, statusString</td>
+        <td>becomes null, so the status propagates</td></tr>
+    <tr><td>absTime</td><td>becomes null</td></tr>
+    <tr><td>relTime</td><td><strong>unchanged</strong></td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Convert between status types wherever the value matters.</strong> The
+     simple types have nowhere to put a status, so the only honest thing a converter
+     can do is leave the old value in place — which downstream logic cannot distinguish
+     from a live reading. A chain that drops to <code>boolean</code> or
+     <code>integer</code> halfway along has thrown away the fault flag for good.</p>
+</div>
+
+<h2 id="times-are-milliseconds-from-three-different-origins">Times are milliseconds, from three different origins</h2>
+<div class="pl-body">
+  <p>All the time conversions are millisecond arithmetic; what differs is where zero
+     sits. To <code>relTime</code>, milliseconds count from 0, so 4800000 is 1h 20m and
+     a negative value is allowed. To <code>time</code>, they count from midnight, so
+     900000 is 00:15. To <code>absTime</code>, they count from the Java epoch, so
+     1296509138929 lands in January 2011.</p>
+  <p>The reverse directions mirror that: relTime and time to a number give milliseconds
+     from their own origin, absTime gives milliseconds since the epoch. Two special
+     cases are handy — absTime to time keeps the time portion and drops the date, and
+     time to absTime takes today's date, which is the shortest route from a
+     schedule-style time to a real timestamp.</p>
+</div>
+
+<h2 id="formatting-on-the-way-to-a-string">Formatting on the way to a string</h2>
+<div class="pl-body">
+  <p>Any conversion whose target is a string or statusString has a <code>Format</code>
+     property, and its default depends on the source.</p>
+  <p>From a number it is blank, meaning every digit, unformatted. Fill it in with
+     <code>#</code> for digits, <code>0</code> for forced leading or trailing zeros, and
+     comma or period as separators: <code>###,###.###</code> turns 123456.789 into
+     123,456.789, <code>###,##</code> turns it into 123456.79, and
+     <code>00000.000</code> turns 123.78 into 000123.780.</p>
+  <p>From a boolean the default is <code>%.%</code>, which is BFormat — so static text
+     can be wrapped around the value, and a format of
+     <code>Enabled: %.%</code> produces exactly that. From absTime the default is
+     <code>YYYY-MM-DDTHH:mm:ssZ</code> and from time it is <code>HH:mm:ssZ</code>; both
+     accept the usual patterns, so <code>HH:mm a</code> gives 3:31 PM and
+     <code>MM-DD-YYYY HH:mm</code> reorders the date.</p>
+  <p>Enums are the pleasant surprise here. A statusEnum linked to a string gives the
+     tag rather than the ordinal — "Occupied", not "1" — which is usually what a
+     graphic or an alarm message wanted. Link it to a number and you get the ordinal
+     instead.</p>
+</div>
+
+<h2 id="the-one-link-you-do-have-to-edit-by-hand">The one link you do have to edit by hand</h2>
+<div class="pl-body">
+  <p>Conversion links are otherwise a leave-alone feature, with one documented
+     exception: linking out of the dynamically created components under a station's
+     PlatformServices. Those components are built at runtime rather than stored, so a
+     link that identifies its source by Handle points at something that will not exist
+     the same way next start. Open the link and change <strong>Source Ord</strong> from
+     Handle to Slot, and it survives.</p>
+</div>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/px-relative-ords/">One PX sheet for every AHU</a></h3>
+      <p>The Px editor binds absolutely by default, which is why a graphic works for AHU-01 and nothing else. Relativised, one sheet serves the whole plant.</p>
+      <ul class="pl-chips"><li class="pl-chip">PX graphics</li><li class="pl-chip">Standard sheets</li><li class="pl-chip">Reuse</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-writable-point-priority/">Why a writable point ignores the value you set</a></h3>
+      <p>Sixteen priority inputs, two of them reserved for right-click actions, a fallback underneath, and a BACnet scheme wired to none of it.</p>
+      <ul class="pl-chips"><li class="pl-chip">Station engineering</li><li class="pl-chip">BACnet</li><li class="pl-chip">Commissioning</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/platform-versus-station/">Platform or station: two connections, two sets of logins</a></h3>
+      <p>Two processes, two Java VMs, two logins and two file trees — and most “it works in Workbench but not the browser” starts here.</p>
+      <ul class="pl-chips"><li class="pl-chip">Platform</li><li class="pl-chip">Station engineering</li><li class="pl-chip">Workbench</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

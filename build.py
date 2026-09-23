@@ -5401,6 +5401,198 @@ NOTES += [
            "notes/commissioning-a-jace-8000/",
            "notes/niagara-writable-point-priority/"],
  ),
+ dict(
+  slug="notes/niagara-conversion-links/",
+  date="2026-09-23",
+  nav="Conversion links",
+  title="Conversion Links: What a Mismatched Wire Really Does",
+  desc=("Link a boolean to a numeric and Niagara inserts a converter with its own "
+        "properties. Here is what each one assumes on your behalf."),
+  h1="Conversion links: what a mismatched wire really does",
+  lede=("Drag a wire between two slots of different types and it just works, which "
+        "is the problem: a converter was inserted, it has <strong>settings you did "
+        "not choose</strong>, and null does not behave the way you expect."),
+  tags=["Station engineering", "Wire sheet", "Workbench"],
+  body="""
+<h2>The wire that converts itself</h2>
+<div class="pl-body">
+  <p>Since AX-3.6, linking two slots of dissimilar data types produces a conversion
+     link automatically. Before that the same job needed a Program object, which is why
+     older stations are full of them. The link is not a plain wire: it carries a child
+     Converter component whose type is chosen for you from the pair of types involved,
+     and some of those converters have properties.</p>
+  <p>To see one, right-click the wire on the wire sheet and choose <strong>Edit
+     Link</strong>. If the link shows as a knob rather than a wire — which is what
+     happens when the other end is off-sheet — open the component's link sheet and
+     double-click the row. The Converter appears as an expandable node inside the Edit
+     dialog.</p>
+  <p>This is worth doing deliberately rather than never. A conversion link is not
+     wrong, it is just silent, and the defaults are only right some of the time.</p>
+</div>
+
+<h2>Not every pair is allowed</h2>
+<div class="pl-body">
+  <p>The conversion matrix is wide but not complete, and the holes are the useful part
+     to remember. A link Niagara will not make is one you have to solve with a
+     component, so knowing the gaps saves a wire-sheet argument.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Type</th><th>What it will not do</th></tr></thead>
+  <tbody>
+    <tr><td><code>frozenEnum</code></td>
+        <td>nothing can convert <em>into</em> it — its whole row of the matrix is
+            blank. It converts outwards to everything except ord and the time
+            types</td></tr>
+    <tr><td><code>ord</code></td>
+        <td>exchanges only with string and statusString, both directions, and with no
+            validation in either</td></tr>
+    <tr><td><code>boolean</code></td>
+        <td>no conversion either way with any time type</td></tr>
+    <tr><td><code>statusEnum</code>, <code>dynamicEnum</code></td>
+        <td>reachable from booleans, numbers and other enums, but never from a string
+            or a statusString</td></tr>
+    <tr><td><code>time</code></td>
+        <td>arrives only from the plain number types and absTime — statusNumeric
+            cannot reach it, though it can reach absTime and relTime</td></tr>
+    <tr><td><code>relTime</code></td>
+        <td>arrives from numbers and statusNumeric; leaves as numbers, statusNumeric
+            or a string — never a boolean or an enum</td></tr>
+  </tbody>
+</table>
+
+<h2>Booleans, numbers, and the False Value property</h2>
+<div class="pl-body">
+  <p>The everyday case is a boolean driving something numeric. A statusBoolean linked
+     to a statusNumeric gives 1 for active and 0 for inactive, and that is usually
+     what you wanted. Where the target is a plain number type, the Converter carries
+     <strong>True Value</strong> and <strong>False Value</strong> properties, defaulting
+     to 1 and 0 — and those exist because the defaults are frequently useless. Driving
+     a MultiVibrator's Duty Cycle, which runs 0 to 100, means editing them to something
+     like 75 and 25 rather than adding arithmetic downstream.</p>
+  <p>Going the other way, a number linked to a boolean uses a False Value with a
+     default of 0: <em>anything else</em> is true. Worth saying out loud that this
+     includes negative numbers, so a sensor reading -4 is true, not false. If the
+     meaningful off-state is some other value, set False Value to it.</p>
+  <p>Number to number is unremarkable except at the edges, where the result clamps
+     rather than wrapping. A double of 2147484000 into an integer slot lands on
+     2147483647, the integer maximum, with nothing to indicate it happened.</p>
+</div>
+
+<h2>Strings are where it goes wrong</h2>
+<div class="pl-body">
+  <p>String conversions are the ones to be suspicious of, because each failure mode is
+     different and none of them is loud.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Link</th><th>What bad input produces</th></tr></thead>
+  <tbody>
+    <tr><td>string &rarr; double or float</td>
+        <td><code>nan</code> — anything that is not a plain decimal number, blank
+            included</td></tr>
+    <tr><td>string &rarr; long or integer</td>
+        <td>0, or the last non-zero value, if there are any extra characters</td></tr>
+    <tr><td>string &rarr; statusNumeric</td>
+        <td>a <strong>fault</strong> on the target, with the value left unchanged</td></tr>
+    <tr><td>string &rarr; boolean</td>
+        <td>true, for everything except the False Value string (default
+            "<code>false</code>", case insensitive) — and a blank string is
+            <em>true</em></td></tr>
+    <tr><td>string &rarr; absTime</td>
+        <td>null, unless the string is ISO-formatted
+            (<code>yyyy-mm-ddThh:mm:ss.mmm±hh:mm</code>)</td></tr>
+    <tr><td>string &rarr; ord</td>
+        <td>whatever you gave it — there is no ORD validation at all</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>The pattern to notice is that the three numeric targets fail three different ways:
+     one gives a not-a-number, one silently holds its last value, one raises a fault.
+     Only the statusNumeric case is visible on a graphic. If a string from a third-party
+     integration is feeding logic, that is the target type to prefer, purely because it
+     tells you when the parse failed.</p>
+</div>
+
+<h2>Null is not zero</h2>
+<div class="pl-body">
+  <p>Every status type can be null, and what a conversion does with null is decided per
+     target type rather than uniformly. This is the trap that produces plant running on
+     stale values after a device goes offline.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Target</th><th>On a null source</th></tr></thead>
+  <tbody>
+    <tr><td>double, float</td><td>becomes <code>nan</code></td></tr>
+    <tr><td>long, integer</td><td><strong>unchanged</strong> — keeps the last value</td></tr>
+    <tr><td>string</td><td><strong>unchanged</strong> — keeps the last text</td></tr>
+    <tr><td>boolean</td><td><strong>unchanged</strong></td></tr>
+    <tr><td>statusBoolean, statusNumeric, statusEnum, statusString</td>
+        <td>becomes null, so the status propagates</td></tr>
+    <tr><td>absTime</td><td>becomes null</td></tr>
+    <tr><td>relTime</td><td><strong>unchanged</strong></td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Convert between status types wherever the value matters.</strong> The
+     simple types have nowhere to put a status, so the only honest thing a converter
+     can do is leave the old value in place — which downstream logic cannot distinguish
+     from a live reading. A chain that drops to <code>boolean</code> or
+     <code>integer</code> halfway along has thrown away the fault flag for good.</p>
+</div>
+
+<h2>Times are milliseconds, from three different origins</h2>
+<div class="pl-body">
+  <p>All the time conversions are millisecond arithmetic; what differs is where zero
+     sits. To <code>relTime</code>, milliseconds count from 0, so 4800000 is 1h 20m and
+     a negative value is allowed. To <code>time</code>, they count from midnight, so
+     900000 is 00:15. To <code>absTime</code>, they count from the Java epoch, so
+     1296509138929 lands in January 2011.</p>
+  <p>The reverse directions mirror that: relTime and time to a number give milliseconds
+     from their own origin, absTime gives milliseconds since the epoch. Two special
+     cases are handy — absTime to time keeps the time portion and drops the date, and
+     time to absTime takes today's date, which is the shortest route from a
+     schedule-style time to a real timestamp.</p>
+</div>
+
+<h2>Formatting on the way to a string</h2>
+<div class="pl-body">
+  <p>Any conversion whose target is a string or statusString has a <code>Format</code>
+     property, and its default depends on the source.</p>
+  <p>From a number it is blank, meaning every digit, unformatted. Fill it in with
+     <code>#</code> for digits, <code>0</code> for forced leading or trailing zeros, and
+     comma or period as separators: <code>###,###.###</code> turns 123456.789 into
+     123,456.789, <code>###,##</code> turns it into 123456.79, and
+     <code>00000.000</code> turns 123.78 into 000123.780.</p>
+  <p>From a boolean the default is <code>%.%</code>, which is BFormat — so static text
+     can be wrapped around the value, and a format of
+     <code>Enabled: %.%</code> produces exactly that. From absTime the default is
+     <code>YYYY-MM-DDTHH:mm:ssZ</code> and from time it is <code>HH:mm:ssZ</code>; both
+     accept the usual patterns, so <code>HH:mm a</code> gives 3:31 PM and
+     <code>MM-DD-YYYY HH:mm</code> reorders the date.</p>
+  <p>Enums are the pleasant surprise here. A statusEnum linked to a string gives the
+     tag rather than the ordinal — "Occupied", not "1" — which is usually what a
+     graphic or an alarm message wanted. Link it to a number and you get the ordinal
+     instead.</p>
+</div>
+
+<h2>The one link you do have to edit by hand</h2>
+<div class="pl-body">
+  <p>Conversion links are otherwise a leave-alone feature, with one documented
+     exception: linking out of the dynamically created components under a station's
+     PlatformServices. Those components are built at runtime rather than stored, so a
+     link that identifies its source by Handle points at something that will not exist
+     the same way next start. Open the link and change <strong>Source Ord</strong> from
+     Handle to Slot, and it survives.</p>
+</div>
+""",
+  related=["services/station-engineering/", "notes/platform-versus-station/",
+           "notes/niagara-writable-point-priority/",
+           "notes/px-relative-ords/"],
+ ),
 ]
 
 NOTE_LOOKUP = {n["slug"]: n for n in NOTES}
@@ -5728,7 +5920,8 @@ NOTE_GROUPS = [
       "notes/niagara-tag-dictionaries/",
       "notes/niagara-hierarchies/",
       "notes/niagara-templates/",
-      "notes/px-relative-ords/"]),
+      "notes/px-relative-ords/",
+      "notes/niagara-conversion-links/"]),
     ("Data, alarms and time", "data-alarms-and-time",
      "What the station records, who it tells, and when it decides to act.",
      ["notes/getting-data-out-of-a-niagara-station/",
