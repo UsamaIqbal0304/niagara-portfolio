@@ -2606,6 +2606,32 @@ NOTES += [
   </ul>
 </div>
 
+<h2>How a point ends up in a bucket</h2>
+<div class="pl-body">
+  <p>The rate on the drop-down is not the whole story, because the scheduler does not
+     poll from a fixed list. Every ten seconds it rebuilds the list of objects assigned
+     to each rate, and that has two consequences worth knowing before you decide a
+     change did nothing.</p>
+  <ul>
+    <li>A rate change takes <strong>up to ten seconds</strong> to take effect. Watching
+       for an instant difference will mislead you.</li>
+    <li>The <code>Dibs Stack</code> is polled first, last-in first-out, and while
+       anything is in it the scheduler polls as fast as it can with no inter-message
+       delay at all. Only once it empties does the rate algorithm run.</li>
+  </ul>
+  <p>A pollable enters the dibs stack whenever it transitions into a subscribed state.
+     That is either a temporary subscription — somebody opening a view on a proxy point
+     that has no links, no history extension and no alarm extension — or the first poll
+     of a permanently subscribed point, after which it is never dibs-polled again.</p>
+  <p>So subscription decides the bucket, not the property on its own. A point that
+     exists only to be looked at in Workbench is served by the dibs mechanism at full
+     speed, and its configured poll frequency barely describes what you see on screen.
+     A point with a wiresheet link, a history extension or an alarm extension is
+     permanently subscribed and rides its rate group all day. The gap between those two
+     is the usual reason a value looks live on a graphic and arrives stale in a
+     history.</p>
+</div>
+
 <h2>The single-policy trap</h2>
 <div class="pl-body">
   <p>A driver's Tuning Policy Map ships with one default policy, and a station built
@@ -2620,11 +2646,43 @@ NOTES += [
      different note.</p>
 </div>
 
+<h2>The write side of the same policy</h2>
+<div class="pl-body">
+  <p>A tuning policy is not only about reads. The same component decides when a
+     writable proxy point actually sends a value, and its defaults are the ones that
+     catch people out.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Property</th><th scope="col">Default</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Min Write Time</th><td>0, disabled</td>
+        <td>The minimum time allowed between writes. Throttles a point whose linked
+            input changes rapidly so that only the last value goes out. At the default,
+            every value change attempts a write.</td></tr>
+    <tr><th scope="row">Max Write Time</th><td>0, disabled</td>
+        <td>How long to wait before rewriting the value when nothing else has triggered
+            a write; any write resets the timer. At the default there are no timed
+            rewrites, so a device that quietly drops a value never gets it back.</td></tr>
+    <tr><th scope="row">Write On Start</th><td>true</td>
+        <td>Writes when the station first reaches a steady state.</td></tr>
+    <tr><th scope="row">Write On Up</th><td>true</td>
+        <td>Writes when the point and its parent device transition from down to up.</td></tr>
+    <tr><th scope="row">Write On Enabled</th><td>true</td>
+        <td>Writes when the point's status transitions from disabled to normal.</td></tr>
+    <tr><th scope="row">Stale Time</th><td>0, disabled</td>
+        <td>How long without a successful read before a value is marked stale. At the
+            default the stale timer is off and points instead go stale the moment they
+            are unsubscribed.</td></tr>
+  </tbody>
+</table>
+
 <div class="pl-note pl-note--warn">
-  <p><strong>Check Write On Start while you are in there.</strong> A tuning policy also
-     governs writes, and <code>Write On Start</code> decides whether the station pushes
-     its value out to the field device when it comes up. On plant that should not be
-     commanded by a station restart, that default matters more than any poll rate.</p>
+  <p><strong>Tridium's own advice on Write On Start runs against its default.</strong>
+     The documentation says to consider setting it to false except for critical proxy
+     points, because large networks otherwise risk write-queue-overflow exceptions. On
+     plant that should not be commanded by a station restart, it is the property to
+     look at before any poll rate.</p>
 </div>
 
 <h2>Measure before changing anything</h2>
@@ -2634,13 +2692,20 @@ NOTES += [
   <ul>
     <li><strong>Busy Time</strong> — the percentage of the time the station spent
        polling. This is the number that tells you whether the bus is saturated or the
-       problem is somewhere else entirely.</li>
+       problem is somewhere else entirely. Near 100% is not automatically a fault: it
+       means the calculated inter-message delay has reached zero, so the poll thread
+       never gets to sleep.</li>
     <li><strong>Average Poll</strong> — the average time spent in each poll.</li>
     <li><strong>Total Polls</strong>, against the elapsed milliseconds.</li>
   </ul>
   <p>Right-click the poll service and use <code>Actions &gt; Reset Statistics</code> to
      start a clean window before and after a change, so the comparison is between two
      measurements rather than between a measurement and a memory.</p>
+  <p>The fast, slow and normal <strong>cycle times</strong> need reading carefully.
+     Each is the average time to complete one poll cycle, and the scheduler deliberately
+     spreads its messages evenly across the configured interval. Five points on Normal
+     will report a normal cycle time near 10,000&nbsp;ms; that is the spacing, not ten
+     seconds of work. Reading cycle time as effort is how a healthy bus gets blamed.</p>
   <p>One caveat on reading them: the BACnet driver polls on multiple threads — two per
      network port — and the statistics are the sum across all of them. There is no
      per-thread breakdown, so a busy figure on a station with several trunks tells you
