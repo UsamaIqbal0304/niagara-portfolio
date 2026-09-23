@@ -3,23 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Niagara Engineering Notes &amp; Technical Guides</title>
-<meta name="description" content="Practical notes on Niagara module signing, version stamping, JACE limits, bulk tagging, getting data out of a station and scheduled backups.">
-<link rel="canonical" href="https://plantroomlabs.com/notes/">
+<title>Tags, Dictionaries and the Licence You Need</title>
+<meta name="description" content="Tagging is how a station describes itself to software that did not engineer it. Three kinds of tag, one namespace, and a licence feature that gates it.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-tag-dictionaries/">
 <meta name="author" content="Plantroom Labs">
 
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:site_name" content="Plantroom Labs">
-<meta property="og:title" content="Niagara Engineering Notes &amp; Technical Guides">
-<meta property="og:description" content="Practical notes on Niagara module signing, version stamping, JACE limits, bulk tagging, getting data out of a station and scheduled backups.">
-<meta property="og:url" content="https://plantroomlabs.com/notes/">
+<meta property="og:title" content="Tags, Dictionaries and the Licence You Need">
+<meta property="og:description" content="Tagging is how a station describes itself to software that did not engineer it. Three kinds of tag, one namespace, and a licence feature that gates it.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-tag-dictionaries/">
 <meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Niagara Engineering Notes &amp; Technical Guides">
-<meta name="twitter:description" content="Practical notes on Niagara module signing, version stamping, JACE limits, bulk tagging, getting data out of a station and scheduled backups.">
+<meta name="twitter:title" content="Tags, Dictionaries and the Licence You Need">
+<meta name="twitter:description" content="Tagging is how a station describes itself to software that did not engineer it. Three kinds of tag, one namespace, and a licence feature that gates it.">
 <meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
 
 <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
@@ -28,6 +28,7 @@
 <link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/niagara-tag-dictionaries.md" title="This page as markdown">
 
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
@@ -84,81 +85,23 @@
    }
   },
   {
-   "@type": "ItemList",
-   "itemListElement": [
-    {
-     "@type": "ListItem",
-     "position": 1,
-     "url": "https://plantroomlabs.com/notes/niagara-module-version-stamping/",
-     "name": "Which Niagara version to stamp a module for"
-    },
-    {
-     "@type": "ListItem",
-     "position": 2,
-     "url": "https://plantroomlabs.com/notes/niagara-module-signing/",
-     "name": "What a station checks before loading a module"
-    },
-    {
-     "@type": "ListItem",
-     "position": 3,
-     "url": "https://plantroomlabs.com/notes/what-runs-on-a-jace/",
-     "name": "Pure Java, or it will not run on a JACE"
-    },
-    {
-     "@type": "ListItem",
-     "position": 4,
-     "url": "https://plantroomlabs.com/notes/bulk-point-renaming-and-tagging/",
-     "name": "Renaming and tagging points in bulk"
-    },
-    {
-     "@type": "ListItem",
-     "position": 5,
-     "url": "https://plantroomlabs.com/notes/getting-data-out-of-a-niagara-station/",
-     "name": "Getting data out of a Niagara station"
-    },
-    {
-     "@type": "ListItem",
-     "position": 6,
-     "url": "https://plantroomlabs.com/notes/scheduled-niagara-station-backups/",
-     "name": "Scheduled station backups, and the gap"
-    },
-    {
-     "@type": "ListItem",
-     "position": 7,
-     "url": "https://plantroomlabs.com/notes/niagara-poll-rates-and-tuning-policies/",
-     "name": "Why a station polls too slowly"
-    },
-    {
-     "@type": "ListItem",
-     "position": 8,
-     "url": "https://plantroomlabs.com/notes/px-relative-ords/",
-     "name": "One PX sheet for every AHU"
-    },
-    {
-     "@type": "ListItem",
-     "position": 9,
-     "url": "https://plantroomlabs.com/notes/bacnet-mstp-on-a-jace/",
-     "name": "BACnet MS/TP on a JACE"
-    },
-    {
-     "@type": "ListItem",
-     "position": 10,
-     "url": "https://plantroomlabs.com/notes/niagara-tls-certificates/",
-     "name": "The certificate on a new JACE"
-    },
-    {
-     "@type": "ListItem",
-     "position": 11,
-     "url": "https://plantroomlabs.com/notes/niagara-tag-dictionaries/",
-     "name": "Tags, dictionaries and the licence you need"
-    },
-    {
-     "@type": "ListItem",
-     "position": 12,
-     "url": "https://plantroomlabs.com/notes/niagara-history-capacity/",
-     "name": "History capacity on a JACE"
-    }
-   ]
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/niagara-tag-dictionaries/#article",
+   "headline": "Tags, dictionaries and the licence you need",
+   "description": "Tagging is how a station describes itself to software that did not engineer it. Three kinds of tag, one namespace, and a licence feature that gates it.",
+   "url": "https://plantroomlabs.com/notes/niagara-tag-dictionaries/",
+   "inLanguage": "en-GB",
+   "keywords": "Tagging, Data modelling, Haystack",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-tag-dictionaries/"
   },
   {
    "@type": "BreadcrumbList",
@@ -172,7 +115,13 @@
     {
      "@type": "ListItem",
      "position": 2,
-     "name": "Notes"
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Tag dictionaries"
     }
    ]
   }
@@ -201,17 +150,110 @@
 
 <section class="pl-band pl-hero pl-hero--page">
   <div class="pl-wrap">
-    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li>Notes</li></ol></nav>
-    <p class="pl-eyebrow">Notes</p>
-    <h1>Niagara engineering notes</h1>
-    <p class="pl-lede">Answers to the narrow questions that cost a day each and are
-       written down almost nowhere. No product pitch in them — if a note saves you
-       hiring anyone, it has done its job.</p>
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Tag dictionaries</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>Tags, dictionaries and the licence you need</h1>
+    <p class="pl-lede">Tagging is sold as tidiness. It is not: it is the difference between a station another tool can <strong>read</strong> and one it can only display.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Tagging</li><li class="pl-chip pl-chip--on-dark">Data modelling</li><li class="pl-chip pl-chip--on-dark">Haystack</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
   </div>
 </section>
 
 <section class="pl-section">
   <div class="pl-wrap">
+<div class="pl-note pl-note--warn">
+  <p><strong>Check the licence first.</strong> The <code>tags</code> licence feature is
+     required to use the <code>TagDictionaryService</code> and tag dictionaries on a
+     station. A tagging scope agreed against a licence that does not carry it is a
+     conversation nobody enjoys having in week three.</p>
+</div>
+
+<h2>What a tag is made of</h2>
+<div class="pl-body">
+  <p>A tag has an id, and the id is two parts separated by a colon:
+     <code>namespace:name</code>. The namespace names the dictionary the tag came from
+     and is normally one or two characters — <code>n</code> for Niagara,
+     <code>hs</code> for Haystack. A tag may also carry a value, which is where the
+     building name, the equipment reference or the location goes.</p>
+  <p>Mechanically, a direct tag on a component is a property holding a non-component
+     value with the metaData flag set. That is worth knowing because it explains both why
+     tagging is cheap and why an untidy tagging job is as durable as any other untidy
+     property.</p>
+</div>
+
+<h2>Three kinds, and only two of them scale</h2>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Kind</th><th scope="col">Where it comes from</th><th scope="col">Use it when</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Direct</th>
+        <td>Added deliberately from an installed dictionary, and stored on the component.</td>
+        <td>The normal case. Shared vocabulary, visible in the Direct Tags tab.</td></tr>
+    <tr><th scope="row">Implied</th>
+        <td>Not stored at all — produced by tag rules in a Smart Tag Dictionary, typically remapping properties the component already has onto the dictionary's naming.</td>
+        <td>Wherever the information is already in the station. Nothing to maintain and nothing to get out of step.</td></tr>
+    <tr><th scope="row">Ad hoc</th>
+        <td>Typed in the Add Tag dialog. A direct tag belonging to no dictionary.</td>
+        <td>Rarely. This is how a tagging project quietly turns into a second naming convention with no validation behind it.</td></tr>
+  </tbody>
+</table>
+
+<h2>What a dictionary actually contains</h2>
+<div class="pl-body">
+  <p>A tag dictionary is more than a word list. It carries a unique namespace, tag
+     definitions with their default values and validation rules, optional tag group
+     definitions — standard groupings you can apply in one action — optional relation
+     definitions, and, in a smart dictionary, the tag rules that generate implied
+     tags.</p>
+  <p>Niagara 4.15 ships a <strong>Brick</strong> tag dictionary in the <code>brick</code>
+     palette, dropped into the <code>TagDictionaryService</code> over a Fox connection,
+     with two narrower alternates — <code>BrickHasTagsOnly</code> and
+     <code>BrickSubclassesOnly</code>. Brick models a building as a class hierarchy, so
+     which of the three you install decides how much of that ontology lands in the
+     station. Pick deliberately; retagging afterwards is the expensive direction.</p>
+</div>
+
+<h2>Doing it to a whole station</h2>
+<div class="pl-body">
+  <p>Tagging point by point is how tagging projects die. The Batch Editor under
+     <code>Program Service</code> is the tool: <strong>Find Objects</strong> opens the
+     BQL Query Builder, you narrow the result set, remove what should not be there, and
+     <strong>Add Tag</strong> applies a tag — or a whole tag group — to everything
+     selected at once.</p>
+  <p>Do it at discovery time where you can. Associations are typically established when a
+     device is discovered, registered and subscribed, and a tag added then costs nothing
+     compared with a tag added to four thousand existing points.</p>
+</div>
+
+<h2>What it buys</h2>
+<div class="pl-body">
+  <p>One thing, and it is worth the effort by itself: another piece of software can
+     discover what is in the station without knowing the naming convention the installer
+     used. Hierarchies, search, analytics and any external consumer stop depending on
+     whether somebody wrote <code>SpaceTemp</code> or <code>ZnT</code> in 2019.</p>
+</div>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 3.5a5 5 0 0 0-6.8 6.3L3 14.5V21h6.5l4.7-4.7a5 5 0 0 0 6.3-6.8L17 12.5 11.5 7z"/></svg></span>
+        <h3><a href="/services/workbench-tooling/">Workbench tooling</a></h3>
+        <p>Custom Workbench views and tools for repetitive Niagara work: bulk renaming and retagging, station audits, provisioning helpers and module inventories.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
     <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
       <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
       <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
@@ -224,56 +266,7 @@
       <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
       <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
       <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/bulk-point-renaming-and-tagging/">Renaming and tagging points in bulk</a></h3>
-      <p>Point names arrive from the field device and there is no standard. What to use to select, rename and tag in bulk — and what a rename quietly breaks.</p>
-      <ul class="pl-chips"><li class="pl-chip">Bulk engineering</li><li class="pl-chip">Tagging</li><li class="pl-chip">Workbench</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/getting-data-out-of-a-niagara-station/">Getting data out of a Niagara station</a></h3>
-      <p>REST, MQTT, a relational history database, file export or an HTTP client. Which suits which consumer, and what each one costs you to run.</p>
-      <ul class="pl-chips"><li class="pl-chip">Integration</li><li class="pl-chip">Histories</li><li class="pl-chip">MQTT</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/scheduled-niagara-station-backups/">Scheduled station backups, and the gap</a></h3>
-      <p>A Supervisor can back up every station in its Niagara Network on a schedule. The station it does not cover that way is its own.</p>
-      <ul class="pl-chips"><li class="pl-chip">Backups</li><li class="pl-chip">Provisioning</li><li class="pl-chip">Supervisor</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-poll-rates-and-tuning-policies/">Why a station polls too slowly</a></h3>
-      <p>Slow, Normal and Fast are three numbers you choose, and one default tuning policy applied to every point is the usual reason a station feels sluggish.</p>
-      <ul class="pl-chips"><li class="pl-chip">Station engineering</li><li class="pl-chip">Performance</li><li class="pl-chip">BACnet</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/px-relative-ords/">One PX sheet for every AHU</a></h3>
-      <p>The Px editor binds absolutely by default, which is why a graphic works for AHU-01 and nothing else. Relativised, one sheet serves the whole plant.</p>
-      <ul class="pl-chips"><li class="pl-chip">PX graphics</li><li class="pl-chip">Standard sheets</li><li class="pl-chip">Reuse</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/bacnet-mstp-on-a-jace/">BACnet MS/TP on a JACE</a></h3>
-      <p>Baud, MAC address, Max Master and Max Info Frames. Four settings on one Link component decide whether an RS-485 trunk works, crawls or drops the token.</p>
-      <ul class="pl-chips"><li class="pl-chip">BACnet</li><li class="pl-chip">MS/TP</li><li class="pl-chip">Commissioning</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-tls-certificates/">The certificate on a new JACE</a></h3>
-      <p>Every station starts with a self-signed certificate it generated itself. What that is good for, what it is not, and what breaks on the day it expires.</p>
-      <ul class="pl-chips"><li class="pl-chip">TLS</li><li class="pl-chip">Certificates</li><li class="pl-chip">Commissioning</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-tag-dictionaries/">Tags, dictionaries and the licence you need</a></h3>
-      <p>Tagging is how a station describes itself to software that did not engineer it. Three kinds of tag, one namespace, and a licence feature that gates it.</p>
-      <ul class="pl-chips"><li class="pl-chip">Tagging</li><li class="pl-chip">Data modelling</li><li class="pl-chip">Haystack</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-history-capacity/">History capacity on a JACE</a></h3>
-      <p>The default capacity is 500 records, the default name collides, and one setting decides whether a full history overwrites data or stops collecting.</p>
-      <ul class="pl-chips"><li class="pl-chip">Histories</li><li class="pl-chip">JACE</li><li class="pl-chip">Station engineering</li></ul>
     </div></div>
-  </div>
-</section>
-
-<section class="pl-section pl-section--sunk">
-  <div class="pl-wrap">
-    <div class="pl-section__head">
-      <p class="pl-eyebrow">Why these exist</p>
-      <h2>Written from the framework, not from memory</h2>
-      <p class="pl-sub">Every claim here is checkable against a stock Niagara
-         installation — the documentation modules, the default properties, the shipped
-         drivers — or is flagged as an opinion. Where the honest answer is "it depends",
-         the note says what it depends on instead of picking a side.</p>
-    </div>
   </div>
 </section>
 

@@ -2852,6 +2852,295 @@ NOTES += [
 """,
   related=["services/station-engineering/", "services/niagara-modules/"],
  ),
+
+ dict(
+  slug="notes/niagara-tls-certificates/",
+  date="2026-09-23",
+  nav="TLS certificates",
+  title="The Certificate on a New JACE, and Its Expiry",
+  desc=("Every station starts with a self-signed certificate it generated itself. What "
+        "that is good for, what it is not, and what breaks on the day it expires."),
+  h1="The certificate on a new JACE",
+  lede=("A controller is secure out of the box in the narrow sense that the traffic is "
+        "encrypted. It is <strong>not authenticated</strong>, and the difference only "
+        "becomes visible later."),
+  tags=["TLS", "Certificates", "Commissioning"],
+  body="""
+<h2>Where the first certificate comes from</h2>
+<div class="pl-body">
+  <p>The first time a Workbench installation, a platform or a station starts after
+     commissioning, the system generates a default self-signed server certificate with
+     the alias <code>tridium</code>, using its own 2048-bit private key. Nobody asked for
+     it and nothing prompts you about it.</p>
+  <p>It is self-signed in the literal sense: open it and the Issuer DN and the Subject DN
+     are the same name. There is no authority above it saying it is what it claims to
+     be.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>What it is actually for.</strong> Tridium's documentation is clear that the
+     purpose is to allow secure access to a platform or station <em>before</em> a trusted
+     certificate tree exists. It is the scaffolding for commissioning, not the finished
+     security posture, and because a client cannot validate it, it is explicitly not
+     recommended for robust long-term use.</p>
+</div>
+
+<h2>Three things about the default certificate that surprise people</h2>
+<div class="pl-body">
+  <ul>
+    <li><strong>It cannot be deleted.</strong> From Niagara 4.13 the default certificate
+       created on first platform access is also the recovery certificate, protected by
+       the global certificate password. On a host upgraded from before 4.13, an existing
+       <code>tridium</code> certificate carries on being used but does <em>not</em> serve
+       as the recovery certificate — worth knowing before an upgrade, not after.</li>
+    <li><strong>Do not export it to another host.</strong> Copying one platform's
+       self-signed certificate into another platform's store is possible and is a
+       downgrade in security every time.</li>
+    <li><strong>Accepting one is a commitment.</strong> Once you approve a self-signed
+       certificate you are not asked again — and if its public key later changes, the
+       green shield in Certificate Management becomes a yellow warning and access is
+       denied until somebody accepts the new key. That is the correct behaviour and it
+       looks exactly like a fault.</li>
+  </ul>
+</div>
+
+<h2>The platform settings worth checking on every commission</h2>
+<div class="pl-body">
+  <p>Right-click Platform, open <code>Views &gt; Platform Administration</code>, then
+     <strong>Change TLS Settings</strong>:</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Setting</th><th scope="col">Default</th><th scope="col">Worth changing?</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">State</th><td>TLS only</td>
+        <td>No. Anything else on a controller reachable by more than one person is a decision to justify in writing.</td></tr>
+    <tr><th scope="row">Port</th><td>5011</td>
+        <td>Only if the site's firewall policy says so.</td></tr>
+    <tr><th scope="row">Certificate Alias</th><td>the default self-signed certificate</td>
+        <td>Yes, eventually — this is where a signed server certificate gets selected once one exists.</td></tr>
+    <tr><th scope="row">Protocol</th><td>TLSv1.2+</td>
+        <td>Raise to TLSv1.3 where every client supports it. Never drop to TLSv1.0+ to make an old client work without writing down why.</td></tr>
+  </tbody>
+</table>
+
+<h2>What expiry actually breaks, and what it does not</h2>
+<div class="pl-body">
+  <p>This is the part that makes certificate expiry dangerous rather than merely
+     annoying: it does not fail all at once.</p>
+  <ul>
+    <li>Browsers start warning that the certificate is not trusted — <em>and still
+       connect</em>.</li>
+    <li>Workbench connects.</li>
+    <li>FOXS connections between stations that use Allowed Hosts exemptions still
+       connect.</li>
+    <li>FOXS connections between stations <strong>without</strong> those exemptions fail
+       to reconnect, and stay failed until the certificates are reissued.</li>
+  </ul>
+  <p>So an estate can pass an expiry date looking fine, and lose exactly the
+     station-to-station links that were set up properly. The sites that did the security
+     work are the ones that break first.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Set the alarm now, not the reminder.</strong> An alarm extension can be
+     added to the server certificates under the <code>SecurityService</code> to raise an
+     alarm 30 days before expiry. Thirty days matters: if the site uses a third-party CA,
+     the reissue process can take a couple of weeks on its own. From Niagara 4.14 the
+     Signing Service can renew certificates, which shortens the internal case but not the
+     external one.</p>
+</div>
+
+<h2>A reasonable order of work</h2>
+<ol class="pl-steps">
+  <li><div><strong>Commission on the default certificate.</strong> That is what it is
+      for. Do not spend the first day of a job on PKI.</div></li>
+  <li><div><strong>Decide self-signed-root or third-party CA before handover</strong>,
+      because the lead time is entirely different and only one of them is free.</div></li>
+  <li><div><strong>Issue and install the server certificates</strong>, then point the
+      platform TLS settings and the station's web service at them.</div></li>
+  <li><div><strong>Add the 30-day expiry alarms</strong> and record every expiry date
+      somewhere that outlives the engineer who set it.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/niagara-modules/"],
+ ),
+
+ dict(
+  slug="notes/niagara-tag-dictionaries/",
+  date="2026-09-23",
+  nav="Tag dictionaries",
+  title="Tags, Dictionaries and the Licence You Need",
+  desc=("Tagging is how a station describes itself to software that did not engineer "
+        "it. Three kinds of tag, one namespace, and a licence feature that gates it."),
+  h1="Tags, dictionaries and the licence you need",
+  lede=("Tagging is sold as tidiness. It is not: it is the difference between a station "
+        "another tool can <strong>read</strong> and one it can only display."),
+  tags=["Tagging", "Data modelling", "Haystack"],
+  body="""
+<div class="pl-note pl-note--warn">
+  <p><strong>Check the licence first.</strong> The <code>tags</code> licence feature is
+     required to use the <code>TagDictionaryService</code> and tag dictionaries on a
+     station. A tagging scope agreed against a licence that does not carry it is a
+     conversation nobody enjoys having in week three.</p>
+</div>
+
+<h2>What a tag is made of</h2>
+<div class="pl-body">
+  <p>A tag has an id, and the id is two parts separated by a colon:
+     <code>namespace:name</code>. The namespace names the dictionary the tag came from
+     and is normally one or two characters — <code>n</code> for Niagara,
+     <code>hs</code> for Haystack. A tag may also carry a value, which is where the
+     building name, the equipment reference or the location goes.</p>
+  <p>Mechanically, a direct tag on a component is a property holding a non-component
+     value with the metaData flag set. That is worth knowing because it explains both why
+     tagging is cheap and why an untidy tagging job is as durable as any other untidy
+     property.</p>
+</div>
+
+<h2>Three kinds, and only two of them scale</h2>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Kind</th><th scope="col">Where it comes from</th><th scope="col">Use it when</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Direct</th>
+        <td>Added deliberately from an installed dictionary, and stored on the component.</td>
+        <td>The normal case. Shared vocabulary, visible in the Direct Tags tab.</td></tr>
+    <tr><th scope="row">Implied</th>
+        <td>Not stored at all — produced by tag rules in a Smart Tag Dictionary, typically remapping properties the component already has onto the dictionary's naming.</td>
+        <td>Wherever the information is already in the station. Nothing to maintain and nothing to get out of step.</td></tr>
+    <tr><th scope="row">Ad hoc</th>
+        <td>Typed in the Add Tag dialog. A direct tag belonging to no dictionary.</td>
+        <td>Rarely. This is how a tagging project quietly turns into a second naming convention with no validation behind it.</td></tr>
+  </tbody>
+</table>
+
+<h2>What a dictionary actually contains</h2>
+<div class="pl-body">
+  <p>A tag dictionary is more than a word list. It carries a unique namespace, tag
+     definitions with their default values and validation rules, optional tag group
+     definitions — standard groupings you can apply in one action — optional relation
+     definitions, and, in a smart dictionary, the tag rules that generate implied
+     tags.</p>
+  <p>Niagara 4.15 ships a <strong>Brick</strong> tag dictionary in the <code>brick</code>
+     palette, dropped into the <code>TagDictionaryService</code> over a Fox connection,
+     with two narrower alternates — <code>BrickHasTagsOnly</code> and
+     <code>BrickSubclassesOnly</code>. Brick models a building as a class hierarchy, so
+     which of the three you install decides how much of that ontology lands in the
+     station. Pick deliberately; retagging afterwards is the expensive direction.</p>
+</div>
+
+<h2>Doing it to a whole station</h2>
+<div class="pl-body">
+  <p>Tagging point by point is how tagging projects die. The Batch Editor under
+     <code>Program Service</code> is the tool: <strong>Find Objects</strong> opens the
+     BQL Query Builder, you narrow the result set, remove what should not be there, and
+     <strong>Add Tag</strong> applies a tag — or a whole tag group — to everything
+     selected at once.</p>
+  <p>Do it at discovery time where you can. Associations are typically established when a
+     device is discovered, registered and subscribed, and a tag added then costs nothing
+     compared with a tag added to four thousand existing points.</p>
+</div>
+
+<h2>What it buys</h2>
+<div class="pl-body">
+  <p>One thing, and it is worth the effort by itself: another piece of software can
+     discover what is in the station without knowing the naming convention the installer
+     used. Hierarchies, search, analytics and any external consumer stop depending on
+     whether somebody wrote <code>SpaceTemp</code> or <code>ZnT</code> in 2019.</p>
+</div>
+""",
+  related=["services/station-engineering/", "services/workbench-tooling/"],
+ ),
+
+ dict(
+  slug="notes/niagara-history-capacity/",
+  date="2026-09-23",
+  nav="History capacity",
+  title="History Capacity on a JACE, and Lost Records",
+  desc=("The default capacity is 500 records, the default name collides, and one "
+        "setting decides whether a full history overwrites data or stops collecting."),
+  h1="History capacity on a JACE",
+  lede=("Histories are the part of a station nobody checks until somebody asks for last "
+        "March. By then the answer is already decided by <strong>two properties</strong> "
+        "set at engineering time."),
+  tags=["Histories", "JACE", "Station engineering"],
+  body="""
+<h2>A new history extension collects nothing</h2>
+<div class="pl-body">
+  <p>Add a history extension to a point and it arrives <strong>disabled</strong>. Setting
+     <code>Enabled</code> to true is the whole of what is strictly required to start
+     collecting — which is exactly why the other properties get skipped.</p>
+</div>
+
+<h2>The name collides by default</h2>
+<div class="pl-body">
+  <p><code>History Name</code> defaults to <code>%parent.name%</code>. Every
+     <code>SpaceTemp</code> point under every air handler therefore wants to be the same
+     history. Qualify it with the equipment above:</p>
+  <p><code>%parent.parent.name%_%parent.name%</code> &nbsp;→&nbsp;
+     <code>AHU-1_SpaceTemp1</code></p>
+  <p>There is a checkable tell for getting this wrong. Expand <code>History Config</code>
+     and read the read-only <code>Id</code>: if it shows an error string rather than a
+     name, the History Name property is misconfigured. Check it on the first point of a
+     batch rather than on all of them afterwards.</p>
+</div>
+
+<h2>Capacity, and the setting that silently stops collecting</h2>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Property</th><th scope="col">Default</th><th scope="col">What it means for you</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Capacity</th><td>Record Count: 500</td>
+        <td>500 or fewer is generally adequate on a controller <em>because the records are archived to a Supervisor</em>. Tridium's stated best practice is to hold about two days of data on a JACE. On a Supervisor a large number such as 250,000 is reasonable.</td></tr>
+    <tr><th scope="row">Full Policy</th><td>Roll</td>
+        <td><code>Roll</code> overwrites the oldest record first, so the latest data always exists. <code>Stop</code> terminates recording when capacity is reached — the history stays present, stays green, and stops containing anything new.</td></tr>
+    <tr><th scope="row">Unlimited</th><td>—</td>
+        <td>Available, and not the wise choice even on a Supervisor. On a controller with a fixed flash budget it is how a station fills its own disk.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Full Policy is the one to audit on an inherited station.</strong> A history
+     set to <code>Stop</code> raises nothing and looks identical to a healthy one. The
+     first evidence is a chart that flatlines on a date nobody can explain. Note also
+     that Full Policy does nothing at all when Capacity is Unlimited.</p>
+</div>
+
+<h2>Changing the interval creates a new history</h2>
+<div class="pl-body">
+  <p>Histories with different intervals are not compatible, so changing
+     <code>Interval</code> splits a new history off from the original rather than editing
+     it. Decide the interval before the data matters. A trend re-rated a year in gives
+     you two datasets and a join, not a better trend.</p>
+</div>
+
+<h2>Sizing it against the archive</h2>
+<div class="pl-body">
+  <p>Where records are archived to a relational database and queried back through the
+     Archive History Provider, the local capacity is a cache decision rather than a
+     retention decision. Two things pull in opposite directions: local histories answer a
+     query faster than archived ones, and local storage on a controller is finite. Size
+     the local capacity to cover the time ranges people actually ask for, and to remain
+     useful on the day the archive source is down for maintenance.</p>
+  <p><code>System Tags</code> on a history extension are worth setting while you are
+     there — they are the metadata that makes a selective import or export possible later
+     without hand-picking histories.</p>
+</div>
+
+<h2>What to check on a station you did not build</h2>
+<ol class="pl-steps">
+  <li><div><strong>Any history whose Full Policy is Stop.</strong> Then look at when it
+      last recorded.</div></li>
+  <li><div><strong>Duplicate or unqualified history names</strong>, which are the sign
+      that the default name template was never changed.</div></li>
+  <li><div><strong>Capacity against the archive schedule.</strong> A controller holding
+      two days of data and archiving weekly loses five days on every missed
+      archive.</div></li>
+  <li><div><strong>Anything set to Unlimited on a controller</strong>, before the flash
+      answers the question for you.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/workbench-tooling/"],
+ ),
 ]
 
 NOTE_LOOKUP = {n["slug"]: n for n in NOTES}

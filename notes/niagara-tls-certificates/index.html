@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Certificate on a New JACE, and Its Expiry</title>
+<meta name="description" content="Every station starts with a self-signed certificate it generated itself. What that is good for, what it is not, and what breaks on the day it expires.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-tls-certificates/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="The Certificate on a New JACE, and Its Expiry">
+<meta property="og:description" content="Every station starts with a self-signed certificate it generated itself. What that is good for, what it is not, and what breaks on the day it expires.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-tls-certificates/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Certificate on a New JACE, and Its Expiry">
+<meta name="twitter:description" content="Every station starts with a self-signed certificate it generated itself. What that is good for, what it is not, and what breaks on the day it expires.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/niagara-tls-certificates.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/niagara-tls-certificates/#article",
+   "headline": "The certificate on a new JACE",
+   "description": "Every station starts with a self-signed certificate it generated itself. What that is good for, what it is not, and what breaks on the day it expires.",
+   "url": "https://plantroomlabs.com/notes/niagara-tls-certificates/",
+   "inLanguage": "en-GB",
+   "keywords": "TLS, Certificates, Commissioning",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-tls-certificates/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "TLS certificates"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>TLS certificates</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>The certificate on a new JACE</h1>
+    <p class="pl-lede">A controller is secure out of the box in the narrow sense that the traffic is encrypted. It is <strong>not authenticated</strong>, and the difference only becomes visible later.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">TLS</li><li class="pl-chip pl-chip--on-dark">Certificates</li><li class="pl-chip pl-chip--on-dark">Commissioning</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+<h2>Where the first certificate comes from</h2>
+<div class="pl-body">
+  <p>The first time a Workbench installation, a platform or a station starts after
+     commissioning, the system generates a default self-signed server certificate with
+     the alias <code>tridium</code>, using its own 2048-bit private key. Nobody asked for
+     it and nothing prompts you about it.</p>
+  <p>It is self-signed in the literal sense: open it and the Issuer DN and the Subject DN
+     are the same name. There is no authority above it saying it is what it claims to
+     be.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>What it is actually for.</strong> Tridium's documentation is clear that the
+     purpose is to allow secure access to a platform or station <em>before</em> a trusted
+     certificate tree exists. It is the scaffolding for commissioning, not the finished
+     security posture, and because a client cannot validate it, it is explicitly not
+     recommended for robust long-term use.</p>
+</div>
+
+<h2>Three things about the default certificate that surprise people</h2>
+<div class="pl-body">
+  <ul>
+    <li><strong>It cannot be deleted.</strong> From Niagara 4.13 the default certificate
+       created on first platform access is also the recovery certificate, protected by
+       the global certificate password. On a host upgraded from before 4.13, an existing
+       <code>tridium</code> certificate carries on being used but does <em>not</em> serve
+       as the recovery certificate — worth knowing before an upgrade, not after.</li>
+    <li><strong>Do not export it to another host.</strong> Copying one platform's
+       self-signed certificate into another platform's store is possible and is a
+       downgrade in security every time.</li>
+    <li><strong>Accepting one is a commitment.</strong> Once you approve a self-signed
+       certificate you are not asked again — and if its public key later changes, the
+       green shield in Certificate Management becomes a yellow warning and access is
+       denied until somebody accepts the new key. That is the correct behaviour and it
+       looks exactly like a fault.</li>
+  </ul>
+</div>
+
+<h2>The platform settings worth checking on every commission</h2>
+<div class="pl-body">
+  <p>Right-click Platform, open <code>Views &gt; Platform Administration</code>, then
+     <strong>Change TLS Settings</strong>:</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Setting</th><th scope="col">Default</th><th scope="col">Worth changing?</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">State</th><td>TLS only</td>
+        <td>No. Anything else on a controller reachable by more than one person is a decision to justify in writing.</td></tr>
+    <tr><th scope="row">Port</th><td>5011</td>
+        <td>Only if the site's firewall policy says so.</td></tr>
+    <tr><th scope="row">Certificate Alias</th><td>the default self-signed certificate</td>
+        <td>Yes, eventually — this is where a signed server certificate gets selected once one exists.</td></tr>
+    <tr><th scope="row">Protocol</th><td>TLSv1.2+</td>
+        <td>Raise to TLSv1.3 where every client supports it. Never drop to TLSv1.0+ to make an old client work without writing down why.</td></tr>
+  </tbody>
+</table>
+
+<h2>What expiry actually breaks, and what it does not</h2>
+<div class="pl-body">
+  <p>This is the part that makes certificate expiry dangerous rather than merely
+     annoying: it does not fail all at once.</p>
+  <ul>
+    <li>Browsers start warning that the certificate is not trusted — <em>and still
+       connect</em>.</li>
+    <li>Workbench connects.</li>
+    <li>FOXS connections between stations that use Allowed Hosts exemptions still
+       connect.</li>
+    <li>FOXS connections between stations <strong>without</strong> those exemptions fail
+       to reconnect, and stay failed until the certificates are reissued.</li>
+  </ul>
+  <p>So an estate can pass an expiry date looking fine, and lose exactly the
+     station-to-station links that were set up properly. The sites that did the security
+     work are the ones that break first.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Set the alarm now, not the reminder.</strong> An alarm extension can be
+     added to the server certificates under the <code>SecurityService</code> to raise an
+     alarm 30 days before expiry. Thirty days matters: if the site uses a third-party CA,
+     the reissue process can take a couple of weeks on its own. From Niagara 4.14 the
+     Signing Service can renew certificates, which shortens the internal case but not the
+     external one.</p>
+</div>
+
+<h2>A reasonable order of work</h2>
+<ol class="pl-steps">
+  <li><div><strong>Commission on the default certificate.</strong> That is what it is
+      for. Do not spend the first day of a job on PKI.</div></li>
+  <li><div><strong>Decide self-signed-root or third-party CA before handover</strong>,
+      because the lead time is entirely different and only one of them is free.</div></li>
+  <li><div><strong>Issue and install the server certificates</strong>, then point the
+      platform TLS settings and the station's web service at them.</div></li>
+  <li><div><strong>Add the 30-day expiry alarms</strong> and record every expiry date
+      somewhere that outlives the engineer who set it.</div></li>
+</ol>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span>
+        <h3><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></h3>
+        <p>Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
+      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
+      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
+      <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>
