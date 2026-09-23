@@ -4826,6 +4826,206 @@ NOTES += [
   related=["services/niagara-modules/", "services/station-engineering/",
            "notes/getting-data-out-of-a-niagara-station/", "notes/niagara-tls-certificates/"],
  ),
+ dict(
+  slug="notes/commissioning-a-jace-8000/",
+  date="2026-09-23",
+  nav="Commissioning",
+  title="Commissioning a JACE-8000 Without Locking Yourself Out",
+  desc=("The factory address, the passphrase and the account you are made to delete "
+        "— the commissioning steps that strand a new controller."),
+  h1="Commissioning a JACE-8000 without locking yourself out",
+  lede=("Most of the Commissioning Wizard is a checklist you click through once. "
+        "Three of its steps are one-way doors, and the route back from any of them "
+        "is a <strong>factory recovery over a serial cable</strong>."),
+  tags=["JACE", "Commissioning", "Deployment"],
+  body="""
+<h2>What a factory-shipped controller is</h2>
+<div class="pl-body">
+  <p>Out of the box a JACE-8000 answers on <code>192.168.1.140</code> with a
+     <code>255.255.255.0</code> mask, on the primary LAN1 port only — LAN2 ships
+     disabled, with no address at all. The platform daemon listens on HTTPS port 5011,
+     and there is a documented default platform user name and password. All three are
+     temporary by design, and the wizard exists mostly to replace them.</p>
+  <p>So the first obstacle is arithmetic rather than Niagara: your laptop has to be on
+     that subnet to open the platform connection, on any address except .140 itself.
+     Re-addressing the laptop's NIC is the usual answer. The two alternatives are a
+     USB-to-Ethernet adapter as a second NIC with a crossover cable, which saves
+     disturbing the machine's real network settings, or the debug port — a micro-USB
+     serial shell, needing a VCP driver and a terminal emulator, from which you can
+     reassign the controller's address and reboot before going anywhere near
+     Workbench.</p>
+</div>
+
+<h2>The steps the wizard will not let you skip</h2>
+<div class="pl-body">
+  <p>Right-click the connected platform in the Nav tree for
+     <strong>Commissioning Wizard</strong>. Steps run in the order listed, and on a new
+     unit everything is preselected except lexicon installation. Some of those ticks
+     cannot be cleared.</p>
+</div>
+
+<table class="pl-spec">
+  <thead>
+    <tr><th>Step</th><th>On a new unit</th><th>What it actually decides</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Request or install licences</td><td>preselected</td>
+        <td>fetched from the licence server if the laptop has internet; otherwise drop
+            the .lar or .license file into <code>!security/licenses/inbox</code> and
+            restart Workbench <em>first</em></td></tr>
+    <tr><td>Set enabled runtime profiles</td><td>preselected, read-only</td>
+        <td>which module JARs get installed, and therefore how much flash they use</td></tr>
+    <tr><td>Install a station</td><td>optional, recommended</td>
+        <td>can be done later from the Station Copier</td></tr>
+    <tr><td>Install lexicons</td><td>cleared</td>
+        <td>file-based lexicon sets; leave it cleared, N4 wants lexicon modules</td></tr>
+    <tr><td>Install/upgrade modules</td><td>always preselected</td>
+        <td>the module selection list, filtered by the profiles above</td></tr>
+    <tr><td>Install/upgrade core software</td><td>preselected, read-only</td>
+        <td>the distribution files — the reboot at the end of the run</td></tr>
+    <tr><td>Sync date and time</td><td>preselected</td>
+        <td>a new controller's clock is usually wrong by years</td></tr>
+    <tr><td>Configure TCP/IP</td><td>optional, recommended</td>
+        <td>the address you will spend the rest of the job using</td></tr>
+    <tr><td>Remove default platform user</td><td>preselected, read-only</td>
+        <td>you cannot commission a unit that keeps the factory account</td></tr>
+    <tr><td>Additional platform daemon users</td><td>optional</td>
+        <td>up to 20 accounts, every one of them a full administrator</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>Back and Next retrace or skip freely, Cancel performs nothing, and the last screen
+     is a summary of every change before any of it is committed. Up to that review
+     nothing has been written, which makes the wizard much safer to explore than its
+     reputation suggests.</p>
+</div>
+
+<h2>Runtime profiles decide whether a browser can see the station</h2>
+<div class="pl-body">
+  <p>A profile is a class of module JAR. RUNTIME (<code>-rt</code>) is always selected
+     and cannot be cleared. UX (<code>-ux</code>) is what serves HTML5 clients, and
+     without it the WebService will not give a browser anything — the station is
+     reachable from Workbench over Fox and nowhere else. WB (<code>-wb</code>) adds
+     browser-hosted Workbench for Java-enabled clients on top of UX. SE is not
+     available on the QNX JACEs at all, which run a Java 8 compact 3 VM. DOC can be
+     selected and should not be: it is documentation, on the most limited flash in the
+     building.</p>
+  <p>None of this is permanent — profiles can be changed afterwards from Platform
+     Administration — but changing them means reinstalling modules, so it is cheaper
+     to get right during the one run that was going to reboot anyway.</p>
+</div>
+
+<h2>Two Ethernet ports, two subnets</h2>
+<div class="pl-body">
+  <p>LAN2 is there to keep a driver's Ethernet traffic off the customer's network, to
+     hang a private chain of IP devices off the controller, or to give a visiting
+     engineer a fixed address to plug into without touching the corporate LAN. Whatever
+     it is for, <strong>each enabled interface must be on a different subnet</strong>.
+     Setting LAN1 to 192.168.1.99 and LAN2 to 192.168.1.188 under a /24 mask is not a
+     redundant pair, it is a broken configuration, and the symptom is ports that simply
+     do not work.</p>
+  <p>Two more constraints follow from the same place. The controller supports exactly
+     one gateway across all adapters, WiFi included, so only one interface can reach
+     anything off-subnet. And it does no routing or bridging between interfaces — a
+     device on LAN2 is not visible from LAN1, which is the entire point but catches
+     people who expected a switch.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Do not enable DHCP unless you know a DHCP server exists.</strong> If none
+     answers, the controller comes back at an address nobody can predict and the next
+     step is the serial cable. Static addressing is the recommendation regardless; if
+     the site insists on DHCP, insist back on a reservation, because a controller whose
+     address moves takes every Niagara Network connection to it along.</p>
+</div>
+
+<h2>The passphrase, and the account you are made to replace</h2>
+<div class="pl-body">
+  <p>Both replacements demand a strong password: at least ten characters with an
+     uppercase, a lowercase and a digit, and both are case sensitive. The platform
+     account is straightforward — pick a name that is not the factory one. Every
+     platform user has identical full administrative access and can create more, so
+     there is no such thing as a read-only platform login to hand out.</p>
+  <p>The system passphrase is the one that matters later. It protects sensitive data at
+     rest, and it doubles as the <em>file</em> passphrase on everything portable the
+     station produces: backups, station copies, anything encrypted on its way out. Move
+     one of those to a system whose passphrase differs and you will be asked for the
+     original before the restore proceeds. Lose it and the encrypted data is gone —
+     there is no recovery path, only the factory wipe below.</p>
+  <p>Since 4.4 Workbench will not finish a platform connection to a host still holding
+     either default, and launches the Change Platform Defaults Wizard instead. That
+     behaviour is two options under <strong>Tools &rarr; Options &rarr; Platform
+     Connections</strong>, both true out of the box; turning them off only suppresses
+     the prompt where another workflow already covers it.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>If you are changing the address in the same run, write the new credentials
+     down.</strong> Keep the address and Workbench remembers the replacement platform
+     user for the session, which makes the post-reboot reconnect painless. Change the
+     address and it does not — you reconnect to somewhere new, as somebody new, with
+     nothing cached.</p>
+</div>
+
+<h2>The SD card carries the encryption</h2>
+<div class="pl-body">
+  <p>On a JACE-8000 the microSD card is the primary storage for the whole software
+     installation, and because a card can be pocketed, the sensitive parts of it are
+     encrypted at rest and decoded as they are read: WiFi credentials, Niagara key
+     material, private key files, OS account credentials.</p>
+  <p>The consequence shows up on the day a controller dies. Moving the card into a
+     replacement chassis does carry the configuration across, but the card is encrypted
+     under the <em>old</em> unit's passphrase, so the new one fails to boot — the Stat
+     LED flashing at a 50% duty cycle on a one-second period is that failure and not a
+     hardware fault. Connect to the debug shell, log in with platform credentials, and
+     the System Decrypt Failure menu offers exactly two ways forward: supply the
+     original passphrase, or delete all the encrypted data. Only the first keeps the
+     site's keys and certificates.</p>
+  <p>Which makes the pre-emptive version worth knowing: set the replacement unit's
+     passphrase to the original's over serial <em>before</em> inserting the card, and
+     commissioning finds a match and never asks.</p>
+</div>
+
+<h2>Factory recovery, and the buttons behind the door</h2>
+<div class="pl-body">
+  <p>Two mistakes strand a brand-new controller: mistyping the default platform
+     credentials or the default passphrase often enough to be locked out of the
+     platform connection you need in order to fix it. There is no back door. The same
+     procedure is also the correct way to decommission a controller, because it wipes
+     platform and station data together.</p>
+</div>
+
+<ol class="pl-steps">
+  <li><div>Remove any USB device from the backup/restore port. Since 4.7U1 the presence
+      of a stick — any stick — makes the controller skip recovery, which is a guard
+      against wiping a unit you meant to restore.</div></li>
+  <li><div>Power the controller off.</div></li>
+  <li><div>Hold the BACKUP button down and power up, keeping it held until the banner
+      confirms the press. Holding well past that prints a warning about a possible
+      short; it is not a fault, but start again.</div></li>
+  <li><div>Release the button. A ten-second countdown starts. <strong>Any keypress
+      during it switches to restore-from-USB instead</strong> — say nothing and
+      recovery begins when it reaches zero.</div></li>
+  <li><div>Wait. The Backup LED goes to a slow one-second blink while the factory image
+      is written. Interrupting here can leave the controller unusable.</div></li>
+  <li><div>When the LED stops, power-cycle. The first boot after a recovery takes
+      noticeably longer than normal.</div></li>
+</ol>
+
+<div class="pl-body">
+  <p>The other recessed button, SHT/DWN, is the controlled shutdown, and it reports
+     back through the same LED: a fast alert flash while the press is registered, a
+     one-second work pattern while the software reaches a safe state, then dark, which
+     is the only signal that means power can be pulled. A distinctive
+     on-off-on-then-three-seconds-dark pattern means the software could <em>not</em>
+     reach a safe state — worth knowing before assuming a station shut down cleanly.</p>
+</div>
+""",
+  related=["services/niagara-modules/", "notes/what-runs-on-a-jace/",
+           "notes/niagara-tls-certificates/",
+           "notes/scheduled-niagara-station-backups/"],
+ ),
 ]
 
 NOTE_LOOKUP = {n["slug"]: n for n in NOTES}
@@ -5137,7 +5337,8 @@ NOTE_GROUPS = [
      "Building something that installs, runs and keeps running on a controller.",
      ["notes/niagara-module-version-stamping/",
       "notes/niagara-module-signing/",
-      "notes/what-runs-on-a-jace/"]),
+      "notes/what-runs-on-a-jace/",
+      "notes/commissioning-a-jace-8000/"]),
     ("Drivers and field buses", "drivers-and-field-buses",
      "Getting values off equipment, and why the values you get are wrong or late.",
      ["notes/bacnet-mstp-on-a-jace/",
