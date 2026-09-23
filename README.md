@@ -10,7 +10,14 @@ Live: <https://plantroomlabs.com/> (domain registered 2026-09-21)
 
 ```sh
 python3 build.py          # rewrites every page, sitemap.xml, robots.txt, llms.txt
+python3 check.py          # verifies the output; non-zero exit gates the commit
 ```
+
+`check.py` reads the generated HTML only — it never imports `build.py`, so it
+checks the output rather than agreeing with the generator. Every assertion in
+it caught a real mistake at least once: a renamed page still linked, a title
+Google would cut in half, JSON-LD broken by an unescaped quote, a claim the
+site must not make.
 
 No dependencies beyond the standard library. The generator is the source of
 truth: **do not hand-edit the generated HTML** — the next build overwrites it.
@@ -36,8 +43,10 @@ python3 -m http.server 8098 -d .
 | `img/` | still captures from the preview harness in `~/niagara/ux` |
 | `brand/` | the logo kit — its own README; the site copies the badge and favicons out of it, so change geometry there, never in `build.py` |
 
-Twelve indexed pages: `/`, `/services/` + six service pages, `/work/`,
-`/faq/`, `/about/`, `/contact/`.
+Forty-one indexed pages: `/`, `/services/` + six service pages, `/work/`,
+`/building-automation/`, `/faq/`, `/about/`, `/contact/`, `/notes/` and a page per
+note. `check.py` asserts `sitemap.xml` lists exactly the indexable set, so this
+count is checked rather than remembered — run it for the current number.
 
 `/demos/{ahu,building,nav}/` are built too but carry `noindex, follow` and are
 kept out of `sitemap.xml`. They are iframe targets — the widget owns the
