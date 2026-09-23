@@ -643,7 +643,8 @@ SERVICES = [
  <thead><tr><th scope="col">Item</th><th scope="col">What it means in practice</th></tr></thead>
  <tbody>
   <tr><th scope="row">A sheet per plant type</th>
-      <td>AHU, FCU, VAV, chiller, boiler, LTHW/CHW circuit, meter, zone, plant overview.
+      <td>The HVAC plant that actually recurs: AHU, FCU, VAV, chiller, boiler, LTHW/CHW
+          circuit, meter, zone, plant overview.
           Drawn once, to a consistent layout, with the same control affordances in the same
           place on every one.</td></tr>
   <tr><th scope="row">Relative binding</th>
@@ -689,9 +690,10 @@ SERVICES = [
         "and roles, BACnet and Modbus, tagging, histories, alarms, backups."),
   type_="Systems engineering",
   lede=("Standing up a new station or a new controller, properly, from platform "
-        "commissioning to a handover pack. <strong>The boring half done right</strong> — "
-        "naming, tagging, security, histories and backups — because that is the half that "
-        "decides whether the site is maintainable in year three."),
+        "commissioning to a handover pack. The station is the BMS head end for everything "
+        "under it, so <strong>the boring half done right</strong> — naming, tagging, "
+        "security, histories and backups — is the half that decides whether the site is "
+        "maintainable in year three."),
   chips=["Platform commissioning", "TLS / certificates", "BACnet & Modbus", "Tagging", "Histories", "Backups"],
   body="""
 <h2>New station, end to end</h2>
@@ -1076,24 +1078,32 @@ def build_home():
 <section class="pl-band pl-hero">
   <div class="pl-wrap">
     <p class="pl-eyebrow">Independent Niagara Framework engineering</p>
-    <h1>Niagara work that still runs in three years.</h1>
+    <h1>Somebody built this Niagara station. They have moved on.</h1>
     <p class="pl-lede">
+      So the custom module will not load on the version you are moving to, and nobody kept
+      the key it was signed with. The PX graphics nobody can edit are the ones operators
+      look at all day. Nobody has inventoried what is actually installed, because the person
+      who knew has left. That is the ordinary condition of a ten-year-old building
+      management system.
+    </p>
+    <p class="pl-lede">
+      <strong>We do the Niagara side of building automation, and nothing else.</strong>
       Custom modules and drivers, bajaux widgets, PX graphics, station engineering and
       Niagara&nbsp;5 migration — for systems integrators, controls contractors and building
-      owners. Pure Java and JavaScript, <strong>signed</strong>, and stamped to run on a
-      JACE as readily as on a Supervisor.
+      owners. Pure Java and JavaScript, signed, and stamped to run on a JACE as readily as
+      on a Supervisor.
     </p>
     <ul class="pl-chips">
-      <li class="pl-chip pl-chip--on-dark">Niagara 4 and Niagara 5</li>
+      <li class="pl-chip pl-chip--on-dark">Niagara AX, 4 and 5</li>
       <li class="pl-chip pl-chip--on-dark">bajaux / BajaScript</li>
-      <li class="pl-chip pl-chip--on-dark">PX graphics</li>
+      <li class="pl-chip pl-chip--on-dark">HVAC plant graphics</li>
       <li class="pl-chip pl-chip--on-dark">JACE and Supervisor</li>
       <li class="pl-chip pl-chip--on-dark">Signed modules</li>
       <li class="pl-chip pl-chip--on-dark">Fixed price per deliverable</li>
     </ul>
     <div class="pl-btn-row">
       <a class="pl-btn pl-btn--on-dark" href="{href('work/')}">Try a live demo</a>
-      <a class="pl-btn pl-btn--quiet-dark" href="{href('services/')}">What we build</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="#services">What we build</a>
     </div>
   </div>
 </section>
@@ -1107,6 +1117,9 @@ def build_home():
          start with one and grow into two.</p>
     </div>
     <div class="pl-grid pl-grid--3">{service_cards()}</div>
+    <p style="margin-top:var(--pl-s-9)">
+      <a class="pl-btn pl-btn--ghost" href="{href('services/')}">How each one is scoped and priced &rarr;</a>
+    </p>
   </div>
 </section>
 
@@ -1191,11 +1204,35 @@ def build_home():
   </div>
 </section>
 
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Where to start</p>
+      <h2>Three ways in, none of them a sales call</h2>
+      <p class="pl-sub">In ascending order of how much of your time they cost.</p>
+    </div>
+    <ol class="pl-steps">
+      <li><div><h3><a href="{href('notes/')}">Read a note</a></h3>
+        <p>There are {len(NOTES)}, on narrow Niagara questions, written from the framework
+           rather than from memory. No form, no email address, no follow-up. If a note means
+           you can do the job yourself, do the job yourself.</p></div></li>
+      <li><div><h3><a href="{href('work/')}">Run a demo</a></h3>
+        <p>The widgets on the Work page are the module code itself, running in your browser
+           against a simulated station that pushes live values. Change the theme, turn the ORD
+           overlay on, watch it re-render. Nothing is a screenshot.</p></div></li>
+      <li><div><h3><a href="{href('services/niagara-5-migration/')}">Ask what a job would cost</a></h3>
+        <p>A Niagara&nbsp;5 readiness audit is the usual first piece: an inventory of every
+           third-party and bespoke module in the estate, and what each one needs before it
+           will load. Fixed price, and it stands on its own if you go elsewhere afterwards.</p></div></li>
+    </ol>
+  </div>
+</section>
+
 {CTA}
 '''
     page("", f"Custom Niagara Modules & bajaux Widgets | {BRAND}",
-         "Independent Niagara Framework engineering: custom modules and drivers, bajaux "
-         "widgets, PX graphics, station setup and Niagara 5 migration. Live demos.",
+         "Independent Niagara Framework engineering for BMS integrators and building "
+         "owners: custom modules, bajaux widgets, PX graphics, station work, Niagara 5.",
          body,
          schema=[ORG, {
              "@type": "WebSite", "@id": url() + "#website", "url": url(),
@@ -1435,9 +1472,18 @@ FAQS = [
   "browser. Publishing a live connection into somebody's building would be a poor idea."),
 
  ("Who do you work with?",
-  "Systems integrators and controls contractors who need a module or a widget set they do not "
-  "have time to write, distributors whose customers are asking for something outside the stock "
-  "catalogue, and building owners with an estate and a migration to scope. Work is remote."),
+  "BMS systems integrators and controls contractors who need a module or a widget set they do "
+  "not have time to write, distributors whose customers are asking for something outside the "
+  "stock catalogue, and building owners with an estate and a migration to scope. Work is "
+  "remote."),
+
+ ("Do you work on Niagara AX?",
+  "Only to get you off it. AX is end of life, so the honest answer is that new modules and new "
+  "graphics should not be written against it. What is worth doing on an AX site is the "
+  "inventory: what is actually running on the station, which of it has a Niagara 4 equivalent, "
+  "which of it was bespoke and has no source, and what the building automation estate has to "
+  "look like on the other side. That inventory is the same piece of work as a Niagara 5 "
+  "readiness audit, one framework generation earlier."),
 
  ("Are you affiliated with Tridium?",
   "No. This is an independent development practice. Niagara, Niagara Framework, JACE, "
@@ -1493,9 +1539,9 @@ def build_about():
     {{{{CRUMBS}}}}
     <p class="pl-eyebrow">About</p>
     <h1>An independent Niagara development practice</h1>
-    <p class="pl-lede">Small, remote, and focused on one framework rather than on being
-       available for anything. The work is Niagara: modules, widgets, graphics, stations
-       and migrations.</p>
+    <p class="pl-lede">Small, remote, and focused on one building automation framework
+       rather than on being available for anything. The work is Niagara: modules, widgets,
+       graphics, stations and migrations.</p>
   </div>
 </section>
 
@@ -1503,11 +1549,12 @@ def build_about():
   <div class="pl-wrap">
     <div class="pl-body pl-prose">
       <h2>Why this exists</h2>
-      <p>The Niagara ecosystem has a strange shape. It runs a very large number of buildings,
-         it has a capable and open module architecture, and yet the market for third-party
-         modules is served by a handful of vendors. Most integrators who need something outside
-         the stock catalogue either do without, or pay for a bespoke build from whoever is
-         nearest, and then discover three years later that nobody holds the source.</p>
+      <p>The Niagara ecosystem has a strange shape. It is the building management system in a
+         very large number of buildings, it has a capable and open module architecture, and yet
+         the market for third-party modules is served by a handful of vendors. Most BMS
+         integrators who need something outside the stock catalogue either do without, or pay
+         for a bespoke build from whoever is nearest, and then discover three years later that
+         nobody holds the source.</p>
       <p>This practice exists in that gap: build the thing properly, sign it, stamp it so it
          installs across a mixed estate, document it for the engineer who has to commission it,
          and hand over the source so the module outlives the supplier.</p>
@@ -1539,6 +1586,10 @@ def build_about():
          specification. The first conversation is usually half an hour and frequently ends with
          a recommendation that costs nothing — a stock feature you had not found, or a
          configuration change that removes the need for a module at all.</p>
+      <p>Estates are rarely uniform. A single client often has stations on Niagara&nbsp;AX, on
+         several Niagara&nbsp;4 point releases and on nothing at all yet, with HVAC plant from
+         four vendors underneath. Work is scoped against the version floor that estate actually
+         has, not against the newest one in it.</p>
     </div>
   </div>
 </section>

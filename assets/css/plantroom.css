@@ -118,7 +118,12 @@
   --pl-dark-line:    rgba(255,255,255,0.09);
   --pl-dark-text:    #dfe4ec;
   --pl-dark-muted:   #97a2b3;
-  --pl-dark-faint:   #737f91;   /* 4.66 on --pl-dark; #6f7b8d was 4.41 */
+  /* Tuned against every dark background it can land on, not just the flat one:
+     .pl-band paints two radial meshes over --pl-dark, and a breadcrumb link sits
+     where mesh-a is ~0.13 alpha. #737f91 was 4.66 on the flat colour but 4.11
+     there. This clears 4.5 on --pl-dark, on either mesh at full strength, and on
+     --pl-dark-surface / --pl-dark-raised. */
+  --pl-dark-faint:   #818d9f;
   --pl-dark-accent:  #9b85ff;
   --pl-dark-mesh-a:  rgba(123,97,255,0.20);
   --pl-dark-mesh-b:  rgba(0,184,217,0.15);
