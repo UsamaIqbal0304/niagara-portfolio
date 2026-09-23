@@ -1,0 +1,289 @@
+# Plantroom Labs — full text
+
+> Niagara Framework engineering. Every technical note published at https://plantroomlabs.com, in full, in one file,
+> so an agent can read the whole knowledge base in a single request.
+
+Site map for language models: https://plantroomlabs.com/llms.txt
+Last updated: 2026-09-23
+
+Licence: quote freely with attribution to Plantroom Labs (https://plantroomlabs.com).
+
+---
+
+# Which Niagara version to stamp a module for
+
+> A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.
+
+Source: https://plantroomlabs.com/notes/niagara-module-version-stamping/  
+Published: 2026-09-22 (22 September 2026) · Plantroom Labs  
+Topics: Module development, Mixed estates, Build tooling
+
+A module that refuses to install with a dependency error is usually not incompatible. It is stamped too high — and the fix is a build flag, not a port.
+
+## The failure this prevents
+
+You build a module on a development machine, sign it, push it to a controller, and the Software Manager refuses it with a dependency error naming a Niagara version higher than the one the controller runs. Nothing is wrong with the code. The module has simply declared that it needs a newer framework than it actually needs.
+
+This is the single most common reason a perfectly good module will not install on an estate that was not all commissioned in the same year — and most estates were not.
+
+## What the declared version actually means
+
+A module declares what it needs in `module.xml`, as a set of dependencies each carrying a vendor version. That version is a **minimum**. It says "do not load me on anything older than this". It does not say "load me only on this".
+
+So a module stamped at the version of the SDK that happened to be installed on the build machine will install on that version and everything newer, and be refused everywhere older. Stamp the same module at the oldest version in the estate and it installs across the whole estate, including everything newer.
+
+> **The rule.** Compile against the newest SDK you have. Stamp for the oldest station the module has to run on. These are two separate decisions and the build should let you make them separately.
+
+## Why compiling on a newer SDK is usually safe
+
+The instinct is that building on a newer framework must produce something the older one cannot load. Within a single Niagara generation that is rarely true, for two reasons.
+
+The first is the Java level: it is constant across the generation, so the bytecode a newer SDK emits is bytecode an older station's JVM already understands. The second is that most module code touches a small, old, stable part of the API — component and property declarations, ORD resolution, BQL, the driver framework. That surface has barely moved.
+
+The claim is checkable rather than hopeful. Walk the constant pool of the built jar, list every framework class and method it references, and compare that against the API present in the oldest target. If the list contains nothing introduced after the floor version, the module will load. If it does contain something newer, you have found the real incompatibility instead of guessing at one.
+
+## Where it does bite
+
+Two places, in practice.
+
+| Area | What to watch |
+|---|---|
+| Browser CSS | Workbench embeds a browser engine, and an older Workbench embeds an older one. A `ux` widget using recent CSS — container queries, modern selector features — can look correct in a current browser and broken inside an older Workbench. The station is not the constraint here; the viewing engine is. |
+| New API | If the code genuinely calls something that did not exist at the floor version, no stamp will save it. Either guard the call and degrade, or ship two builds. Knowing which of the two you are in is the point of checking the jar's API surface. |
+
+## How to make this routine
+
+Make the target version an argument to the build rather than something inherited from whatever is installed. A build that defaults to the developer's own installation will quietly produce a module that only works on the developer's own installation, and nobody finds out until it is in front of a customer.
+
+Then record the floor version in the delivery note, so that when the estate gains a controller two generations older than anything else on site, the question "will this load" has a written answer.
+
+
+---
+
+# What a station checks before loading a module
+
+> Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.
+
+Source: https://plantroomlabs.com/notes/niagara-module-signing/  
+Published: 2026-09-22 (22 September 2026) · Plantroom Labs  
+Topics: Module signing, Certificates, Deployment
+
+Signing is not a formality bolted on at the end. It is a load-time gate with three settings, and the default one refuses unsigned code.
+
+## The three modes
+
+A Niagara host decides how strict to be about module signatures with a single system property, `niagara.moduleVerificationMode`. It takes three values, and the distinction between them is about the *certificate*, not about whether a signature exists.
+
+| Mode | What the host requires |
+|---|---|
+| low | Warnings only — an unsigned module still loads. Documented as an option that will be removed in a future release, so anything depending on it has a deadline whether or not anyone has written it down. |
+| medium | The current default. Modules must be signed by a **valid, trusted** certificate. Trusted means present in that host's trust store — which is a per-host fact, not a property of your certificate. |
+| high | Valid, trusted **and CA-issued**. An internal CA is acceptable, so this does not automatically mean buying a certificate, but it does rule out a bare self-signed key. |
+
+> **Default is medium, and that is the number that matters.** An unsigned module does not install on a stock station or a stock controller. Not "warns", not "logs" — refused.
+
+## Trusted is a property of the host
+
+The most common surprise is a module that installs on one host and is refused by the next, with the same jar and the same signature. Nothing about the module changed; the second host does not have the signing certificate in its trust store.
+
+This is why "is it signed?" is the wrong question when something will not install. The question is "is this certificate trusted *by this host*, and does this host demand a CA behind it?" The answer is per host, and on an estate assembled over several years the answer varies across the estate.
+
+## You cannot talk a station out of it at the command line
+
+There is a matching property, a command-line property blacklist, whose job is to stop somebody setting the verification mode — among other security-relevant properties — as a launch argument. The intent is plain: the strictness of module verification is a decision made in the host's configuration by whoever administers it, not something a process can lower for itself on the way up.
+
+Treat a plan that involves relaxing verification as a plan that will be rejected during commissioning.
+
+## Program objects are gated separately
+
+Modules are not the only executable thing in a station. Program objects have their own signing requirement, with its own property, defaulting to permissive — unsigned program objects run. A site that has tightened module verification and left program objects alone has a gap it very likely does not know about, and closing it is a one-line configuration change plus the work of signing what is already there.
+
+## Practical consequences
+
+1. **Sign in development, not at the end.** A build that produces unsigned jars for months and signs once before delivery discovers every trust and packaging problem on the day of delivery.
+2. **Decide self-signed or CA early.** Self-signed with the certificate distributed to the estate's trust stores is coherent for an internal estate. Anything sold or shipped to third parties needs a CA behind it, and obtaining a code-signing certificate now requires hardware key storage — which takes lead time and money, so it belongs in the plan, not the last week.
+3. **Record which certificate signed which release.** When a certificate expires or is replaced, the question "what is out there signed by the old one" needs an answer that is not an estate-wide search.
+
+
+---
+
+# Pure Java, or it will not run on a JACE
+
+> A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.
+
+Source: https://plantroomlabs.com/notes/what-runs-on-a-jace/  
+Published: 2026-09-22 (22 September 2026) · Plantroom Labs  
+Topics: JACE, Controllers, Module development
+
+A module that works beautifully on a Supervisor can be structurally incapable of running on a controller. The reasons are architecture and budget, and neither is negotiable at install time.
+
+## A controller is not a small Supervisor
+
+It is tempting to treat a JACE as a Supervisor with less of everything. It is not: it is a different processor architecture running a different operating system, with a memory and flash budget measured in a way a server's never is. Code that assumes otherwise does not run slowly. It does not run.
+
+## Native code is the hard stop
+
+Controllers are ARM hosts. A development machine almost certainly is not. Any dependency that carries a compiled binary — a bundled shared library, a JNI layer, a library that unpacks a platform-specific native blob at runtime — was compiled for the wrong architecture and the wrong operating system, and will fail on the controller however cleanly it behaved in testing.
+
+This rules out a surprising amount of ordinary Java library choice: some compression, imaging, cryptography and database libraries ship native fast paths. The test is not "does it work on my machine"; it is "does this jar, or anything it drags in, contain anything that is not bytecode".
+
+> **The rule.** Modules for a controller are pure Java plus resources — JavaScript, CSS, images, lexicons. If a dependency cannot meet that, the dependency is out, not the platform.
+
+## The budget is real, and it is shared
+
+The second constraint is quieter and does more damage over time, because nothing fails outright. Every module installed occupies flash and heap whether or not it is doing anything, and the station is sharing that headroom with drivers, histories, alarms and the actual control logic that justifies the panel existing.
+
+Consequences worth designing for:
+
+- **Few modules, small jars.** One utility method is not worth hauling in a framework. Prefer a hundred lines of your own to a megabyte of somebody else's.
+- **Watch the file count in a view.** A browser-facing widget that serves twenty unbundled scripts makes the controller answer twenty requests to draw one page, and it does that for every operator who opens it.
+- **Assume concurrent operators.** A dashboard that is comfortable with one session open can be the reason a controller struggles with six.
+
+## Who renders what
+
+One clarification that saves a lot of misplaced optimisation: the browser rendering a graphic is the *operator's*, not the controller's. Client-side rendering cost is the operator's laptop problem, and the compatibility target is whatever browsers the site actually uses. The exception is viewing inside Workbench, which renders in its own embedded engine, typically older than the browsers on the same desks.
+
+What the controller pays for is serving the files and answering the data subscriptions behind them. Optimise those.
+
+## Checking before you ship
+
+1. **Inventory the jar.** Anything in the archive that is not a class, a resource or metadata deserves an explanation.
+2. **Inventory the dependencies.** Transitive dependencies are where native code hides, because nobody chose them deliberately.
+3. **Measure the installed size** and compare it against what the target has free, before the commissioning visit rather than during it.
+
+
+---
+
+# Renaming and tagging points in bulk
+
+> Point names arrive from the field device and there is no standard. What to use to select, rename and tag in bulk — and what a rename quietly breaks.
+
+Source: https://plantroomlabs.com/notes/bulk-point-renaming-and-tagging/  
+Published: 2026-09-22 (22 September 2026) · Plantroom Labs  
+Topics: Bulk engineering, Tagging, Workbench
+
+Every integrator renames points by hand because the names arrive from somebody else's controller. It is the most repetitive work in Niagara engineering and almost all of it is mechanical.
+
+## Why the problem exists at all
+
+Points are discovered from field devices, and their names are whatever the device vendor chose — abbreviations, instance numbers, a naming scheme that made sense inside that product and nowhere else. Niagara does not impose a convention, and neither does the industry, so every integrator applies their own. On a large job that is thousands of manual edits, done under time pressure, by whoever is available.
+
+The result is predictable: names that are nearly consistent. Nearly is the expensive part, because it defeats every query written against them afterwards.
+
+## Renaming and tagging are different jobs
+
+Conflating them is the root mistake. A name is a label for a human reading a tree. A tag is machine-readable meaning attached to a point — this is a zone temperature, this belongs to that AHU, this is a setpoint. Graphics, queries, analytics and navigation should lean on tags; only people should lean on names.
+
+Estates that tag well can afford imperfect names. Estates that only rename have to get the names perfect, forever, because every downstream thing is parsing them.
+
+> If you are about to rename four thousand points so a graphic can find them, tag them instead. The graphic binds to the tag, and the next engineer's naming preference stops being a breaking change.
+
+## What a rename can break
+
+Renaming is not free, and the damage is usually discovered later by somebody else. Three things to check before a bulk pass:
+
+- **Bindings that address by path.** An ORD written as a slot path names the component by name. Rename the component and the path no longer resolves. Bindings written to resolve by handle are unaffected. Which style your graphics use decides how dangerous a rename is.
+- **History already collected.** Existing history records keep the identity they were created under. Renaming the point does not retroactively rename its history, so a careless pass can orphan trend data from the point that produced it.
+- **Anything outside the station.** Reports, exports, dashboards and integrations that were written against the old names, which nobody in the room remembers exist.
+
+## The tooling that makes it repeatable
+
+| Step | What does the work |
+|---|---|
+| Select | A query, not a person scrolling. Niagara's own query language can express "every writable point under this device whose name starts with that" far more reliably than a multi-select, and it produces the same set twice. |
+| Act | A batch job, so the operation is recorded, resumable and reviewable, rather than a sequence of edits with no log. On a Supervisor, provisioning applies the same idea across every station in the network at once. |
+| Mean | A tag dictionary, so the vocabulary is defined once and applied, instead of each engineer inventing tags as they go. |
+| Verify | Re-run the selecting query afterwards and check the count is what you intended. A bulk operation without an after-count is a hope. |
+
+## Do it once, keep the recipe
+
+The value is not in the single pass. It is that the selection query and the job definition survive, so the next building, the next phase and the next contractor's handover get the same treatment in minutes. Bulk work done by hand produces a tidy station; bulk work done as a recorded job produces a tidy station and a standard.
+
+
+---
+
+# Getting data out of a Niagara station
+
+> REST, MQTT, a relational history database, file export or an HTTP client. Which suits which consumer, and what each one costs you to run.
+
+Source: https://plantroomlabs.com/notes/getting-data-out-of-a-niagara-station/  
+Published: 2026-09-22 (22 September 2026) · Plantroom Labs  
+Topics: Integration, Histories, MQTT
+
+Six separate third-party products exist to push station data somewhere else, which tells you how often this comes up — and that the stock answers are not well known.
+
+## Answer four questions first
+
+Most bad integrations are a good mechanism chosen for the wrong shape of problem. Before picking one, settle: **who consumes it** (a person, a dashboard, a data team, another control system), **push or pull**, **live values or history**, and **how often**. Those four answers usually eliminate three of the five options immediately.
+
+## The five routes
+
+| Route | Suits | Costs you |
+|---|---|---|
+| REST / oBIX | Another system that wants to *ask* for values, on its own schedule. Standardised, so the consumer may already speak it. | Verbose, and every consumer is one more thing authenticating against the station. Poor fit for high-frequency polling. |
+| MQTT | Push to a broker, and from there to anything. The natural fit for cloud platforms and for many consumers of the same data. | A broker to run and secure, and a topic and payload design that you will live with far longer than you expect. |
+| History to a database | Reporting and analytics over long periods. A data team that already has SQL tooling wants this and nothing else. | A database to own, and a real decision about retention on both sides so the same trend is not stored twice forever. |
+| File / CSV export | One-off extracts, hand-offs, and the finance or operations person who wants a spreadsheet and is right to. | Nothing is live, and files quietly become an interface that somebody starts depending on. |
+| Outbound HTTP | Events rather than data: an alarm into a chat channel, a condition into a ticketing system, a webhook into somebody's API. | Retry, failure and back-pressure behaviour are yours to design. A station that blocks on a slow endpoint is a control problem, not an IT one. |
+
+> **Events are not telemetry.** The most common mistake is pushing every point change into a channel built for notifications. Route state changes worth a human's attention over HTTP; route data over MQTT or into a database.
+
+## What to decide before the first message
+
+1. **Naming and topic structure.** Whatever you emit first is what the consumer builds against, and changing it later is a coordinated release across two systems. Derive it from tags rather than point names — see [renaming and tagging in bulk](https://plantroomlabs.com/notes/bulk-point-renaming-and-tagging/).
+2. **Units and timestamps.** Send the unit and send time as UTC. Ambiguity here is discovered months later, in a report, by someone who cannot tell whether the building really used that much.
+3. **Change-of-value, not polling.** Publishing on change with a heartbeat gives the consumer both liveness and a fraction of the traffic. A timer loop is easier to write and worse at everything else.
+4. **What happens when the far end is down.** Queue, drop, or block — pick deliberately. The default is usually the one you would not have chosen.
+
+## On the controller specifically
+
+If the station doing the publishing is a controller rather than a Supervisor, the budget from [what runs on a JACE](https://plantroomlabs.com/notes/what-runs-on-a-jace/) applies to the integration too. Aggregating at a Supervisor and publishing once is usually better than every controller holding its own connection to a broker or a cloud endpoint.
+
+
+---
+
+# Scheduled station backups, and the gap
+
+> A Supervisor can back up every station in its Niagara Network on a schedule. The station it does not cover that way is its own.
+
+Source: https://plantroomlabs.com/notes/scheduled-niagara-station-backups/  
+Published: 2026-09-22 (22 September 2026) · Plantroom Labs  
+Topics: Backups, Provisioning, Supervisor
+
+Niagara ships scheduled backups for the stations a Supervisor watches over. The Supervisor itself is the exception — and it is the host holding the histories, the graphics and the hierarchy.
+
+## "Backup" means three different things
+
+Before scheduling anything, be precise about which of these you mean, because they restore differently and are not interchangeable.
+
+| Kind | Contains | Restores to |
+|---|---|---|
+| Station copy | The station database, histories and alarms. | Any host, including a different controller model. The portable one. |
+| Backup distribution | The above plus references to modules, the runtime and OS version, and platform configuration. | A host you are rebuilding to match. Downgrading needs a clean distribution first. |
+| Clone | Everything, including copies of the modules, the runtime, the OS image and the platform configuration. | The same model of controller only. Self-contained, and much larger. |
+
+## What is scheduled out of the box
+
+A Supervisor's Niagara Network carries a provisioning extension, and that extension has a schedule component wired to a start-backup action. Set the schedule and every station in the network is backed up together, without anyone opening Workbench.
+
+Provisioning does considerably more than backups — installing software, updating licences, distributing certificates, changing default credentials, applying templates and running custom jobs — all driven from the Supervisor against the stations beneath it. If you are only using it for backups you are using a small corner of it.
+
+> **The built-in schedule does not scale.** Niagara's own documentation advises against it on a larger enterprise system, because it fires a backup of every subordinate station at the same moment. On a sizeable estate, use job prototypes so the work is batched and staggered instead.
+
+## The gap
+
+All of that provisioning work is performed *by* the Supervisor *against* the stations in its Niagara Network. Its own station is not one of them.
+
+Which is awkward, because the Supervisor is usually the host that matters most: the consolidated histories, the graphics, the hierarchy, the users, the reports. A site can have every controller backed up nightly and the single most valuable station on the estate backed up whenever somebody last remembered.
+
+That gap is why a market exists for third-party scheduled-backup modules, some priced in the thousands. It is a genuine hole, and paying to fill it is a legitimate answer — but it is worth knowing you are paying for one missing schedule rather than for backup as a capability.
+
+## What to put in place
+
+1. **Schedule the subordinates properly** — job prototypes rather than the convenience schedule, staggered, with the results actually reviewed.
+2. **Decide explicitly how the Supervisor gets backed up.** A third-party module, a scheduled job that drives the backup, or a documented manual procedure with an owner and a date. Any of the three beats the usual answer, which is silence.
+3. **Get the files off the host.** A backup stored only on the machine it protects is not a backup.
+4. **Restore one, once.** Onto spare hardware, before you need it. An untested backup is an assumption with a filename.
+
+
+---

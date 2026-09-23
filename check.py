@@ -147,6 +147,64 @@ for rel, src in docs:
         hit = re.search(pattern, body, re.I)
         check(not hit, f"{rel}: {why} — {hit.group(0) if hit else ''}")
 
+# The machine-readable layer: llms.txt, llms-full.txt and a markdown twin per
+# note. An answer engine that fetches the markdown instead of the HTML has to
+# get the same page, and a link into this layer that 404s is worse than not
+# publishing it at all.
+check(os.path.exists(os.path.join(ROOT, ".nojekyll")),
+      ".nojekyll missing — GitHub Pages would run Jekyll and swallow the note .md files")
+
+llms = open(os.path.join(ROOT, "llms.txt"), encoding="utf-8").read()
+llms_full = open(os.path.join(ROOT, "llms-full.txt"), encoding="utf-8").read()
+robots = open(os.path.join(ROOT, "robots.txt"), encoding="utf-8").read()
+
+# "## Optional" is the one heading llmstxt.org gives a defined meaning to
+# (skippable when the context window is short), so it has to stay spelled
+# exactly that way to mean anything.
+check("\n## Optional\n" in llms, "llms.txt: no '## Optional' section")
+for f in ("llms.txt", "llms-full.txt"):
+    check(ORIGIN + "/" + f in robots, f"robots.txt does not point at {f}")
+
+note_pages = [(rel, src) for rel, src in docs if rel.startswith("notes/") and rel != "notes/index.html"]
+check(len(note_pages) >= 6, f"expected at least 6 notes, found {len(note_pages)}")
+
+for rel, src in note_pages:
+    slug = rel[: -len("/index.html")]
+    md_path = os.path.join(ROOT, slug + ".md")
+    check(os.path.exists(md_path), f"{rel}: no markdown twin at /{slug}.md")
+    if not os.path.exists(md_path):
+        continue
+    md = open(md_path, encoding="utf-8").read()
+    h1 = text_of(re.search(r"<h1[^>]*>(.*?)</h1>", src, re.S).group(1))
+
+    # The head advertises it, so an agent finds the markdown without having to
+    # know the convention.
+    check(f'<link rel="alternate" type="text/markdown" href="/{slug}.md"' in src,
+          f"{rel}: head does not advertise its markdown twin")
+
+    check(md.startswith("# " + h1 + "\n"), f"{slug}.md: first line is not the page H1")
+    check(f"Source: {ORIGIN}/{slug}/" in md, f"{slug}.md: no Source line back to the HTML")
+    # Every H2 in the note body has to survive the conversion, or the markdown
+    # is a different, shorter document wearing the same title. Everything from
+    # the "Related" block down is page furniture, not the note.
+    body = src.split('<p class="pl-eyebrow">Related</p>')[0]
+    heads = [text_of(h) for h in re.findall(r"<h2[^>]*>(.*?)</h2>", body, re.S)]
+    check(len(heads) >= 2, f"{slug}: note body has {len(heads)} H2s, expected at least 2")
+    for h2 in heads:
+        check("\n## " + h2 + "\n" in md, f"{slug}.md: missing section '{h2}'")
+    leftover = re.search(r"</(p|li|h2|h3|div|table)>|<(div|p|h2|h3|ul|table)\b", md)
+    check(not leftover, f"{slug}.md: unconverted HTML — {leftover.group(0) if leftover else ''}")
+
+    check("# " + h1 + "\n" in llms_full, f"llms-full.txt: does not contain '{h1}'")
+    check(f"{ORIGIN}/{slug}.md" in llms, f"llms.txt: no markdown URL for {slug}")
+
+# Nothing in either file may point at a URL this build did not produce.
+for name, text in (("llms.txt", llms), ("llms-full.txt", llms_full)):
+    for u in sorted(set(re.findall(r"https://plantroomlabs\.com(/[^\s)>,;]*)", text))):
+        u = u.rstrip(".")
+        ok = u in known or os.path.exists(os.path.join(ROOT, u.lstrip("/")))
+        check(ok, f"{name}: links to {u}, which this build does not produce")
+
 print(f"{checks - len(failures)} passed, {len(failures)} failed, {len(docs)} pages")
 for f in failures:
     print("  FAIL", f)

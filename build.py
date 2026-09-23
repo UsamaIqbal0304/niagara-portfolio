@@ -19,6 +19,7 @@ import re
 import shutil
 import subprocess
 from datetime import date
+from html.parser import HTMLParser
 
 # ---------------------------------------------------------------- settings
 
@@ -241,14 +242,16 @@ FOOTER = f'''<footer class="pl-footer">
 # ------------------------------------------------------------------- shell
 
 def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type="website",
-         filename=None, listed=True, tabs=None):
+         filename=None, listed=True, tabs=None, md=None):
     """Render one page to <slug>/index.html (or index.html for the root).
 
     filename overrides that target for the one page that is not a directory —
     404.html, which the server hands back under whatever path was asked for.
     listed=False keeps a page out of the sitemap and the llms.txt inventory.
     tabs is a list of (section id, label, drop_below): where a page has one,
-    the header links point at those sections and track scrolling."""
+    the header links point at those sections and track scrolling.
+    md is a site-relative path to this page's markdown twin, advertised in the
+    head so an agent can find it without guessing the convention."""
     canonical = url(slug)
     graph = list(schema or [])
     if crumbs:
@@ -267,6 +270,9 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
               + json.dumps({"@context": "https://schema.org", "@graph": graph},
                            indent=1, ensure_ascii=False)
               + "</script>")
+
+    md_link = (f'\n<link rel="alternate" type="text/markdown" href="{href(md)}" '
+               f'title="This page as markdown">') if md else ""
 
     crumb_nav = ""
     if crumbs and len(crumbs) > 1:
@@ -304,7 +310,7 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
 <link rel="icon" href="{href('assets/mark.svg')}" type="image/svg+xml">
 <link rel="icon" href="{href('assets/favicon.ico')}" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
 <link rel="apple-touch-icon" href="{href('assets/apple-touch-icon.png')}">
-<link rel="alternate" type="text/plain" href="{href('llms.txt')}" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/plain" href="{href('llms.txt')}" title="llms.txt — site summary for language models">{md_link}
 
 <link rel="preload" as="font" type="font/woff2" href="{href('assets/fonts/inter-var.woff2')}" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="{href('assets/fonts/jetbrains-mono-var.woff2')}" crossorigin>
@@ -1681,6 +1687,7 @@ def build_robots():
     body = f"""# {BRAND} — {TAGLINE}
 # Crawling and indexing are welcome, including by AI agents and answer engines.
 # A plain-text summary written for language models is at {url('llms.txt')}
+# and the full text of every technical note is at {url('llms-full.txt')}
 
 User-agent: *
 Allow: /
@@ -1720,6 +1727,13 @@ def build_sitemap():
         f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n')
 
 
+def build_nojekyll():
+    """GitHub Pages runs Jekyll unless told not to, and Jekyll would take the
+    .md files meant for machines and render them into HTML pages. Everything
+    here is generated already; there is nothing for it to do."""
+    write_text(".nojekyll", "")
+
+
 def build_llms_txt():
     """llms.txt — a curated, plain-text brief for language models and agents.
 
@@ -1736,7 +1750,8 @@ def build_llms_txt():
         f"- {d['title']}: {d['blurb']}" for d in DEMOS)
     faq = "\n\n".join(f"**{q}**\n{re.sub(r'<[^>]+>', '', a)}" for q, a in FAQS)
     notes = "\n".join(
-        f"- [{n['h1']}]({url(n['slug'])}): {n['desc']}" for n in NOTES)
+        f"- [{n['h1']}]({url(n['slug'])}): {n['desc']} "
+        f"Markdown: {url(n['slug'].rstrip('/') + '.md')}" for n in NOTES)
 
     body = f"""# {BRAND}
 
@@ -1826,6 +1841,21 @@ than from memory, and free to quote. Index at {url('notes/')}.
 - [About]({url('about/')}): why the practice exists, capability table, what is not claimed.
 - [Contact]({url('contact/')}): what to include in a first email.
 - [Notes]({url('notes/')}): technical knowledge base, one page per question.
+
+## For agents
+
+- [llms-full.txt]({url('llms-full.txt')}): every note above in full, as markdown, in one request.
+- Any note also exists as markdown at its own URL with `.md` on the end, e.g.
+  {url(NOTES[0]['slug'].rstrip('/') + '.md')}.
+- [sitemap.xml]({url('sitemap.xml')}): every indexable page with its last-modified date.
+- Quoting is welcome, with attribution to {BRAND} ({url()}). Nothing here is paywalled,
+  gated behind a form, or generated — each note was written from the framework itself.
+
+## Optional
+
+- [Live demo — plant dashboard]({url('demos/ahu/')}): the bare iframe target, widget only, no prose.
+- [Live demo — building summary]({url('demos/building/')}): as above.
+- [Live demo — navigation rail]({url('demos/nav/')}): as above.
 """
     open(os.path.join(OUT, "llms.txt"), "w", encoding="utf-8").write(body)
 
@@ -2476,6 +2506,179 @@ def note_card(n, level=3):
       <ul class="pl-chips">{tags}</ul>
     </div>'''
 
+# ============================================================================
+#  Markdown for machines
+# ----------------------------------------------------------------------------
+#  Answer engines and coding agents increasingly fetch a page's markdown rather
+#  than parse its HTML: llms.txt for the map, a .md beside each page for the
+#  text, llms-full.txt for everything in one request. The convention is young
+#  but cheap to honour, and it costs a visitor nothing.
+#
+#  These files are generated from the same note bodies the HTML is generated
+#  from, so the two cannot drift. Nothing is written for machines that is not
+#  also on the page.
+# ============================================================================
+
+class _Markdown(HTMLParser):
+    """The note bodies use a small, known set of tags. This converts exactly
+    that set and raises on anything else, so a new construct in a note is a
+    build failure rather than a silently dropped paragraph."""
+
+    BLOCK = {"h2", "h3", "p", "li", "tr"}
+    KNOWN = BLOCK | {"div", "ul", "ol", "table", "thead", "tbody", "th", "td",
+                     "strong", "b", "em", "i", "code", "a", "br"}
+
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.out, self.buf, self.stack = [], [], []
+        self.row, self.rows, self.in_head = [], 0, False
+        self.note, self.list_kind, self.item = False, None, 0
+
+    # -- helpers ------------------------------------------------------------
+    def _text(self):
+        t = re.sub(r"\s+", " ", "".join(self.buf)).strip()
+        self.buf = []
+        return t
+
+    def _emit(self, line):
+        self.out.append(("> " + line) if self.note and line else line)
+
+    # -- parser -------------------------------------------------------------
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag not in self.KNOWN:
+            raise SystemExit(f"note markdown: unhandled <{tag}>")
+        if tag == "div":
+            if "pl-note" in a.get("class", ""):
+                self.note = True
+                self.out.append("")
+        elif tag in ("ul", "ol"):
+            self.list_kind, self.item = tag, 0
+            self.out.append("")
+        elif tag == "table":
+            self.rows = 0
+        elif tag == "thead":
+            self.in_head = True
+        elif tag == "a":
+            self.buf.append("[")
+            self.stack.append(a.get("href", ""))
+        elif tag == "code":
+            self.buf.append("`")
+        elif tag in ("strong", "b"):
+            self.buf.append("**")
+        elif tag in ("em", "i"):
+            self.buf.append("*")
+        elif tag == "br":
+            self.buf.append(" ")
+
+    def handle_endtag(self, tag):
+        if tag == "a":
+            self.buf.append(f"]({href_abs(self.stack.pop())})")
+        elif tag == "code":
+            self.buf.append("`")
+        elif tag in ("strong", "b"):
+            self.buf.append("**")
+        elif tag in ("em", "i"):
+            self.buf.append("*")
+        elif tag in ("h2", "h3"):
+            self.out += ["", ("## " if tag == "h2" else "### ") + self._text(), ""]
+        elif tag == "p":
+            self._emit(self._text())
+            self.out.append("")
+        elif tag == "li":
+            self.item += 1
+            bullet = f"{self.item}. " if self.list_kind == "ol" else "- "
+            self._emit(bullet + self._text())
+        elif tag in ("th", "td"):
+            self.row.append(self._text())
+        elif tag == "tr":
+            self.out.append("| " + " | ".join(self.row) + " |")
+            if self.in_head:
+                self.out.append("|" + "---|" * len(self.row))
+            self.row = []
+        elif tag == "thead":
+            self.in_head = False
+        elif tag == "table":
+            self.out.append("")
+        elif tag == "div" and self.note:
+            self.note = False
+            self.out.append("")
+
+    def handle_data(self, data):
+        self.buf.append(data)
+
+    def markdown(self):
+        lines, out = self.out, []
+        for line in lines:
+            if line or (out and out[-1]):
+                out.append(line.rstrip())
+        return "\n".join(out).strip() + "\n"
+
+
+def href_abs(link):
+    """Links inside a note are site-relative; a markdown file may be read
+    anywhere, so they leave here absolute."""
+    if link.startswith(("http://", "https://", "mailto:")):
+        return link
+    return ORIGIN.rstrip("/") + "/" + link.lstrip("/")
+
+
+def note_markdown(n):
+    p = _Markdown()
+    p.feed(n["body"])
+    written = date.fromisoformat(n["date"]).strftime("%-d %B %Y")
+    head = [
+        f'# {n["h1"]}',
+        "",
+        f'> {n["desc"]}',
+        "",
+        f'Source: {url(n["slug"])}  ',
+        f'Published: {n["date"]} ({written}) · {BRAND}  ',
+        f'Topics: {", ".join(n["tags"])}',
+        "",
+        re.sub(r"<[^>]+>", "", n["lede"]),
+        "",
+        "",
+    ]
+    return "\n".join(head) + p.markdown()
+
+
+def write_text(path, text):
+    target = os.path.join(OUT, path)
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    with open(target, "w", encoding="utf-8") as fh:
+        fh.write(text)
+
+
+def build_note_markdown():
+    """One .md per note, at the page URL with .md on the end — the address an
+    agent tries first."""
+    for n in NOTES:
+        write_text(n["slug"].rstrip("/") + ".md", note_markdown(n))
+
+
+def build_llms_full():
+    """Every note in one file. An agent that wants the whole knowledge base
+    should not have to make seven requests and guess at the seventh."""
+    parts = [
+        f"# {BRAND} — full text",
+        "",
+        f"> {TAGLINE}. Every technical note published at {ORIGIN}, in full, in one file,",
+        "> so an agent can read the whole knowledge base in a single request.",
+        "",
+        f"Site map for language models: {url('llms.txt')}",
+        f"Last updated: {TODAY}",
+        "",
+        "Licence: quote freely with attribution to " + BRAND + f" ({ORIGIN}).",
+        "",
+        "---",
+        "",
+    ]
+    for n in NOTES:
+        parts += [note_markdown(n), "", "---", ""]
+    write_text("llms-full.txt", "\n".join(parts).rstrip() + "\n")
+
+
 def note_page(n):
     """One note. The same page furniture as a service page, so a visitor who
     arrives on a note from a search result lands somewhere that looks like the
@@ -2547,7 +2750,8 @@ def note_page(n):
     page(n["slug"], n["title"], n["desc"], body,
          schema=[ORG, article],
          crumbs=[("Home", ""), ("Notes", "notes/"), (n["nav"], None)],
-         active="notes/", og_type="article")
+         active="notes/", og_type="article",
+         md=n["slug"].rstrip("/") + ".md")
 
 def build_notes_index():
     cards = "".join(note_card(n) for n in NOTES)
@@ -2695,12 +2899,16 @@ def main():
     build_indexnow_key()
     build_sitemap()
     build_llms_txt()
+    build_note_markdown()
+    build_llms_full()
+    build_nojekyll()
     cname = build_cname()
 
     print(f"\n  {len(PAGES)} pages")
     for slug, title, _ in PAGES:
         print(f"    /{slug:<34} {title[:58]}")
-    print("\n  robots.txt  sitemap.xml  llms.txt  assets/mark.svg  assets/og-card.html")
+    print("\n  robots.txt  sitemap.xml  llms.txt  llms-full.txt  "
+          f"{len(NOTES)} note .md files  assets/mark.svg  assets/og-card.html")
     if cname:
         print(f"  CNAME -> {cname}")
     print("\n  assets/og.png is NOT rebuilt here — og-card.html has to be")

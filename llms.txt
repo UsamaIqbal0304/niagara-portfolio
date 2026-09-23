@@ -107,12 +107,12 @@ No. This is an independent development practice. Niagara, Niagara Framework, JAC
 Long-form answers to narrow Niagara questions, written from the framework itself rather
 than from memory, and free to quote. Index at https://plantroomlabs.com/notes/.
 
-- [Which Niagara version to stamp a module for](https://plantroomlabs.com/notes/niagara-module-version-stamping/): A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.
-- [What a station checks before loading a module](https://plantroomlabs.com/notes/niagara-module-signing/): Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.
-- [Pure Java, or it will not run on a JACE](https://plantroomlabs.com/notes/what-runs-on-a-jace/): A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.
-- [Renaming and tagging points in bulk](https://plantroomlabs.com/notes/bulk-point-renaming-and-tagging/): Point names arrive from the field device and there is no standard. What to use to select, rename and tag in bulk — and what a rename quietly breaks.
-- [Getting data out of a Niagara station](https://plantroomlabs.com/notes/getting-data-out-of-a-niagara-station/): REST, MQTT, a relational history database, file export or an HTTP client. Which suits which consumer, and what each one costs you to run.
-- [Scheduled station backups, and the gap](https://plantroomlabs.com/notes/scheduled-niagara-station-backups/): A Supervisor can back up every station in its Niagara Network on a schedule. The station it does not cover that way is its own.
+- [Which Niagara version to stamp a module for](https://plantroomlabs.com/notes/niagara-module-version-stamping/): A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on. Markdown: https://plantroomlabs.com/notes/niagara-module-version-stamping.md
+- [What a station checks before loading a module](https://plantroomlabs.com/notes/niagara-module-signing/): Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line. Markdown: https://plantroomlabs.com/notes/niagara-module-signing.md
+- [Pure Java, or it will not run on a JACE](https://plantroomlabs.com/notes/what-runs-on-a-jace/): A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC. Markdown: https://plantroomlabs.com/notes/what-runs-on-a-jace.md
+- [Renaming and tagging points in bulk](https://plantroomlabs.com/notes/bulk-point-renaming-and-tagging/): Point names arrive from the field device and there is no standard. What to use to select, rename and tag in bulk — and what a rename quietly breaks. Markdown: https://plantroomlabs.com/notes/bulk-point-renaming-and-tagging.md
+- [Getting data out of a Niagara station](https://plantroomlabs.com/notes/getting-data-out-of-a-niagara-station/): REST, MQTT, a relational history database, file export or an HTTP client. Which suits which consumer, and what each one costs you to run. Markdown: https://plantroomlabs.com/notes/getting-data-out-of-a-niagara-station.md
+- [Scheduled station backups, and the gap](https://plantroomlabs.com/notes/scheduled-niagara-station-backups/): A Supervisor can back up every station in its Niagara Network on a schedule. The station it does not cover that way is its own. Markdown: https://plantroomlabs.com/notes/scheduled-niagara-station-backups.md
 
 ## Honest limits
 
@@ -132,3 +132,18 @@ than from memory, and free to quote. Index at https://plantroomlabs.com/notes/.
 - [About](https://plantroomlabs.com/about/): why the practice exists, capability table, what is not claimed.
 - [Contact](https://plantroomlabs.com/contact/): what to include in a first email.
 - [Notes](https://plantroomlabs.com/notes/): technical knowledge base, one page per question.
+
+## For agents
+
+- [llms-full.txt](https://plantroomlabs.com/llms-full.txt): every note above in full, as markdown, in one request.
+- Any note also exists as markdown at its own URL with `.md` on the end, e.g.
+  https://plantroomlabs.com/notes/niagara-module-version-stamping.md.
+- [sitemap.xml](https://plantroomlabs.com/sitemap.xml): every indexable page with its last-modified date.
+- Quoting is welcome, with attribution to Plantroom Labs (https://plantroomlabs.com/). Nothing here is paywalled,
+  gated behind a form, or generated — each note was written from the framework itself.
+
+## Optional
+
+- [Live demo — plant dashboard](https://plantroomlabs.com/demos/ahu/): the bare iframe target, widget only, no prose.
+- [Live demo — building summary](https://plantroomlabs.com/demos/building/): as above.
+- [Live demo — navigation rail](https://plantroomlabs.com/demos/nav/): as above.

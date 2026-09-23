@@ -1,6 +1,7 @@
 # Plantroom Labs — Niagara Framework engineering
 # Crawling and indexing are welcome, including by AI agents and answer engines.
 # A plain-text summary written for language models is at https://plantroomlabs.com/llms.txt
+# and the full text of every technical note is at https://plantroomlabs.com/llms-full.txt
 
 User-agent: *
 Allow: /
