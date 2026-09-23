@@ -44,7 +44,7 @@ OUT        = os.path.dirname(os.path.abspath(__file__))
 #    which is why this site has no consent banner and is not going to grow
 #    one. It is free with no event cap, and works on a domain Cloudflare does
 #    not host, so nothing about the DNS at Squarespace has to change.
-ANALYTICS_TOKEN = ""     # the data-cf-beacon token, 32 hex characters
+ANALYTICS_TOKEN = "4b22c0dd7f50413da48d0286988da559"   # the data-cf-beacon token
 
 # 2. What the site ranks for. Search Console and Bing Webmaster Tools are the
 #    only places the query, impression and position data exists; both want
