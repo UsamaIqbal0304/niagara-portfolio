@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Niagara Engineering Notes &amp; Technical Guides</title>
-<meta name="description" content="Practical notes on Niagara module signing, version stamping, JACE limits, bulk tagging, getting data out of a station and scheduled backups.">
+<meta name="description" content="Twenty worked notes on Niagara: module signing and stamping, BACnet and Modbus, tagging, histories, alarms, permissions, provisioning and migration.">
 <link rel="canonical" href="https://plantroomlabs.com/notes/">
 <meta name="author" content="Plantroom Labs">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Plantroom Labs">
 <meta property="og:title" content="Niagara Engineering Notes &amp; Technical Guides">
-<meta property="og:description" content="Practical notes on Niagara module signing, version stamping, JACE limits, bulk tagging, getting data out of a station and scheduled backups.">
+<meta property="og:description" content="Twenty worked notes on Niagara: module signing and stamping, BACnet and Modbus, tagging, histories, alarms, permissions, provisioning and migration.">
 <meta property="og:url" content="https://plantroomlabs.com/notes/">
 <meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -19,7 +19,7 @@
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Niagara Engineering Notes &amp; Technical Guides">
-<meta name="twitter:description" content="Practical notes on Niagara module signing, version stamping, JACE limits, bulk tagging, getting data out of a station and scheduled backups.">
+<meta name="twitter:description" content="Twenty worked notes on Niagara: module signing and stamping, BACnet and Modbus, tagging, histories, alarms, permissions, provisioning and migration.">
 <meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
 
 <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
@@ -260,7 +260,11 @@
 
 <section class="pl-section">
   <div class="pl-wrap">
-    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+    <div class="pl-section__head">
+      <h2 id="modules-and-deployment">Modules and deployment</h2>
+      <p class="pl-sub">Building something that installs, runs and keeps running on a controller.</p>
+    </div>
+    <div class="pl-grid pl-grid--3" style="margin-bottom:var(--pl-s-13)"><div class="pl-card pl-card--link">
       <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
       <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
       <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
@@ -272,54 +276,36 @@
       <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
       <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
       <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/bulk-point-renaming-and-tagging/">Renaming and tagging points in bulk</a></h3>
-      <p>Point names arrive from the field device and there is no standard. What to use to select, rename and tag in bulk — and what a rename quietly breaks.</p>
-      <ul class="pl-chips"><li class="pl-chip">Bulk engineering</li><li class="pl-chip">Tagging</li><li class="pl-chip">Workbench</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/getting-data-out-of-a-niagara-station/">Getting data out of a Niagara station</a></h3>
-      <p>REST, MQTT, a relational history database, file export or an HTTP client. Which suits which consumer, and what each one costs you to run.</p>
-      <ul class="pl-chips"><li class="pl-chip">Integration</li><li class="pl-chip">Histories</li><li class="pl-chip">MQTT</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/scheduled-niagara-station-backups/">Scheduled station backups, and the gap</a></h3>
-      <p>A Supervisor can back up every station in its Niagara Network on a schedule. The station it does not cover that way is its own.</p>
-      <ul class="pl-chips"><li class="pl-chip">Backups</li><li class="pl-chip">Provisioning</li><li class="pl-chip">Supervisor</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-poll-rates-and-tuning-policies/">Why a station polls too slowly</a></h3>
-      <p>Slow, Normal and Fast are three numbers you choose, and one default tuning policy applied to every point is the usual reason a station feels sluggish.</p>
-      <ul class="pl-chips"><li class="pl-chip">Station engineering</li><li class="pl-chip">Performance</li><li class="pl-chip">BACnet</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/px-relative-ords/">One PX sheet for every AHU</a></h3>
-      <p>The Px editor binds absolutely by default, which is why a graphic works for AHU-01 and nothing else. Relativised, one sheet serves the whole plant.</p>
-      <ul class="pl-chips"><li class="pl-chip">PX graphics</li><li class="pl-chip">Standard sheets</li><li class="pl-chip">Reuse</li></ul>
-    </div><div class="pl-card pl-card--link">
+    </div></div>
+    <div class="pl-section__head">
+      <h2 id="drivers-and-field-buses">Drivers and field buses</h2>
+      <p class="pl-sub">Getting values off equipment, and why the values you get are wrong or late.</p>
+    </div>
+    <div class="pl-grid pl-grid--3" style="margin-bottom:var(--pl-s-13)"><div class="pl-card pl-card--link">
       <h3><a href="/notes/bacnet-mstp-on-a-jace/">BACnet MS/TP on a JACE</a></h3>
       <p>Baud, MAC address, Max Master and Max Info Frames. Four settings on one Link component decide whether an RS-485 trunk works, crawls or drops the token.</p>
       <ul class="pl-chips"><li class="pl-chip">BACnet</li><li class="pl-chip">MS/TP</li><li class="pl-chip">Commissioning</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-tls-certificates/">The certificate on a new JACE</a></h3>
-      <p>Every station starts with a self-signed certificate it generated itself. What that is good for, what it is not, and what breaks on the day it expires.</p>
-      <ul class="pl-chips"><li class="pl-chip">TLS</li><li class="pl-chip">Certificates</li><li class="pl-chip">Commissioning</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-tag-dictionaries/">Tags, dictionaries and the licence you need</a></h3>
-      <p>Tagging is how a station describes itself to software that did not engineer it. Three kinds of tag, one namespace, and a licence feature that gates it.</p>
-      <ul class="pl-chips"><li class="pl-chip">Tagging</li><li class="pl-chip">Data modelling</li><li class="pl-chip">Haystack</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-history-capacity/">History capacity on a JACE</a></h3>
-      <p>The default capacity is 500 records, the default name collides, and one setting decides whether a full history overwrites data or stops collecting.</p>
-      <ul class="pl-chips"><li class="pl-chip">Histories</li><li class="pl-chip">JACE</li><li class="pl-chip">Station engineering</li></ul>
     </div><div class="pl-card pl-card--link">
       <h3><a href="/notes/modbus-register-addressing/">Why a Modbus point reads the wrong register</a></h3>
       <p>Modbus decimal addressing is zero-based, vendor documentation is not, and the Address Format property decides which of the two you are typing.</p>
       <ul class="pl-chips"><li class="pl-chip">Modbus</li><li class="pl-chip">Integration</li><li class="pl-chip">Station engineering</li></ul>
     </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-alarm-routing/">Why an alarm never reached anybody</a></h3>
-      <p>Detection, class and recipient are three separate objects in a Niagara station. An alarm goes missing wherever the chain between them is not linked.</p>
-      <ul class="pl-chips"><li class="pl-chip">Alarms</li><li class="pl-chip">Station engineering</li><li class="pl-chip">Commissioning</li></ul>
+      <h3><a href="/notes/niagara-poll-rates-and-tuning-policies/">Why a station polls too slowly</a></h3>
+      <p>Slow, Normal and Fast are three numbers you choose, and one default tuning policy applied to every point is the usual reason a station feels sluggish.</p>
+      <ul class="pl-chips"><li class="pl-chip">Station engineering</li><li class="pl-chip">Performance</li><li class="pl-chip">BACnet</li></ul>
+    </div></div>
+    <div class="pl-section__head">
+      <h2 id="station-engineering">Station engineering</h2>
+      <p class="pl-sub">The work between a working driver and a station somebody else can maintain.</p>
+    </div>
+    <div class="pl-grid pl-grid--3" style="margin-bottom:var(--pl-s-13)"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/bulk-point-renaming-and-tagging/">Renaming and tagging points in bulk</a></h3>
+      <p>Point names arrive from the field device and there is no standard. What to use to select, rename and tag in bulk — and what a rename quietly breaks.</p>
+      <ul class="pl-chips"><li class="pl-chip">Bulk engineering</li><li class="pl-chip">Tagging</li><li class="pl-chip">Workbench</li></ul>
     </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-schedules-and-special-events/">Niagara schedules: special events and master copies</a></h3>
-      <p>Special event priority is list order, a partly-filled special event falls back to the weekly schedule, and an imported schedule cannot be edited locally.</p>
-      <ul class="pl-chips"><li class="pl-chip">Scheduling</li><li class="pl-chip">Station engineering</li><li class="pl-chip">Commissioning</li></ul>
+      <h3><a href="/notes/niagara-tag-dictionaries/">Tags, dictionaries and the licence you need</a></h3>
+      <p>Tagging is how a station describes itself to software that did not engineer it. Three kinds of tag, one namespace, and a licence feature that gates it.</p>
+      <ul class="pl-chips"><li class="pl-chip">Tagging</li><li class="pl-chip">Data modelling</li><li class="pl-chip">Haystack</li></ul>
     </div><div class="pl-card pl-card--link">
       <h3><a href="/notes/niagara-hierarchies/">A navigation tree that builds itself</a></h3>
       <p>Hierarchies generate the nav tree from tags and NEQL queries instead of hand-placed nodes — and the cache hides your edits until you rebuild it.</p>
@@ -329,19 +315,61 @@
       <p>Component, application and station templates do different jobs — and only one of them supports bulk deployment from a spreadsheet and upgrade in place.</p>
       <ul class="pl-chips"><li class="pl-chip">Templates</li><li class="pl-chip">Bulk engineering</li><li class="pl-chip">Station engineering</li></ul>
     </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/px-relative-ords/">One PX sheet for every AHU</a></h3>
+      <p>The Px editor binds absolutely by default, which is why a graphic works for AHU-01 and nothing else. Relativised, one sheet serves the whole plant.</p>
+      <ul class="pl-chips"><li class="pl-chip">PX graphics</li><li class="pl-chip">Standard sheets</li><li class="pl-chip">Reuse</li></ul>
+    </div></div>
+    <div class="pl-section__head">
+      <h2 id="data-alarms-and-time">Data, alarms and time</h2>
+      <p class="pl-sub">What the station records, who it tells, and when it decides to act.</p>
+    </div>
+    <div class="pl-grid pl-grid--3" style="margin-bottom:var(--pl-s-13)"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/getting-data-out-of-a-niagara-station/">Getting data out of a Niagara station</a></h3>
+      <p>REST, MQTT, a relational history database, file export or an HTTP client. Which suits which consumer, and what each one costs you to run.</p>
+      <ul class="pl-chips"><li class="pl-chip">Integration</li><li class="pl-chip">Histories</li><li class="pl-chip">MQTT</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-history-capacity/">History capacity on a JACE</a></h3>
+      <p>The default capacity is 500 records, the default name collides, and one setting decides whether a full history overwrites data or stops collecting.</p>
+      <ul class="pl-chips"><li class="pl-chip">Histories</li><li class="pl-chip">JACE</li><li class="pl-chip">Station engineering</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-alarm-routing/">Why an alarm never reached anybody</a></h3>
+      <p>Detection, class and recipient are three separate objects in a Niagara station. An alarm goes missing wherever the chain between them is not linked.</p>
+      <ul class="pl-chips"><li class="pl-chip">Alarms</li><li class="pl-chip">Station engineering</li><li class="pl-chip">Commissioning</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-schedules-and-special-events/">Niagara schedules: special events and master copies</a></h3>
+      <p>Special event priority is list order, a partly-filled special event falls back to the weekly schedule, and an imported schedule cannot be edited locally.</p>
+      <ul class="pl-chips"><li class="pl-chip">Scheduling</li><li class="pl-chip">Station engineering</li><li class="pl-chip">Commissioning</li></ul>
+    </div></div>
+    <div class="pl-section__head">
+      <h2 id="running-an-estate">Running an estate</h2>
+      <p class="pl-sub">Doing the same thing to fifty stations, and moving them forward a version.</p>
+    </div>
+    <div class="pl-grid pl-grid--3" style="margin-bottom:var(--pl-s-13)"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/scheduled-niagara-station-backups/">Scheduled station backups, and the gap</a></h3>
+      <p>A Supervisor can back up every station in its Niagara Network on a schedule. The station it does not cover that way is its own.</p>
+      <ul class="pl-chips"><li class="pl-chip">Backups</li><li class="pl-chip">Provisioning</li><li class="pl-chip">Supervisor</li></ul>
+    </div><div class="pl-card pl-card--link">
       <h3><a href="/notes/niagara-provisioning-jobs/">Doing one thing to fifty stations at once</a></h3>
       <p>Provisioning runs platform tasks across a whole NiagaraNetwork from one Supervisor connection — and the obvious backup action is the wrong one.</p>
       <ul class="pl-chips"><li class="pl-chip">Provisioning</li><li class="pl-chip">Estate management</li><li class="pl-chip">Supervisor</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-roles-and-permissions/">Roles, categories and the grid between them</a></h3>
-      <p>Niagara permissions are a grid of category against level — which is why a user can log in successfully and still be told they have no access.</p>
-      <ul class="pl-chips"><li class="pl-chip">Station security</li><li class="pl-chip">Permissions</li><li class="pl-chip">Commissioning</li></ul>
     </div><div class="pl-card pl-card--link">
       <h3><a href="/notes/ax-to-n4-migration/">What actually blocks an AX to N4 migration</a></h3>
       <p>A station cannot migrate until every module it uses has been refactored for Niagara 4 — and licences, users and permissions all change shape on the way.</p>
       <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Estate management</li><li class="pl-chip">Module development</li></ul>
     </div></div>
-  </div>
+    <div class="pl-section__head">
+      <h2 id="security-and-access">Security and access</h2>
+      <p class="pl-sub">Who can reach the station, and what they can do once they are in.</p>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-tls-certificates/">The certificate on a new JACE</a></h3>
+      <p>Every station starts with a self-signed certificate it generated itself. What that is good for, what it is not, and what breaks on the day it expires.</p>
+      <ul class="pl-chips"><li class="pl-chip">TLS</li><li class="pl-chip">Certificates</li><li class="pl-chip">Commissioning</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-roles-and-permissions/">Roles, categories and the grid between them</a></h3>
+      <p>Niagara permissions are a grid of category against level — which is why a user can log in successfully and still be told they have no access.</p>
+      <ul class="pl-chips"><li class="pl-chip">Station security</li><li class="pl-chip">Permissions</li><li class="pl-chip">Commissioning</li></ul>
+    </div></div></div>
 </section>
 
 <section class="pl-section pl-section--sunk">

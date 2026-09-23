@@ -4801,8 +4801,69 @@ def note_page(n):
          active="notes/", og_type="article",
          md=n["slug"].rstrip("/") + ".md")
 
+# The index is the page that has to make twenty notes look like a knowledge
+# base rather than a pile. Grouping gives it headings a search engine can
+# read, and gives a reader arriving with a vague problem somewhere to start.
+NOTE_GROUPS = [
+    ("Modules and deployment", "modules-and-deployment",
+     "Building something that installs, runs and keeps running on a controller.",
+     ["notes/niagara-module-version-stamping/",
+      "notes/niagara-module-signing/",
+      "notes/what-runs-on-a-jace/"]),
+    ("Drivers and field buses", "drivers-and-field-buses",
+     "Getting values off equipment, and why the values you get are wrong or late.",
+     ["notes/bacnet-mstp-on-a-jace/",
+      "notes/modbus-register-addressing/",
+      "notes/niagara-poll-rates-and-tuning-policies/"]),
+    ("Station engineering", "station-engineering",
+     "The work between a working driver and a station somebody else can maintain.",
+     ["notes/bulk-point-renaming-and-tagging/",
+      "notes/niagara-tag-dictionaries/",
+      "notes/niagara-hierarchies/",
+      "notes/niagara-templates/",
+      "notes/px-relative-ords/"]),
+    ("Data, alarms and time", "data-alarms-and-time",
+     "What the station records, who it tells, and when it decides to act.",
+     ["notes/getting-data-out-of-a-niagara-station/",
+      "notes/niagara-history-capacity/",
+      "notes/niagara-alarm-routing/",
+      "notes/niagara-schedules-and-special-events/"]),
+    ("Running an estate", "running-an-estate",
+     "Doing the same thing to fifty stations, and moving them forward a version.",
+     ["notes/scheduled-niagara-station-backups/",
+      "notes/niagara-provisioning-jobs/",
+      "notes/ax-to-n4-migration/"]),
+    ("Security and access", "security-and-access",
+     "Who can reach the station, and what they can do once they are in.",
+     ["notes/niagara-tls-certificates/",
+      "notes/niagara-roles-and-permissions/"]),
+]
+
+
+def grouped_notes():
+    """Every note in exactly one group. A note added to NOTES and forgotten
+    here would otherwise drop off the index silently, which is the one way
+    this page can be wrong without anything looking broken."""
+    placed = [s for _, _, _, slugs in NOTE_GROUPS for s in slugs]
+    assert len(placed) == len(set(placed)), "a note is in two groups"
+    missing = [n["slug"] for n in NOTES if n["slug"] not in placed]
+    assert not missing, f"notes missing from NOTE_GROUPS: {missing}"
+    unknown = [s for s in placed if s not in {n["slug"] for n in NOTES}]
+    assert not unknown, f"NOTE_GROUPS names notes that do not exist: {unknown}"
+    lookup = {n["slug"]: n for n in NOTES}
+    return [(title, ident, blurb, [lookup[s] for s in slugs])
+            for title, ident, blurb, slugs in NOTE_GROUPS]
+
+
 def build_notes_index():
-    cards = "".join(note_card(n) for n in NOTES)
+    groups = grouped_notes()
+    cards = "".join(f'''
+    <div class="pl-section__head">
+      <h2 id="{ident}">{e(title)}</h2>
+      <p class="pl-sub">{e(blurb)}</p>
+    </div>
+    <div class="pl-grid pl-grid--3"{"" if i == len(groups) - 1 else ' style="margin-bottom:var(--pl-s-13)"'}>{"".join(note_card(n) for n in group)}</div>'''
+        for i, (title, ident, blurb, group) in enumerate(groups))
     listing = {
         "@type": "ItemList",
         "itemListElement": [
@@ -4823,9 +4884,7 @@ def build_notes_index():
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-    <div class="pl-grid pl-grid--3">{cards}</div>
-  </div>
+  <div class="pl-wrap">{cards}</div>
 </section>
 
 <section class="pl-section pl-section--sunk">
@@ -4844,8 +4903,8 @@ def build_notes_index():
 {CTA}
 '''
     page("notes/", "Niagara Engineering Notes & Technical Guides",
-         "Practical notes on Niagara module signing, version stamping, JACE limits, "
-         "bulk tagging, getting data out of a station and scheduled backups.",
+         "Twenty worked notes on Niagara: module signing and stamping, BACnet and "
+         "Modbus, tagging, histories, alarms, permissions, provisioning and migration.",
          body, schema=[ORG, listing],
          crumbs=[("Home", ""), ("Notes", None)], active="notes/")
 
