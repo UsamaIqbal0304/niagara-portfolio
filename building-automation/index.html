@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building Automation Software Engineering on Niagara</title>
+<meta name="description" content="Independent building automation software on the Niagara Framework: BMS integration, custom drivers, HVAC graphics, station work, Niagara 5.">
+<link rel="canonical" href="https://plantroomlabs.com/building-automation/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Building Automation Software Engineering on Niagara">
+<meta property="og:description" content="Independent building automation software on the Niagara Framework: BMS integration, custom drivers, HVAC graphics, station work, Niagara 5.">
+<meta property="og:url" content="https://plantroomlabs.com/building-automation/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Building Automation Software Engineering on Niagara">
+<meta name="twitter:description" content="Independent building automation software on the Niagara Framework: BMS integration, custom drivers, HVAC graphics, station work, Niagara 5.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "building automation systems",
+    "BMS integration",
+    "DDC controls",
+    "HVAC controls software",
+    "HVAC plant graphics",
+    "supervisory control",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   },
+   "makesOffer": [
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/niagara-modules/#service",
+      "@type": "Service",
+      "name": "Custom Niagara modules and drivers",
+      "serviceType": "Custom software development"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/bajaux-widgets/#service",
+      "@type": "Service",
+      "name": "bajaux web widgets and dashboards",
+      "serviceType": "User interface development"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/px-graphics/#service",
+      "@type": "Service",
+      "name": "PX graphics and standard sheets",
+      "serviceType": "Graphics engineering"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/station-engineering/#service",
+      "@type": "Service",
+      "name": "Station engineering and new controller setup",
+      "serviceType": "Systems engineering"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/workbench-tooling/#service",
+      "@type": "Service",
+      "name": "Workbench tooling and bulk engineering",
+      "serviceType": "Engineering automation"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/niagara-5-migration/#service",
+      "@type": "Service",
+      "name": "Niagara 5 readiness and migration",
+      "serviceType": "Migration and porting"
+     }
+    }
+   ]
+  },
+  {
+   "@type": "WebPage",
+   "url": "https://plantroomlabs.com/building-automation/",
+   "about": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "name": "Building automation software engineering on Niagara"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Building automation"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+    <details class="pl-menu" data-menu>
+      <summary aria-label="Menu"><span class="pl-menu__bars" aria-hidden="true"></span>Menu</summary>
+      <ul class="pl-menu__panel">
+        <li><a href="/services/">Services</a></li><li><a href="/work/">Work</a></li><li><a href="/services/niagara-5-migration/">Niagara 5</a></li><li><a href="/notes/">Notes</a></li><li><a href="/faq/">FAQ</a></li><li><a href="/about/">About</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </details>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li>Building automation</li></ol></nav>
+    <p class="pl-eyebrow">Building automation</p>
+    <h1>Building automation software, built on Niagara</h1>
+    <p class="pl-lede">A building management system is plant, controllers, a network and a
+       pile of software. We are hired for the software: the drivers that make equipment
+       legible, the graphics an operator actually uses, and the station configuration that
+       decides whether any of it is maintainable in year five.</p>
+    <ul class="pl-chips">
+      <li class="pl-chip pl-chip--on-dark">BMS integration</li>
+      <li class="pl-chip pl-chip--on-dark">HVAC plant graphics</li>
+      <li class="pl-chip pl-chip--on-dark">BACnet &amp; Modbus</li>
+      <li class="pl-chip pl-chip--on-dark">Supervisory layer</li>
+      <li class="pl-chip pl-chip--on-dark">Open protocols</li>
+    </ul>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/services/">What we build</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="/work/">See it running</a>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-body pl-prose">
+      <h2>Where Niagara sits in a building automation system</h2>
+      <p>A building automation system is usually drawn in three layers. At the bottom is
+         field equipment — valves, dampers, VSDs, meters, sensors — speaking BACnet MS/TP,
+         Modbus RTU, M-Bus or a manufacturer's own protocol. Above that sit DDC controllers
+         running the actual control logic for a plant item: the AHU sequence, the boiler
+         cascade, the zone loop. Above those sits a supervisory layer that talks to every
+         controller at once, normalises what they say, stores history, raises alarms and
+         draws the screens.</p>
+      <p>The Niagara Framework is that top layer. Its distinguishing feature is that it was
+         built to be vendor-neutral: a BACnet AHU from one manufacturer, a Modbus chiller from
+         another and a metering system from a third all arrive in the same object model, with
+         the same naming, tagging, history and alarm machinery over the top. That is why it
+         turns up in mixed estates that have been extended by four different contractors over
+         fifteen years, which is most estates.</p>
+      <p>Two pieces of hardware carry it. A <strong>JACE</strong> is a small ARM controller
+         mounted in a panel, running a Niagara station for one building or one plant room. A
+         <strong>Supervisor</strong> is the same software on a server, aggregating many JACEs
+         into one head end. Both run the same modules, which is why a module that is built
+         carelessly for the server will not install on the controller.</p>
+
+      <h2>What &ldquo;the software layer&rdquo; means on a real project</h2>
+      <p>On a live BMS project the software work separates into four pieces that get bought
+         separately and fail differently.</p>
+    </div>
+
+    <div class="pl-grid pl-grid--2" style="margin-top:var(--pl-s-10)">
+      <div class="pl-card"><h3>Making equipment legible</h3>
+        <p>A driver turns a device on a wire into points in a tree. Stock drivers cover
+           BACnet, Modbus and the common cases. The gap is the equipment that has a published
+           protocol and no Niagara driver — a legacy field bus, a proprietary register map, a
+           vendor REST or MQTT API — which is where a
+           <a href="/services/niagara-modules/">custom driver</a> earns its cost.</p></div>
+      <div class="pl-card"><h3>Screens people actually use</h3>
+        <p>HVAC plant views, zone pages, meter dashboards and a navigation tree that reaches
+           any unit in three clicks. Done as a small set of
+           <a href="/services/px-graphics/">standard PX sheets</a> bound relatively,
+           or as <a href="/services/bajaux-widgets/">responsive web widgets</a> where
+           the view has to work on a phone or carry a brand.</p></div>
+      <div class="pl-card"><h3>The configuration nobody sees</h3>
+        <p>Naming, tagging, history collection, alarm classes and recipients, schedules, users
+           and roles, certificates, backups. None of it is visible on handover day and all of
+           it decides whether the estate is workable later.
+           <a href="/services/station-engineering/">Station engineering</a> is this
+           half.</p></div>
+      <div class="pl-card"><h3>Getting data back out</h3>
+        <p>An energy team, an analytics platform, a CMMS or a customer API wants the data the
+           station is already collecting. That is an integration outward, with buffering and
+           retry, so a network outage costs a gap in a chart rather than a day of readings.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Vocabulary</p>
+      <h2>The same thing, two names</h2>
+      <p class="pl-sub">Building automation and Niagara are not different subjects, but they
+         are different words, and a quote can go badly wrong on the gap between them.</p>
+    </div>
+    <table class="pl-spec">
+     <thead><tr><th scope="col">In building automation</th><th scope="col">In Niagara</th></tr></thead>
+     <tbody>
+      <tr><th scope="row">BMS head end</th><td>A Supervisor: the server-side station that
+          aggregates the others and usually owns the long-term history.</td></tr>
+      <tr><th scope="row">Field controller / DDC panel</th><td>A JACE, where it is Niagara.
+          Third-party DDC controllers stay what they are and are integrated over
+          BACnet or Modbus.</td></tr>
+      <tr><th scope="row">Point</th><td>A control point component in the station tree, with
+          its own facets, extensions, history and alarm configuration.</td></tr>
+      <tr><th scope="row">Graphic / mimic</th><td>A PX view, or a bajaux widget inside one.</td></tr>
+      <tr><th scope="row">Trend log</th><td>A history extension on a point, collected on
+          interval or on change of value, queried with BQL.</td></tr>
+      <tr><th scope="row">Alarm / event</th><td>Three separate objects: the alarm extension
+          that detects, the alarm class that groups, and the recipient that delivers.</td></tr>
+      <tr><th scope="row">Time schedule</th><td>A schedule component, optionally mastered on
+          the Supervisor and replicated down to each station.</td></tr>
+      <tr><th scope="row">Software driver</th><td>A module: a signed jar, stamped to a minimum
+          framework version, installed through the platform rather than copied in.</td></tr>
+     </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-body pl-prose">
+      <h2>Why a separate developer at all</h2>
+      <p>The contractor who installed the system is usually very good at the things the job
+         mostly consists of: panels, field wiring, commissioning, tuning a plant until it
+         behaves. Writing a signed Java module that has to install on an ARM controller, on
+         the oldest framework version in the estate, and keep loading after a security update,
+         is a different discipline with different failure modes. It is a poor use of a
+         commissioning engineer's week and a normal use of a developer's.</p>
+      <p>So the usual shape is not replacement. A systems integrator keeps the client, the
+         site and the commissioning, and subcontracts the module, the widget set or the
+         graphics standard. The work arrives signed, documented for the engineer who installs
+         it, and with source where that is in scope, so it does not become another orphaned
+         dependency.</p>
+
+      <h2>What we do not do</h2>
+      <p>No panel building, no field wiring, no on-site commissioning, no electrical design
+         and no maintenance contracts. Work is remote, and it is the software. If a job needs
+         hands in a plant room, it needs your engineers or your contractor's — we work
+         alongside them rather than instead of them.</p>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Who this is for</p>
+      <h2>Three kinds of buyer, three different first jobs</h2>
+    </div>
+    <ol class="pl-steps">
+      <li><div><h3>Systems integrators and controls contractors</h3>
+        <p>A module, a widget set or a graphics standard you do not have a developer to write.
+           Usually scoped against one site and then reused across the next ten, which is where
+           a standard sheet set or a themed component library pays for itself.</p></div></li>
+      <li><div><h3>Building owners and estates teams</h3>
+        <p>You have inherited a BMS, several contractors' worth of conventions, and no
+           inventory. The first job is finding out what is actually installed — normally a
+           <a href="/services/niagara-5-migration/">readiness audit</a> — before
+           anyone quotes a number for changing it.</p></div></li>
+      <li><div><h3>Consultants and specifiers</h3>
+        <p>A second opinion on whether a specification is deliverable in Niagara, what a
+           requirement will really cost in station work, and which parts of it stock features
+           already cover. This is frequently half an hour and no invoice.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent <a href="/building-automation/">building automation</a>
+          software on the Niagara Framework: custom modules, bajaux widgets, PX graphics,
+          station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/building-automation/">Building automation</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+<!-- Cookieless, no personal data, no consent banner needed. -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4b22c0dd7f50413da48d0286988da559"}'></script>
+</body>
+</html>

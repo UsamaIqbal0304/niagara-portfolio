@@ -4,7 +4,7 @@
 > so an agent can read the whole knowledge base in a single request.
 
 Site map for language models: https://plantroomlabs.com/llms.txt
-Last updated: 2026-09-23
+Last updated: 2026-09-24
 
 Licence: quote freely with attribution to Plantroom Labs (https://plantroomlabs.com).
 

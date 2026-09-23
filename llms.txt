@@ -1,21 +1,22 @@
 # Plantroom Labs
 
-> Independent niagara framework engineering practice. Builds custom Niagara Framework modules and
-> drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work
-> for systems integrators, controls contractors, distributors and building owners.
+> Independent niagara framework engineering practice: the software layer of a building automation
+> system, built on the Niagara Framework. Custom Niagara modules and drivers, bajaux
+> widgets, PX graphics, station engineering and Niagara 5 migration work for BMS systems
+> integrators, controls contractors, distributors and building owners.
 > Remote, worldwide. Fixed price per deliverable against a written specification.
 
 Contact: info@plantroomlabs.com
 Website: https://plantroomlabs.com/
-Last updated: 2026-09-23
+Last updated: 2026-09-24
 
 ## What this practice does
 
 Niagara Framework (Tridium) software engineering, specifically:
 
 - [Custom Niagara modules and drivers](https://plantroomlabs.com/services/niagara-modules/): Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.
-- [bajaux web widgets and dashboards](https://plantroomlabs.com/services/bajaux-widgets/): Custom Niagara web widgets built with bajaux and BajaScript: HTML5 dashboards, navigation, equipment views and charts, bound to live station ORDs and BQL.
-- [PX graphics and standard sheets](https://plantroomlabs.com/services/px-graphics/): Niagara PX graphics as a reusable template set: standard sheets per plant type, relative-ORD binding, navigation hierarchy and a graphics standard.
+- [bajaux web widgets and dashboards](https://plantroomlabs.com/services/bajaux-widgets/): Custom Niagara web widgets in bajaux and BajaScript: HTML5 BMS dashboards, HVAC plant views, navigation and charts, bound to live station ORDs and BQL.
+- [PX graphics and standard sheets](https://plantroomlabs.com/services/px-graphics/): Niagara PX graphics as a reusable template set: standard HVAC plant sheets, relative-ORD binding, navigation hierarchy and a written graphics standard.
 - [Station engineering and new controller setup](https://plantroomlabs.com/services/station-engineering/): Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.
 - [Workbench tooling and bulk engineering](https://plantroomlabs.com/services/workbench-tooling/): Custom Workbench views and tools for repetitive Niagara work: bulk renaming and retagging, station audits, provisioning helpers and module inventories.
 - [Niagara 5 readiness and migration](https://plantroomlabs.com/services/niagara-5-migration/): Niagara 5 readiness audits and migration: which third-party modules survive the new runtime and mandatory signing, and porting your modules so they load.
@@ -65,6 +66,9 @@ or electrical installation, or as a Tridium-authorised channel. It is independen
 unaffiliated.
 
 ## Frequently asked questions
+
+**Where does Niagara sit in a building automation system?**
+In the supervisory layer, above the field controllers and below whatever the client reports on. It is the vendor-neutral layer that talks BACnet, Modbus and the rest, normalises the points into one tree, and serves the graphics operators look at. We build the software in that layer: drivers, modules, graphics and station work. There is a longer explanation, with a BMS-to-Niagara vocabulary map, on the building automation page.
 
 **Do you work on Niagara 4 or Niagara 5?**
 Both. Most production work is on Niagara 4, because that is what is installed. New code is written so the same source also builds for Niagara 5 when you need it. Modules are stamped to the oldest Niagara version you have to support, not to the newest one available, so one build covers a mixed estate.
@@ -151,6 +155,8 @@ than from memory, and free to quote. Index at https://plantroomlabs.com/notes/.
 
 - [Home](https://plantroomlabs.com/): overview and a live demo.
 - [Services](https://plantroomlabs.com/services/): all six services and how an engagement runs.
+- [Building automation](https://plantroomlabs.com/building-automation/): where Niagara sits in a building
+  automation system, a BMS-to-Niagara vocabulary map, and the boundary of what is offered.
 - [Work](https://plantroomlabs.com/work/): live interactive demos and how the demo harness works.
 - [FAQ](https://plantroomlabs.com/faq/): signing modes, JACE support, source code, pricing, Niagara 5.
 - [About](https://plantroomlabs.com/about/): why the practice exists, capability table, what is not claimed.

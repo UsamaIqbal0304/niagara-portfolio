@@ -270,8 +270,9 @@ FOOTER = f'''<footer class="pl-footer">
           <span class="pl-brand__name">{BRAND}<span>{TAGLINE}</span></span>
         </a>
         <p style="margin-top:var(--pl-s-7); max-width:42ch">
-          Independent Niagara Framework development: custom modules, bajaux widgets,
-          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+          Independent <a href="{href('building-automation/')}">building automation</a>
+          software on the Niagara Framework: custom modules, bajaux widgets, PX graphics,
+          station engineering and Niagara&nbsp;5 migration work.
         </p>
         <p style="margin-top:var(--pl-s-6)">
           <a href="mailto:{EMAIL}">{EMAIL}</a>
@@ -293,6 +294,7 @@ FOOTER = f'''<footer class="pl-footer">
         <ul>
           <li><a href="{href('work/')}">Work</a></li>
           <li><a href="{href('notes/')}">Notes</a></li>
+          <li><a href="{href('building-automation/')}">Building automation</a></li>
           <li><a href="{href('about/')}">About</a></li>
           <li><a href="{href('faq/')}">FAQ</a></li>
           <li><a href="{href('contact/')}">Contact</a></li>
@@ -436,7 +438,9 @@ ORG = {
         "Niagara Framework", "Niagara 4", "Niagara 5", "Tridium Niagara", "bajaux",
         "BajaScript", "Baja API", "PX graphics", "JACE 8000", "JACE 9000",
         "Niagara Supervisor", "Workbench", "BACnet", "Modbus", "building management systems",
-        "building automation", "HVAC controls software", "module signing", "BQL", "ORD",
+        "building automation", "building automation systems", "BMS integration",
+        "DDC controls", "HVAC controls software", "HVAC plant graphics",
+        "supervisory control", "module signing", "BQL", "ORD",
     ],
     "areaServed": {"@type": "Place", "name": "Worldwide (remote)"},
     "availableLanguage": "en",
@@ -555,9 +559,9 @@ SERVICES = [
   date="2026-09-22",
   nav="bajaux widgets",
   h1="bajaux web widgets and dashboards",
-  title="Niagara Web Widgets & bajaux Development | HTML5 UI",
-  desc=("Custom Niagara web widgets built with bajaux and BajaScript: HTML5 dashboards, "
-        "navigation, equipment views and charts, bound to live station ORDs and BQL."),
+  title="Niagara HVAC Dashboards & bajaux Web Widget Development",
+  desc=("Custom Niagara web widgets in bajaux and BajaScript: HTML5 BMS dashboards, HVAC "
+        "plant views, navigation and charts, bound to live station ORDs and BQL."),
   type_="User interface development",
   lede=("Browser-native web widgets that live in your PX views and in your station's web UI. "
         "Bound to real ORDs and BQL history, <strong>responsive by construction</strong>, "
@@ -618,9 +622,9 @@ SERVICES = [
   date="2026-09-22",
   nav="PX graphics",
   h1="PX graphics and standard sheets",
-  title="Niagara PX Graphics & Standard PX Sheet Templates",
-  desc=("Niagara PX graphics as a reusable template set: standard sheets per plant type, "
-        "relative-ORD binding, navigation hierarchy and a graphics standard."),
+  title="Niagara PX Graphics & HVAC Plant Sheet Templates",
+  desc=("Niagara PX graphics as a reusable template set: standard HVAC plant sheets, "
+        "relative-ORD binding, navigation hierarchy and a written graphics standard."),
   type_="Graphics engineering",
   lede=("Most PX estates are not a graphics problem, they are a <strong>duplication</strong> "
         "problem: eighty sheets that were copied, hand-edited and now disagree. The fix is a "
@@ -882,13 +886,35 @@ SERVICES = [
   ]),
 ]
 
+def first_sentence(text):
+    """The opening sentence of a service description, for a card blurb.
+
+    Split on ". " rather than "." so a description containing "4.15" or an
+    abbreviation is not cut in the middle, and strip the stop before adding
+    one back: a single-sentence description already ends in a full stop and
+    was rendering with two.
+    """
+    return text.split(". ")[0].rstrip(". ") + "."
+
+
+# The Service nodes are declared on their own pages. This is the reverse edge,
+# so the organisation is not a name with no offering attached when a crawler
+# reads the home page and nothing else.
+ORG["makesOffer"] = [
+    {"@type": "Offer", "itemOffered": {"@id": url(s["slug"]) + "#service",
+                                       "@type": "Service", "name": s["h1"],
+                                       "serviceType": s["type_"]}}
+    for s in SERVICES
+]
+
+
 def service_page(s):
     deliver_rows = "".join(
         f'<tr><th scope="row">{e(n)}</th><td>{d}</td></tr>' for n, d in s["deliver"])
     others = "".join(
         f'''<div class="pl-card pl-card--link">{icon(o["icon"])}
         <h3><a href="{href(o["slug"])}">{e(o["nav"])}</a></h3>
-        <p>{e(o["desc"].split(".")[0])}.</p></div>'''
+        <p>{e(first_sentence(o["desc"]))}</p></div>'''
         for o in SERVICES if o["slug"] != s["slug"])
 
     # Notes that name this service are the cheapest internal links on the site:
@@ -983,7 +1009,7 @@ def service_cards(band=False, level=3):
     return "".join(
         f'''<div class="pl-card pl-card--link">{icon(s["icon"])}
         <h{level}><a href="{href(s["slug"])}">{e(s["nav"])}</a></h{level}>
-        <p>{e(s["desc"].split(". ")[0])}.</p>
+        <p>{e(first_sentence(s["desc"]))}</p>
         <span class="pl-card__more">Read more</span></div>'''
         for s in SERVICES)
 
@@ -1087,11 +1113,11 @@ def build_home():
       management system.
     </p>
     <p class="pl-lede">
-      <strong>We do the Niagara side of building automation, and nothing else.</strong>
-      Custom modules and drivers, bajaux widgets, PX graphics, station engineering and
-      Niagara&nbsp;5 migration — for systems integrators, controls contractors and building
-      owners. Pure Java and JavaScript, signed, and stamped to run on a JACE as readily as
-      on a Supervisor.
+      <strong>We build the software that runs building automation, on the Niagara
+      Framework.</strong> Custom modules and drivers, bajaux widgets, PX graphics, station
+      engineering and Niagara&nbsp;5 migration — for systems integrators, controls
+      contractors and building owners. Pure Java and JavaScript, signed, and stamped to run
+      on a JACE as readily as on a Supervisor.
     </p>
     <ul class="pl-chips">
       <li class="pl-chip pl-chip--on-dark">Niagara AX, 4 and 5</li>
@@ -1114,7 +1140,9 @@ def build_home():
       <p class="pl-eyebrow">Services</p>
       <h2>Six things, done properly</h2>
       <p class="pl-sub">Each one scoped in writing and priced per deliverable. Most projects
-         start with one and grow into two.</p>
+         start with one and grow into two. New to the framework? Start with
+         <a href="{href('building-automation/')}">where Niagara sits in a building automation
+         system</a>.</p>
     </div>
     <div class="pl-grid pl-grid--3">{service_cards()}</div>
     <p style="margin-top:var(--pl-s-9)">
@@ -1230,9 +1258,9 @@ def build_home():
 
 {CTA}
 '''
-    page("", f"Custom Niagara Modules & bajaux Widgets | {BRAND}",
-         "Independent Niagara Framework engineering for BMS integrators and building "
-         "owners: custom modules, bajaux widgets, PX graphics, station work, Niagara 5.",
+    page("", f"Niagara Building Automation Software | {BRAND}",
+         "Building automation software on the Niagara Framework, for BMS integrators and "
+         "building owners: custom modules, bajaux widgets, PX graphics, Niagara 5.",
          body,
          schema=[ORG, {
              "@type": "WebSite", "@id": url() + "#website", "url": url(),
@@ -1252,8 +1280,10 @@ def build_services_index():
     {{{{CRUMBS}}}}
     <p class="pl-eyebrow">Services</p>
     <h1>What we build, and what you get for it</h1>
-    <p class="pl-lede">Six services. Each quoted as a fixed price against a written
-       specification, with the deliverables listed before the work starts.</p>
+    <p class="pl-lede">Six services, all of them the software layer of a
+       <a href="{href('building-automation/')}">building automation system</a>. Each quoted as a
+       fixed price against a written specification, with the deliverables listed before the
+       work starts.</p>
   </div>
 </section>
 
@@ -1393,9 +1423,9 @@ def build_work():
 
 {CTA}
 '''
-    page("work/", "Live Niagara Widget Demos — Interactive bajaux Dashboards",
-         "Interactive demos of custom Niagara bajaux widgets in your browser: AHU dashboard, "
-         "building summary and navigation rail, on a simulated station.",
+    page("work/", "Live Niagara BMS Dashboard Demos — bajaux Widgets",
+         "Interactive building automation dashboards running in your browser: HVAC plant view, "
+         "building summary and navigation rail, on a simulated Niagara station.",
          body,
          schema=[ORG] + [{
              "@type": "SoftwareApplication",
@@ -1412,6 +1442,14 @@ def build_work():
          crumbs=[("Home", ""), ("Work", None)], active="work/")
 
 FAQS = [
+ ("Where does Niagara sit in a building automation system?",
+  "In the supervisory layer, above the field controllers and below whatever the client "
+  "reports on. It is the vendor-neutral layer that talks BACnet, Modbus and the rest, "
+  "normalises the points into one tree, and serves the graphics operators look at. We "
+  "build the software in that layer: drivers, modules, graphics and station work. There "
+  "is a longer explanation, with a BMS-to-Niagara vocabulary map, on the "
+  "<a href=\"/building-automation/\">building automation</a> page."),
+
  ("Do you work on Niagara 4 or Niagara 5?",
   "Both. Most production work is on Niagara 4, because that is what is installed. New "
   "code is written so the same source also builds for Niagara 5 when you need it. Modules "
@@ -1539,9 +1577,10 @@ def build_about():
     {{{{CRUMBS}}}}
     <p class="pl-eyebrow">About</p>
     <h1>An independent Niagara development practice</h1>
-    <p class="pl-lede">Small, remote, and focused on one building automation framework
-       rather than on being available for anything. The work is Niagara: modules, widgets,
-       graphics, stations and migrations.</p>
+    <p class="pl-lede">Small, remote, and focused on one
+       <a href="{href('building-automation/')}">building automation</a> framework rather than on
+       being available for anything. The work is Niagara: modules, widgets, graphics, stations
+       and migrations.</p>
   </div>
 </section>
 
@@ -1631,6 +1670,195 @@ def build_about():
          body, schema=[ORG, {"@type": "AboutPage", "url": url("about/"),
                              "mainEntity": {"@id": url() + "#org"}}],
          crumbs=[("Home", ""), ("About", None)], active="about/")
+
+
+def build_building_automation():
+    """The category page.
+
+    Everything else on this site is written in Niagara vocabulary, which is
+    correct for the engineer who already has a station and wrong for the
+    person who has a building. That person searches for building automation,
+    BMS and HVAC controls, lands nowhere near us, and would not recognise
+    "bajaux" as the answer to anything. This page is the bridge: where the
+    framework sits in a building automation stack, what the software layer of
+    a BMS project actually consists of, and a plain map between the two
+    vocabularies. It earns its place by being useful to somebody who never
+    hires us — which is also the only kind of page worth ranking.
+    """
+    body = f'''
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    {{{{CRUMBS}}}}
+    <p class="pl-eyebrow">Building automation</p>
+    <h1>Building automation software, built on Niagara</h1>
+    <p class="pl-lede">A building management system is plant, controllers, a network and a
+       pile of software. We are hired for the software: the drivers that make equipment
+       legible, the graphics an operator actually uses, and the station configuration that
+       decides whether any of it is maintainable in year five.</p>
+    <ul class="pl-chips">
+      <li class="pl-chip pl-chip--on-dark">BMS integration</li>
+      <li class="pl-chip pl-chip--on-dark">HVAC plant graphics</li>
+      <li class="pl-chip pl-chip--on-dark">BACnet &amp; Modbus</li>
+      <li class="pl-chip pl-chip--on-dark">Supervisory layer</li>
+      <li class="pl-chip pl-chip--on-dark">Open protocols</li>
+    </ul>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="{href('services/')}">What we build</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="{href('work/')}">See it running</a>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-body pl-prose">
+      <h2>Where Niagara sits in a building automation system</h2>
+      <p>A building automation system is usually drawn in three layers. At the bottom is
+         field equipment — valves, dampers, VSDs, meters, sensors — speaking BACnet MS/TP,
+         Modbus RTU, M-Bus or a manufacturer's own protocol. Above that sit DDC controllers
+         running the actual control logic for a plant item: the AHU sequence, the boiler
+         cascade, the zone loop. Above those sits a supervisory layer that talks to every
+         controller at once, normalises what they say, stores history, raises alarms and
+         draws the screens.</p>
+      <p>The Niagara Framework is that top layer. Its distinguishing feature is that it was
+         built to be vendor-neutral: a BACnet AHU from one manufacturer, a Modbus chiller from
+         another and a metering system from a third all arrive in the same object model, with
+         the same naming, tagging, history and alarm machinery over the top. That is why it
+         turns up in mixed estates that have been extended by four different contractors over
+         fifteen years, which is most estates.</p>
+      <p>Two pieces of hardware carry it. A <strong>JACE</strong> is a small ARM controller
+         mounted in a panel, running a Niagara station for one building or one plant room. A
+         <strong>Supervisor</strong> is the same software on a server, aggregating many JACEs
+         into one head end. Both run the same modules, which is why a module that is built
+         carelessly for the server will not install on the controller.</p>
+
+      <h2>What &ldquo;the software layer&rdquo; means on a real project</h2>
+      <p>On a live BMS project the software work separates into four pieces that get bought
+         separately and fail differently.</p>
+    </div>
+
+    <div class="pl-grid pl-grid--2" style="margin-top:var(--pl-s-10)">
+      <div class="pl-card"><h3>Making equipment legible</h3>
+        <p>A driver turns a device on a wire into points in a tree. Stock drivers cover
+           BACnet, Modbus and the common cases. The gap is the equipment that has a published
+           protocol and no Niagara driver — a legacy field bus, a proprietary register map, a
+           vendor REST or MQTT API — which is where a
+           <a href="{href('services/niagara-modules/')}">custom driver</a> earns its cost.</p></div>
+      <div class="pl-card"><h3>Screens people actually use</h3>
+        <p>HVAC plant views, zone pages, meter dashboards and a navigation tree that reaches
+           any unit in three clicks. Done as a small set of
+           <a href="{href('services/px-graphics/')}">standard PX sheets</a> bound relatively,
+           or as <a href="{href('services/bajaux-widgets/')}">responsive web widgets</a> where
+           the view has to work on a phone or carry a brand.</p></div>
+      <div class="pl-card"><h3>The configuration nobody sees</h3>
+        <p>Naming, tagging, history collection, alarm classes and recipients, schedules, users
+           and roles, certificates, backups. None of it is visible on handover day and all of
+           it decides whether the estate is workable later.
+           <a href="{href('services/station-engineering/')}">Station engineering</a> is this
+           half.</p></div>
+      <div class="pl-card"><h3>Getting data back out</h3>
+        <p>An energy team, an analytics platform, a CMMS or a customer API wants the data the
+           station is already collecting. That is an integration outward, with buffering and
+           retry, so a network outage costs a gap in a chart rather than a day of readings.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Vocabulary</p>
+      <h2>The same thing, two names</h2>
+      <p class="pl-sub">Building automation and Niagara are not different subjects, but they
+         are different words, and a quote can go badly wrong on the gap between them.</p>
+    </div>
+    <table class="pl-spec">
+     <thead><tr><th scope="col">In building automation</th><th scope="col">In Niagara</th></tr></thead>
+     <tbody>
+      <tr><th scope="row">BMS head end</th><td>A Supervisor: the server-side station that
+          aggregates the others and usually owns the long-term history.</td></tr>
+      <tr><th scope="row">Field controller / DDC panel</th><td>A JACE, where it is Niagara.
+          Third-party DDC controllers stay what they are and are integrated over
+          BACnet or Modbus.</td></tr>
+      <tr><th scope="row">Point</th><td>A control point component in the station tree, with
+          its own facets, extensions, history and alarm configuration.</td></tr>
+      <tr><th scope="row">Graphic / mimic</th><td>A PX view, or a bajaux widget inside one.</td></tr>
+      <tr><th scope="row">Trend log</th><td>A history extension on a point, collected on
+          interval or on change of value, queried with BQL.</td></tr>
+      <tr><th scope="row">Alarm / event</th><td>Three separate objects: the alarm extension
+          that detects, the alarm class that groups, and the recipient that delivers.</td></tr>
+      <tr><th scope="row">Time schedule</th><td>A schedule component, optionally mastered on
+          the Supervisor and replicated down to each station.</td></tr>
+      <tr><th scope="row">Software driver</th><td>A module: a signed jar, stamped to a minimum
+          framework version, installed through the platform rather than copied in.</td></tr>
+     </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-body pl-prose">
+      <h2>Why a separate developer at all</h2>
+      <p>The contractor who installed the system is usually very good at the things the job
+         mostly consists of: panels, field wiring, commissioning, tuning a plant until it
+         behaves. Writing a signed Java module that has to install on an ARM controller, on
+         the oldest framework version in the estate, and keep loading after a security update,
+         is a different discipline with different failure modes. It is a poor use of a
+         commissioning engineer's week and a normal use of a developer's.</p>
+      <p>So the usual shape is not replacement. A systems integrator keeps the client, the
+         site and the commissioning, and subcontracts the module, the widget set or the
+         graphics standard. The work arrives signed, documented for the engineer who installs
+         it, and with source where that is in scope, so it does not become another orphaned
+         dependency.</p>
+
+      <h2>What we do not do</h2>
+      <p>No panel building, no field wiring, no on-site commissioning, no electrical design
+         and no maintenance contracts. Work is remote, and it is the software. If a job needs
+         hands in a plant room, it needs your engineers or your contractor's — we work
+         alongside them rather than instead of them.</p>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Who this is for</p>
+      <h2>Three kinds of buyer, three different first jobs</h2>
+    </div>
+    <ol class="pl-steps">
+      <li><div><h3>Systems integrators and controls contractors</h3>
+        <p>A module, a widget set or a graphics standard you do not have a developer to write.
+           Usually scoped against one site and then reused across the next ten, which is where
+           a standard sheet set or a themed component library pays for itself.</p></div></li>
+      <li><div><h3>Building owners and estates teams</h3>
+        <p>You have inherited a BMS, several contractors' worth of conventions, and no
+           inventory. The first job is finding out what is actually installed — normally a
+           <a href="{href('services/niagara-5-migration/')}">readiness audit</a> — before
+           anyone quotes a number for changing it.</p></div></li>
+      <li><div><h3>Consultants and specifiers</h3>
+        <p>A second opinion on whether a specification is deliverable in Niagara, what a
+           requirement will really cost in station work, and which parts of it stock features
+           already cover. This is frequently half an hour and no invoice.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+{CTA}
+'''
+    page("building-automation/",
+         "Building Automation Software Engineering on Niagara",
+         "Independent building automation software on the Niagara Framework: BMS "
+         "integration, custom drivers, HVAC graphics, station work, Niagara 5.",
+         body,
+         schema=[ORG, {
+             "@type": "WebPage", "url": url("building-automation/"),
+             "about": {"@id": url() + "#org"},
+             "name": "Building automation software engineering on Niagara",
+         }],
+         crumbs=[("Home", ""), ("Building automation", None)],
+         active="building-automation/")
 
 
 def build_contact():
@@ -1888,9 +2116,10 @@ def build_llms_txt():
 
     body = f"""# {BRAND}
 
-> Independent {TAGLINE.lower()} practice. Builds custom Niagara Framework modules and
-> drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work
-> for systems integrators, controls contractors, distributors and building owners.
+> Independent {TAGLINE.lower()} practice: the software layer of a building automation
+> system, built on the Niagara Framework. Custom Niagara modules and drivers, bajaux
+> widgets, PX graphics, station engineering and Niagara 5 migration work for BMS systems
+> integrators, controls contractors, distributors and building owners.
 > Remote, worldwide. Fixed price per deliverable against a written specification.
 
 Contact: {EMAIL}
@@ -1969,6 +2198,8 @@ than from memory, and free to quote. Index at {url('notes/')}.
 
 - [Home]({url()}): overview and a live demo.
 - [Services]({url('services/')}): all six services and how an engagement runs.
+- [Building automation]({url('building-automation/')}): where Niagara sits in a building
+  automation system, a BMS-to-Niagara vocabulary map, and the boundary of what is offered.
 - [Work]({url('work/')}): live interactive demos and how the demo harness works.
 - [FAQ]({url('faq/')}): signing modes, JACE support, source code, pricing, Niagara 5.
 - [About]({url('about/')}): why the practice exists, capability table, what is not claimed.
@@ -6091,7 +6322,7 @@ def note_page(n):
         if s:
             links.append(f'''<div class="pl-card pl-card--link">{icon(s["icon"])}
         <h3><a href="{href(s["slug"])}">{e(s["nav"])}</a></h3>
-        <p>{e(s["desc"].split(".")[0])}.</p></div>''')
+        <p>{e(first_sentence(s["desc"]))}</p></div>''')
     more = "".join(note_card(o) for o in sibling_notes(n))
     written = date.fromisoformat(n["date"]).strftime("%B %Y")
     anchored, sections = section_index(n["body"])
@@ -6356,6 +6587,7 @@ def main():
     build_work()
     build_faq()
     build_about()
+    build_building_automation()
     build_contact()
     build_notes_index()
     for n in NOTES:
