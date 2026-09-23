@@ -11,7 +11,13 @@ Live: <https://plantroomlabs.com/> (domain registered 2026-09-21)
 ```sh
 python3 build.py          # rewrites every page, sitemap.xml, robots.txt, llms.txt
 python3 check.py          # verifies the output; non-zero exit gates the commit
+python3 indexnow.py       # after pushing: pings the engines with what changed
 ```
+
+`indexnow.py` runs last, once the change is live, and submits only the pages
+whose bytes actually changed — IndexNow answers 429 to what it reads as spam,
+and resubmitting the whole sitemap on every deploy is that. Google does not
+participate in IndexNow; it gets `sitemap.xml` and Search Console.
 
 `check.py` reads the generated HTML only — it never imports `build.py`, so it
 checks the output rather than agreeing with the generator. Every assertion in
