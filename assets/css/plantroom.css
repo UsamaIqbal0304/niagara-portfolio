@@ -132,7 +132,7 @@
   --pl-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono",
                   Menlo, Consolas, monospace;
 
-  --pl-fs-micro: 11px;
+  --pl-fs-micro: 12px;
   --pl-fs-xs:    12px;
   --pl-fs-sm:    13.5px;
   --pl-fs-md:    15px;
@@ -308,6 +308,51 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
 }
 .pl-nav__links a:hover { color:var(--pl-text-strong); background:var(--pl-surface-sunk); text-decoration:none; }
 .pl-nav__links a[aria-current="page"] { color:var(--pl-accent-deep); background:var(--pl-accent-tint); }
+
+/* ------------------------------------------------------ narrow-screen menu
+
+   The row above sheds links as the viewport narrows. Below 700px that leaves
+   the first item and the quote button, so this is where the rest of the site
+   lives on a phone. A <details>, so it opens and closes with no script and
+   keeps working if site.js never loads. */
+
+.pl-menu { display:none; position:relative; margin-left:var(--pl-s-4); }
+.pl-menu > summary {
+  display:inline-flex; align-items:center; gap:var(--pl-s-4);
+  min-height:44px; padding:0 var(--pl-s-5); border-radius:var(--pl-r-sm);
+  font-size:var(--pl-fs-xs); font-weight:var(--pl-fw-medium);
+  color:var(--pl-text-muted); cursor:pointer; list-style:none;
+  border:1px solid var(--pl-line-strong); background:var(--pl-surface);
+}
+.pl-menu > summary::-webkit-details-marker { display:none; }
+.pl-menu > summary:focus-visible { outline:2px solid var(--pl-accent); outline-offset:2px; }
+.pl-menu[open] > summary { color:var(--pl-text-strong); background:var(--pl-surface-sunk); }
+
+/* Three bars, drawn rather than shipped as an icon font or an extra request. */
+.pl-menu__bars, .pl-menu__bars::before, .pl-menu__bars::after {
+  display:block; width:15px; height:1.5px; border-radius:1px; background:currentColor;
+}
+.pl-menu__bars { position:relative; }
+.pl-menu__bars::before, .pl-menu__bars::after { content:''; position:absolute; left:0; }
+.pl-menu__bars::before { top:-5px; }
+.pl-menu__bars::after  { top:5px; }
+
+.pl-menu__panel {
+  position:absolute; top:calc(100% + 8px); right:0; z-index:50;
+  /* Wide enough to read, never wider than the screen: this hangs off the
+     right-hand end of a row that already sits inside the page gutter, so an
+     unbounded min-width is horizontal page scroll on a phone. */
+  min-width:210px; max-width:calc(100vw - 2 * var(--pl-gutter));
+  margin:0; padding:var(--pl-s-3); list-style:none;
+  background:var(--pl-canvas); border:1px solid var(--pl-line-strong);
+  border-radius:var(--pl-r-lg); box-shadow:var(--pl-e-3);
+}
+.pl-menu__panel a {
+  display:block; padding:var(--pl-s-5) var(--pl-s-6); border-radius:var(--pl-r-sm);
+  font-size:var(--pl-fs-md); font-weight:var(--pl-fw-medium); color:var(--pl-text);
+}
+.pl-menu__panel a:hover { background:var(--pl-surface-sunk); text-decoration:none; }
+.pl-menu__panel a[aria-current="page"] { color:var(--pl-accent-deep); background:var(--pl-accent-tint); }
 
 /* ----------------------------------------------------------------- brand */
 
@@ -586,6 +631,37 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
   .pl-nav__links { gap:0; }
   .pl-nav__links a { padding-inline:var(--pl-s-4); font-size:var(--pl-fs-xs); }
 }
+@media (max-width:700px) {
+  /* Below here the header has shed enough that the Menu button is the only
+     complete route through the site without scrolling to the footer. */
+  .pl-menu { display:block; }
+
+  /* Everything except the call to action now lives in the menu, and leaving a
+     stray link or two beside it only pushes the row wider than the screen. */
+  .pl-nav__links > li:not(:last-child) { display:none; }
+  .pl-nav__ink { display:none; }
+
+  /* Touch targets. WCAG 2.2 asks for 24px minimum and the platform guidelines
+     for 44px; the header controls were 31-33px tall, which is neither. */
+  .pl-nav__links a { min-height:40px; display:flex; align-items:center; }
+  .pl-footer__cols a { display:inline-block; padding-block:6px; }
+}
+/* Wordmark, call to action and Menu come to within a pixel or two of the
+   available width on a phone, and a header that does not fit is horizontal
+   scroll on every page. Buy the room back from the gaps first. */
+@media (max-width:430px) {
+  .pl-nav__inner { gap:var(--pl-s-5); }
+  .pl-menu { margin-left:0; }
+}
+/* An iPhone SE or a folded phone's cover screen: the gaps are not enough and
+   the wordmark has to go. Hidden rather than removed — the mark beside it is
+   aria-hidden, so deleting the text leaves the home link with no name. */
+@media (max-width:340px) {
+  .pl-brand__name {
+    position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden;
+    clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap;
+  }
+}
 @media (max-width:680px) {
   :root { --pl-gutter:18px; }
   .pl-section { padding-block:var(--pl-s-11); }
@@ -694,7 +770,10 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
 }
 
 @media (max-width:680px) {
-  .pl-demo__frame { height:min(var(--demo-h, 700px), 78vh); }
+  /* No viewport cap here on purpose. Capping makes the frame shorter than the
+     widget, which turns the demo into a scroll region inside a page that is
+     already scrolling — on touch, the worst of both. Let it stand at its full
+     height and let the page scroll past it. */
   .pl-demo__controls { width:100%; }
 }
 

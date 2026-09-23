@@ -182,9 +182,10 @@ NAV = [
     # (path, label, drop_below) — the nav bar is one non-wrapping row of fixed
     # width, so every item needs a viewport width under which it is dropped or
     # the whole page gains a horizontal scrollbar. drop_below=None means the
-    # item always stays. Nothing is lost by dropping: the footer carries the
-    # full navigation at every width, and "Get a quote" is never in this list
-    # because the call to action stays whatever else goes.
+    # item always stays. Nothing is lost by dropping: below 700px the Menu
+    # button carries this whole list, the footer carries it at every width, and
+    # "Get a quote" is never in this list because the call to action stays
+    # whatever else goes.
     ("services/",             "Services",  None),
     ("work/",                 "Work",      420),
     ("services/niagara-5-migration/", "Niagara 5", 520),
@@ -229,8 +230,35 @@ def nav_html(active, sections=None):
       {"".join(items)}
       <li><a class="pl-btn pl-btn--primary" href="{href('contact/')}" style="color:var(--pl-invert)">Get a quote</a></li>
     </ul>{ink}
+    {menu_html(active)}
   </div>
 </nav>'''
+
+
+def menu_html(active):
+    """The narrow-screen way in.
+
+    The header sheds links as the viewport narrows, which keeps one tidy row
+    but on a phone leaves nothing but the first item and the quote button —
+    every other page reachable only by scrolling to the footer. This is the
+    rest of the site, behind one button, and it is always the real page list
+    rather than the landing page's section anchors: someone on a phone who
+    opens a menu wants to go somewhere, not to jump down the page they are on.
+
+    A <details> element, so it opens, closes and takes focus with no script at
+    all; site.js only adds click-outside and Escape.
+    """
+    links = []
+    for path, label, _drop in NAV:
+        cur = ' aria-current="page"' if path == active else ""
+        links.append(f'<li><a href="{href(path)}"{cur}>{label}</a></li>')
+    return f'''<details class="pl-menu" data-menu>
+      <summary aria-label="Menu"><span class="pl-menu__bars" aria-hidden="true"></span>Menu</summary>
+      <ul class="pl-menu__panel">
+        {"".join(links)}
+        <li><a href="{href('contact/')}">Contact</a></li>
+      </ul>
+    </details>'''
 
 
 FOOTER = f'''<footer class="pl-footer">
@@ -962,8 +990,14 @@ def service_cards(band=False, level=3):
 # against the station simulator. Screenshots are kept underneath as a fallback
 # for print, for feed readers and for anyone with JavaScript disabled.
 
+# fit=True means "this composition is meant to be seen at once": the frame
+# grows to whatever the widget reports so no row ends up behind an internal
+# scrollbar. Leave it off for a widget whose content is a list — a table that
+# scrolls is doing its job, and a frame tall enough to hold all of it would be
+# taller than the screen.
+
 DEMOS = [
- dict(id="ahu", title="Plant dashboard \u2014 AHU-01", height=820,
+ dict(id="ahu", title="Plant dashboard \u2014 AHU-01", height=820, fit=True,
       module="iosUi", widget="IosDashboardWidget", config="dashboard.json",
       theme="dark", shot="01-desktop-expanded.png",
       # This widget has no theme property — it is a dark-only view — so the
@@ -975,7 +1009,7 @@ DEMOS = [
              "Twelve tiles, each bound to its own station ORD \u2014 and the values are moving "
              "because a simulated station is pushing them. Move the set point and the plant "
              "responds.")),
- dict(id="building", title="Building summary", height=760,
+ dict(id="building", title="Building summary", height=760, fit=False,
       module="rocketGx", widget="RocketGxDashboardWidget", config="dashboard.json",
       theme="light", shot="rgx-01-level1.png",
       controls=["theme", "ords"],
@@ -985,7 +1019,7 @@ DEMOS = [
              "chilled water and LTHW, plant monitoring, and an equipment table carrying fault "
              "and warning states. Toggle the theme \u2014 every component re-points from the "
              "token layer without one of them being touched.")),
- dict(id="nav", title="Navigation rail", height=600,
+ dict(id="nav", title="Navigation rail", height=600, fit=True,
       module="rocketGx", widget="RocketGxNavWidget", config="nav.json",
       theme="dark", shot="02-collapsed-rail-flyout.png",
       controls=["theme"],
@@ -1028,7 +1062,7 @@ def demo_block(d, level=3):
   </div>
   <div class="pl-demo__frame" style="--demo-h:{d["height"]}px">
     <iframe src="{href('demos/' + d['id'] + '/')}" title="{e(d['title'])} — interactive demo"
-            loading="lazy" sandbox="allow-scripts" data-demo-frame="{d["id"]}"></iframe>
+            loading="lazy" sandbox="allow-scripts" data-demo-frame="{d["id"]}"{' data-demo-fit' if d.get("fit") else ''}></iframe>
     <noscript>
       {shot(d['shot'], d['title'] + ' — screenshot of the interactive demo', lazy=False)}
     </noscript>

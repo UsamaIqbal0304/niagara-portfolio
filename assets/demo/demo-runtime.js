@@ -159,6 +159,49 @@
     sim.start();
     global.__sim = sim;
 
+    /* These widgets stretch to whatever height they are given — in a PX view
+       that is the pane, here it is the iframe — so there is no intrinsic
+       content height to read off. Too short and they do not clip visibly, they
+       start scrolling internally, which on a page the reader is already
+       scrolling means the bottom row of a dashboard is simply never seen.
+
+       So measure the shortfall instead: the largest amount by which any
+       descendant's content exceeds its own box is exactly how much taller the
+       frame needs to be. At a height that fits, that number is zero and the
+       report stops changing. */
+    function reportHeight() {
+      if (!host.clientHeight) { return; }
+      /* Only major containers count. A 7px badge holding a 16px glyph
+         overflows by design, and growing the frame 9px for it just makes it
+         overflow again on the next measurement, all the way to the cap. */
+      var nodes = host.querySelectorAll('*'),
+          floor = host.clientHeight * 0.25,
+          short = 0, i, n, over;
+      for (i = 0; i < nodes.length; i++) {
+        n = nodes[i];
+        if (n.clientHeight < floor) { continue; }
+        over = n.scrollHeight - n.clientHeight;
+        if (over > short) { short = over; }
+      }
+      if (short <= 8) { short = 0; }        // sub-pixel rounding, not a clip
+      try {
+        parent.postMessage({ demo: cfg.id, height: host.clientHeight + short }, '*');
+      } catch (e) {}
+    }
+
+    /* Widgets settle over a frame or two — fonts land, rings measure
+       themselves — and a reflow can change the height long after mount. */
+    var watching = false;
+    function watchHeight() {
+      reportHeight();
+      if (watching) { return; }          // mount() runs again on every prop change
+      watching = true;
+      if (global.ResizeObserver) {
+        new ResizeObserver(reportHeight).observe(host);
+      }
+      global.addEventListener('resize', reportHeight);
+    }
+
     function mount() {
       var widget = new WidgetCtor();
       Object.keys(props).forEach(function (k) {
@@ -170,6 +213,7 @@
           document.body.classList.add('is-live');
           // Tell the parent page the demo is up, so it can show its status chip.
           try { parent.postMessage({ demo: cfg.id, status: 'live' }, '*'); } catch (e) {}
+          watchHeight();
         })
         .catch(fail);
     }

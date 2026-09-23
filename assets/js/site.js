@@ -49,6 +49,25 @@
 
   window.addEventListener('message', function (ev) {
     if (!ev.data || !ev.data.demo) { return; }
+
+    // The frame reports the height its widget actually needs. Without this the
+    // CSS height is a guess, and a guess that is 70px short leaves the bottom
+    // row of a dashboard behind an internal scrollbar nobody uses.
+    //
+    // Only ever grow. The widget stretches to fill whatever it is given, so a
+    // height that shrinks feeds straight back into the next measurement and
+    // the frame oscillates; growing to the tallest request converges instead.
+    // Capped so a runaway widget cannot own the whole page.
+    if (typeof ev.data.height === 'number' && ev.data.height > 0) {
+      var frame = document.querySelector('[data-demo-frame="' + ev.data.demo + '"][data-demo-fit]'),
+          box = frame && frame.closest('.pl-demo__frame');
+      if (box) {
+        var want = Math.max(280, Math.min(1400, Math.ceil(ev.data.height))),
+            have = parseInt(box.style.getPropertyValue('--demo-h'), 10) || 0;
+        if (want > have) { box.style.setProperty('--demo-h', want + 'px'); }
+      }
+    }
+
     var chip = document.querySelector('[data-demo-status="' + ev.data.demo + '"]');
     if (!chip) { return; }
     if (ev.data.status === 'error') {
@@ -141,5 +160,27 @@
     }
 
     update();
+  }());
+
+  // ------------------------------------------------------- narrow-screen menu
+  // The <details> opens and closes on its own. All this adds is the two ways
+  // people expect to dismiss an open menu without choosing anything from it.
+  (function () {
+    var menu = document.querySelector('[data-menu]');
+    if (!menu) { return; }
+
+    function close() {
+      if (menu.open) { menu.open = false; }
+    }
+
+    document.addEventListener('click', function (ev) {
+      if (menu.open && !menu.contains(ev.target)) { close(); }
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Escape' || !menu.open) { return; }
+      close();
+      var summary = menu.querySelector('summary');
+      if (summary) { summary.focus(); }
+    });
   }());
 }());
