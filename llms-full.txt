@@ -602,3 +602,242 @@ Where records are archived to a relational database and queried back through the
 
 
 ---
+
+# Why a Modbus point reads the wrong register
+
+> Modbus decimal addressing is zero-based, vendor documentation is not, and the Address Format property decides which of the two you are typing.
+
+Source: https://plantroomlabs.com/notes/modbus-register-addressing/  
+Published: 2026-09-23 (23 September 2026) · Plantroom Labs  
+Topics: Modbus, Integration, Station engineering
+
+A Modbus point that is off by one, or reads half a number, is almost never a protocol problem. It is an addressing convention and a data type, and both are choices made at point creation.
+
+## Four groups, and the address that identifies them
+
+Everything a Modbus device exposes falls into one of four groups, and the leading digit of the address the vendor publishes is what tells them apart.
+
+| Group | Address convention | Access |
+|---|---|---|
+| Coils | 00000 – 0nnnn, or 0x | Single-bit digital outputs. Read and write. |
+| Inputs (status) | 10000 – 1nnnn, or 1x | Single-bit digital inputs. Read only. |
+| Input registers | 30000 – 3nnnn, or 3x | 16-bit values the device collects from the field. Read only. |
+| Holding registers | 40000 – 4nnnn, or 4x | 16-bit general-purpose values. Read and write. |
+
+A device is under no obligation to implement all four. A meter may have holding registers and nothing else.
+
+## The off-by-one
+
+Decimal and hex addressing on the wire is **zero-based**: the first item in a group is item 0. So holding register 108 is addressed as 107 decimal, or 006B hex. Vendor documentation, meanwhile, almost always lists a five-digit Modbus address starting at 40001 — which is **one-based**.
+
+Those two conventions differ by exactly one, which is why the symptom is a point that reads a plausible but wrong value rather than a fault. Coil Modbus 109 is decimal 108 and hex 6D. Read the neighbouring register of a meter and you get a number, just not the one on the label.
+
+> **Set Address Format to Modbus and the problem disappears.** You then type the vendor's address exactly as printed, with no arithmetic. On read-only client points it also saves setting `Reg Type` at all — the leading numeral does it, 3 for input registers and 4 for holding registers. For coils the driver ignores leading zeros, so 00109 and 109 are the same address.
+
+## The data type is a second, separate decision
+
+Modbus does not describe its own payloads. The protocol moves 16-bit registers; what those registers mean is entirely the vendor's choice, and the only place it is written down is their documentation. Get it wrong and the point still polls happily.
+
+| Data Type | Registers | Range |
+|---|---|---|
+| Integer | 1 | Unsigned 16-bit, 0 – 65,535. The default on a newly created point, and the usual reason a negative temperature reads as 65,000-something. |
+| Signed Integer | 1 | −32,768 – 32,767. Sometimes called a short. |
+| Float | 2 consecutive | 32-bit single precision, with two byte-order schemes to choose from (3-2-1-0 or 1-0-3-2). |
+| Long | 2 consecutive | Signed 32-bit. Same byte-order choice as float. |
+| Double | 4 consecutive | 64-bit double precision. Available from Niagara 4.15. |
+| Long 64-bit | 4 consecutive | Signed 64-bit, with eight byte-order options. Also from 4.15. |
+
+Two things follow from the multi-register types. The first is that byte order is configured at the device, or globally at the network — so one wrong setting scrambles every float on that device at once, which at least makes it obvious. The second is that a float consumes the register you addressed *and the next one*, so point counts and address planning have to allow for it.
+
+Writes round before they go out. Integer and Signed Integer round to the nearest whole number and clamp to their range; Long and Long 64-bit round; Float and Double do not round at all. A write of 20.6 to an integer holding register arrives as 21, and nothing reports that it was changed.
+
+## Bit-packed registers
+
+Vendors routinely pack several unrelated values into one 16-bit register. The driver handles this with bit-level proxy extensions — `NumericBits` and `EnumBits` variants — where several points share the same Data Address and differ only in **Beginning Bit** and **Number Bits**.
+
+A meter's tariff configuration is the classic case: one holding register where bits 8–15 hold the tariff number, bits 2–7 the start hour and bits 0–1 the start quarter-hour. Three points, one address, three bit windows. Reading that register as a plain integer produces a large meaningless number, which is what usually gets reported as "the meter is sending rubbish".
+
+## There is no discovery
+
+Unlike most drivers, the Modbus point manager has no learn mode: no Discover button, no Discovered and Database panes. The protocol carries no self-description, so there is nothing to discover. Every point is created by hand from the vendor's register map.
+
+What the New Points window does give you is **Number To Add**, which creates consecutively addressed points from a starting address in one go. Since devices normally address related data consecutively, that covers most of a register map in a handful of operations.
+
+> **A gap in the map is a fault, not a null.** Requesting a range that includes an unimplemented address makes the device return an illegal-data-address exception for the whole request. If holding registers stop at 40015, a read of 40003–40015 is fine and a read of 40003–40017 fails entirely — so one over-reaching point can take out a block of good ones.
+
+## When a point goes to fault
+
+Open the point and read `ProxyExt > Fault Cause`. It normally contains the Modbus exception verbatim, such as *Read fault: illegal data address*. That string distinguishes the three failures people conflate: the address does not exist, the device is not answering at all, and the address exists but the data type is wrong — only the first two produce a fault.
+
+## Serving data as a slave
+
+Running the station as a Modbus server is the mirror image, and adds one rule worth knowing before you start: **every server point must fall inside a declared register range or it sits in fault**.
+
+The four range tables — coils, status, holding registers, input registers — each arrive from the palette enabled, with a starting address offset of 1 and a size of 64. A holding-register range with starting address 250 and size 75 covers Modbus 40250 to 40325. You can add further ranges, or disable one entirely so that a master querying it gets an exception response, which is occasionally the honest answer.
+
+> **Do not overlap ranges.** Any given address should appear in exactly one range entry. Overlapping entries are accepted at configuration time and misbehave later.
+
+## The order that avoids all of this
+
+1. **Get the vendor's register map first**, with data types and byte order. Without it you are guessing, and Modbus rewards guessing with plausible numbers.
+2. **Set Address Format to Modbus** before creating a single point, so the documented addresses go in unmodified.
+3. **Create one point of each data type and prove it** against a known value on the device display before bulk-adding the rest.
+4. **Set byte order at the device once**, and check a float reads sensibly, rather than discovering it on commissioning day.
+5. **Group consecutive points deliberately**, so device polls can fetch them in single messages instead of one request per point.
+
+
+---
+
+# Why an alarm never reached anybody
+
+> Detection, class and recipient are three separate objects in a Niagara station. An alarm goes missing wherever the chain between them is not linked.
+
+Source: https://plantroomlabs.com/notes/niagara-alarm-routing/  
+Published: 2026-09-23 (23 September 2026) · Plantroom Labs  
+Topics: Alarms, Station engineering, Commissioning
+
+An alarm that nobody received is rarely an alarm that was never raised. It was raised, stored, and routed nowhere &mdash; because routing is a link somebody has to draw.
+
+## Three objects, not one
+
+Niagara splits alarming into three things that are configured independently, and the split is the reason alarms go quiet.
+
+- An **alarm extension** on a point decides *when* a condition is an alarm.
+- An **alarm class** groups alarms that share handling — acknowledgement, priority, escalation — and is the thing that routes.
+- An **alarm recipient** delivers: to a console, to another station, to email, to an on-call rota.
+Break the chain at any point and the station carries on perfectly. The extension still fires, the alarm still lands in the database, the counts on the alarm class still increment. It simply never becomes anybody's problem.
+
+## Choosing the extension that matches the failure
+
+There are more extension types than most stations use, and the common reflex — an out-of-range extension on everything — misses whole categories of fault.
+
+| Extension | What it catches |
+|---|---|
+| Out Of Range | Numeric high and low limits with a deadband. The default choice, and the right one for a measured value with absolute limits. |
+| Float Limit | Limits expressed *relative to a setpoint* rather than as absolutes. This is the one people want when they say "alarm if it cannot hold setpoint" and reach for Out Of Range instead. |
+| Status | Fires on any combination of status flags — fault, down, stale, overridden, null. Applies to any point type. This is how you find out a sensor died rather than reading zero degrees forever. |
+| Command Failure | Boolean or enum. Compares the commanded value against a linked `feedbackValue` and alarms if they disagree for longer than the time delay. The only honest way to know a damper actually moved. |
+| Change Of State / Value | Boolean, enum, numeric and string variants, for conditions defined by a set of values rather than a range. The boolean and enum versions implement the BACnet change-of-state algorithm. |
+| Elapsed Active Time Change Of State Count | In the `kitControl` palette. Alarm on accumulated runtime or on accumulated starts — maintenance alarms rather than fault alarms. Both reference a totaliser extension under the same point. |
+
+> **Every extension carries two algorithms.** An offnormal algorithm and a fault algorithm sit inside each one. The fault algorithm's default implementation raises nothing, so a point can be in fault without generating a fault alarm unless you configure it or add a status extension.
+
+## What the alarm class actually controls
+
+The class is where acknowledgement, priority and escalation live. Priority runs 1 to 255 with a default of **255**, which is the lowest — so a station where nobody set priorities has every alarm at the bottom of the queue, and the colour coding operators rely on is meaningless.
+
+The class also carries read-only counters worth looking at during commissioning: total alarm count, open alarm count, in-alarm count, unacknowledged count, and the time of the last alarm. If those numbers are climbing and nobody is receiving anything, the detection half is working and the routing half is not. That single observation cuts the diagnosis in half.
+
+## Escalation, and why it needs somewhere to go
+
+Three escalation levels re-route an alarm that stays unacknowledged. Each has an enable flag, on by default, and a delay measured in hours and minutes with a one-minute minimum. An alarm that survives all three has been offered to as many as four recipients including the original; acknowledgement at any level stops the chain.
+
+Enabled by default, with no recipient linked at any level, means escalation is switched on and pointed at nothing. It costs nothing and does nothing, which is the worst combination because it looks configured.
+
+## Recipients, and one that does not exist on a controller
+
+Recipients are linked from the alarm class's alarm topic to the recipient's Alarm action. Each can be restricted by time of day, by day of week, and to specific transitions — so a recipient that is silent at 3am may be working exactly as configured.
+
+- **Console** moves alarms between the alarm history and the alarm console, and updates the history when they are acknowledged.
+- **Station** forwards to a remote station, which is how a controller gets alarms to a Supervisor.
+- **Email**, **SMS** and **on-call** deliver to people rather than to software.
+- **Printer** and **line printer** require a station running on Windows. On a QNX controller they are not an option, which is worth knowing before it appears in a specification.
+
+> **Tridium's own advice is to use more than one class.** One alarm class routing to a console recipient and a station recipient; a separate class routing to email. Trying to make a single class serve both leaves you filtering at the recipient for something the class should have separated.
+
+## Station to station: the link everybody forgets
+
+Getting alarms from a controller to a Supervisor needs configuration at both ends. In the sending station, an alarm class and a station recipient in the `AlarmService`, linked together. The two stations do not have to use the same class names, though matching them is one legitimate approach; the receiving side can also collapse everything onto one local class, or use a prepend or append naming scheme to map classes by name.
+
+> **In the receiving station, link the alarm class to the alarm console.** Remote alarms arrive, are stored, and do not appear in any console unless the associated alarm class is linked to the console component. This is the single most common reason a Supervisor shows nothing while the controllers are alarming correctly — and because the data is present in the database, it looks like a display bug rather than a missing link.
+
+## Reassigning classes without opening every point
+
+Alarm extensions are scattered across hundreds of points, so changing a class point by point is not viable on a real station. The `AlarmService` has an **Alarm Ext Manager** view that lists every alarm extension in the station; select any number of them, right-click, and set the alarm class in one operation.
+
+For alarms arriving from subsystems with their own class names, alarm class mapping lets you associate imported classes with local definitions so they display, sort and sound consistently instead of forming a separate vocabulary in the console.
+
+## A commissioning check that takes ten minutes
+
+1. **Force one alarm of each class** and confirm it arrives at every recipient that class is meant to reach. Not one alarm — one per class.
+2. **Check the class counters afterwards.** Rising counts with no delivery is a routing fault; flat counts is a detection fault.
+3. **Leave one unacknowledged past the first escalation delay** and confirm level 1 goes somewhere.
+4. **Confirm the Supervisor console shows it**, not just the Supervisor database.
+5. **Check who can clear the alarm database.** The maintenance view can delete records outright; operators should have the read-only alarm database view instead.
+6. **Write alarm instructions on the points that matter**, so the operator receiving the alarm at 3am is told what to do about it.
+
+
+---
+
+# Niagara schedules: special events and master copies
+
+> Special event priority is list order, a partly-filled special event falls back to the weekly schedule, and an imported schedule cannot be edited locally.
+
+Source: https://plantroomlabs.com/notes/niagara-schedules-and-special-events/  
+Published: 2026-09-23 (23 September 2026) · Plantroom Labs  
+Topics: Scheduling, Station engineering, Commissioning
+
+Two things about Niagara scheduling surprise people on site: priority is the order of a list, and a holiday that only half covers a day quietly hands the rest back to the weekly schedule.
+
+## Set the facets before the events
+
+Weekly schedules come in boolean, numeric, enum and string flavours. For an enum schedule there is an ordering constraint that is easy to hit: define the range in the schedule's facets *first*, on its property sheet, before adding any events. Add events against an undefined range and you get to do them again.
+
+## Special events belong to one schedule
+
+Special events are exceptions to the normal week — holidays, one-off closures, a plant shutdown. They apply to weekly schedules only, and **each weekly schedule has its own**, configured on the Special Events tab of its scheduler view. The tab sits bottom-left in Workbench and top-left in a browser, which is enough of a difference to lose a few minutes the first time.
+
+The consequence of "its own" is the part that matters on a real site: adding a bank holiday to one schedule does nothing to the other forty. That is why a building runs normally on Christmas Day in the three zones somebody missed.
+
+## Priority is the order of the list
+
+Every special event outranks every regular weekly event. Among special events themselves, priority is simply position in the table: top of the list wins, bottom of the list only applies where nothing above it is active during the same period. Arrow buttons move an event up or down, and that is the whole priority mechanism.
+
+There is no numeric priority field to inspect, so a schedule that behaves oddly on one day of the year is diagnosed by reading the list in order, not by hunting for a setting.
+
+> **An empty period is a handback, not an override.** Where a special event has no event defined, it relinquishes control to the next lower-priority special event and finally to the weekly schedule. To take a day out completely you must configure the special event for the *entire* day. A holiday defined as 08:00–18:00 off leaves the weekly schedule running either side of it.
+
+## One calendar, many schedules
+
+A special event can be a reference type, pointing at a calendar schedule that owns the days of occurrence. Edit that one calendar and every weekly schedule referencing it changes together.
+
+This is the answer to the bank-holiday problem above, and it is worth setting up on day one rather than after the first missed holiday: one calendar schedule per class of non-working day, referenced by every weekly schedule, so the annual update is one edit rather than forty.
+
+## Week 1 is not the first calendar week
+
+When defining a recurring special event by week and day, two similar-looking options mean different things.
+
+| Option | How the month is divided |
+|---|---|
+| Week 1 – Week 5 | Seven-day blocks counted from the 1st of the month, regardless of weekday. In a month starting on a Thursday, Week 1 is the 1st to the 7th. Week 5 can be shorter than seven days. |
+| Calendar Week 1 – 6 | Conventional weeks ending on Saturday. If the month starts mid-week, Calendar Week 1 is only the remaining days of that week — possibly one or two. |
+
+"First Monday of the month" is a calendar-week idea. Pick the wrong one and the event lands a week out in roughly half the months of the year, which is exactly the kind of fault that gets reported months later as intermittent.
+
+## Master and slave schedules
+
+Scheduling uses the driver architecture to share configuration. You import a schedule component from another station — normally the Supervisor — and the import creates a local copy you can link into control logic but **cannot edit**. Events change in the master and propagate.
+
+On the sending side, importing creates a schedule export descriptor under the component representing the receiving station, which is where synchronisation is managed and where you look when a site is not picking up a change.
+
+> **The read-only copy is the feature.** Somebody will eventually ask why they cannot edit the schedule on the controller. The answer is that it is a slave copy, and the alternative — forty independently editable copies of the same occupancy times — is the situation master/slave exists to prevent.
+
+## Crossing into BACnet
+
+The same architecture reaches BACnet devices, in both directions.
+
+- **Import** BACnet Schedule and Calendar objects from a device and model them as schedule components in the station.
+- **Export** a station schedule to existing Schedule or Calendar objects in a BACnet device, with the station acting as master.
+- **Expose** station schedules as BACnet Schedule or Calendar objects for any device on the network, through the export table under the BACnet network's local device.
+Third-party plant with its own scheduling therefore does not have to be scheduled twice. Deciding which side owns the times, once, is most of the integration work.
+
+## What to settle before the schedules are built
+
+1. **Who owns occupancy times** — the Supervisor, each controller, or a BACnet device. One answer, written down.
+2. **Calendar schedules for holidays**, referenced by every weekly schedule, before the first holiday rather than after it.
+3. **Full-day special events** wherever the intent is a full-day override, so nothing falls back to the weekly schedule.
+4. **Permissions on special events**, which can differ from the rest of the schedule — useful when site staff may add a closure but not rewrite the week.
+5. **One year rolled forward on paper.** Read the special events list top to bottom and check the priority order produces what the client described.
+
+
+---

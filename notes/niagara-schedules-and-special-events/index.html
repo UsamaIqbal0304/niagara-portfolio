@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Niagara Schedules: Special Events and Master Copies</title>
+<meta name="description" content="Special event priority is list order, a partly-filled special event falls back to the weekly schedule, and an imported schedule cannot be edited locally.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-schedules-and-special-events/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Niagara Schedules: Special Events and Master Copies">
+<meta property="og:description" content="Special event priority is list order, a partly-filled special event falls back to the weekly schedule, and an imported schedule cannot be edited locally.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-schedules-and-special-events/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Niagara Schedules: Special Events and Master Copies">
+<meta name="twitter:description" content="Special event priority is list order, a partly-filled special event falls back to the weekly schedule, and an imported schedule cannot be edited locally.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/niagara-schedules-and-special-events.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/niagara-schedules-and-special-events/#article",
+   "headline": "Niagara schedules: special events and master copies",
+   "description": "Special event priority is list order, a partly-filled special event falls back to the weekly schedule, and an imported schedule cannot be edited locally.",
+   "url": "https://plantroomlabs.com/notes/niagara-schedules-and-special-events/",
+   "inLanguage": "en-GB",
+   "keywords": "Scheduling, Station engineering, Commissioning",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-schedules-and-special-events/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Schedules"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Schedules</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>Niagara schedules: special events and master copies</h1>
+    <p class="pl-lede">Two things about Niagara scheduling surprise people on site: <strong>priority is the order of a list</strong>, and a holiday that only half covers a day quietly hands the rest back to the weekly schedule.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Scheduling</li><li class="pl-chip pl-chip--on-dark">Station engineering</li><li class="pl-chip pl-chip--on-dark">Commissioning</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+<h2>Set the facets before the events</h2>
+<div class="pl-body">
+  <p>Weekly schedules come in boolean, numeric, enum and string flavours. For an enum
+     schedule there is an ordering constraint that is easy to hit: define the range in
+     the schedule's facets <em>first</em>, on its property sheet, before adding any
+     events. Add events against an undefined range and you get to do them again.</p>
+</div>
+
+<h2>Special events belong to one schedule</h2>
+<div class="pl-body">
+  <p>Special events are exceptions to the normal week &mdash; holidays, one-off closures,
+     a plant shutdown. They apply to weekly schedules only, and <strong>each weekly
+     schedule has its own</strong>, configured on the Special Events tab of its scheduler
+     view. The tab sits bottom-left in Workbench and top-left in a browser, which is
+     enough of a difference to lose a few minutes the first time.</p>
+  <p>The consequence of "its own" is the part that matters on a real site: adding a bank
+     holiday to one schedule does nothing to the other forty. That is why a building runs
+     normally on Christmas Day in the three zones somebody missed.</p>
+</div>
+
+<h2>Priority is the order of the list</h2>
+<div class="pl-body">
+  <p>Every special event outranks every regular weekly event. Among special events
+     themselves, priority is simply position in the table: top of the list wins, bottom
+     of the list only applies where nothing above it is active during the same period.
+     Arrow buttons move an event up or down, and that is the whole priority
+     mechanism.</p>
+  <p>There is no numeric priority field to inspect, so a schedule that behaves oddly on
+     one day of the year is diagnosed by reading the list in order, not by hunting for a
+     setting.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>An empty period is a handback, not an override.</strong> Where a special
+     event has no event defined, it relinquishes control to the next lower-priority
+     special event and finally to the weekly schedule. To take a day out completely you
+     must configure the special event for the <em>entire</em> day. A holiday defined as
+     08:00&ndash;18:00 off leaves the weekly schedule running either side of it.</p>
+</div>
+
+<h2>One calendar, many schedules</h2>
+<div class="pl-body">
+  <p>A special event can be a reference type, pointing at a calendar schedule that owns
+     the days of occurrence. Edit that one calendar and every weekly schedule referencing
+     it changes together.</p>
+  <p>This is the answer to the bank-holiday problem above, and it is worth setting up on
+     day one rather than after the first missed holiday: one calendar schedule per class
+     of non-working day, referenced by every weekly schedule, so the annual update is one
+     edit rather than forty.</p>
+</div>
+
+<h2>Week 1 is not the first calendar week</h2>
+<div class="pl-body">
+  <p>When defining a recurring special event by week and day, two similar-looking options
+     mean different things.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Option</th><th scope="col">How the month is divided</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Week 1&nbsp;&ndash;&nbsp;Week 5</th>
+        <td>Seven-day blocks counted from the 1st of the month, regardless of weekday. In
+            a month starting on a Thursday, Week 1 is the 1st to the 7th. Week 5 can be
+            shorter than seven days.</td></tr>
+    <tr><th scope="row">Calendar Week 1&nbsp;&ndash;&nbsp;6</th>
+        <td>Conventional weeks ending on Saturday. If the month starts mid-week, Calendar
+            Week 1 is only the remaining days of that week &mdash; possibly one or
+            two.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>"First Monday of the month" is a calendar-week idea. Pick the wrong one and the
+     event lands a week out in roughly half the months of the year, which is exactly the
+     kind of fault that gets reported months later as intermittent.</p>
+</div>
+
+<h2>Master and slave schedules</h2>
+<div class="pl-body">
+  <p>Scheduling uses the driver architecture to share configuration. You import a schedule
+     component from another station &mdash; normally the Supervisor &mdash; and the
+     import creates a local copy you can link into control logic but
+     <strong>cannot edit</strong>. Events change in the master and propagate.</p>
+  <p>On the sending side, importing creates a schedule export descriptor under the
+     component representing the receiving station, which is where synchronisation is
+     managed and where you look when a site is not picking up a change.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>The read-only copy is the feature.</strong> Somebody will eventually ask why
+     they cannot edit the schedule on the controller. The answer is that it is a slave
+     copy, and the alternative &mdash; forty independently editable copies of the same
+     occupancy times &mdash; is the situation master/slave exists to prevent.</p>
+</div>
+
+<h2>Crossing into BACnet</h2>
+<div class="pl-body">
+  <p>The same architecture reaches BACnet devices, in both directions.</p>
+  <ul>
+    <li><strong>Import</strong> BACnet Schedule and Calendar objects from a device and
+       model them as schedule components in the station.</li>
+    <li><strong>Export</strong> a station schedule to existing Schedule or Calendar
+       objects in a BACnet device, with the station acting as master.</li>
+    <li><strong>Expose</strong> station schedules as BACnet Schedule or Calendar objects
+       for any device on the network, through the export table under the BACnet
+       network's local device.</li>
+  </ul>
+  <p>Third-party plant with its own scheduling therefore does not have to be scheduled
+     twice. Deciding which side owns the times, once, is most of the integration
+     work.</p>
+</div>
+
+<h2>What to settle before the schedules are built</h2>
+<ol class="pl-steps">
+  <li><div><strong>Who owns occupancy times</strong> &mdash; the Supervisor, each
+      controller, or a BACnet device. One answer, written down.</div></li>
+  <li><div><strong>Calendar schedules for holidays</strong>, referenced by every weekly
+      schedule, before the first holiday rather than after it.</div></li>
+  <li><div><strong>Full-day special events</strong> wherever the intent is a full-day
+      override, so nothing falls back to the weekly schedule.</div></li>
+  <li><div><strong>Permissions on special events</strong>, which can differ from the rest
+      of the schedule &mdash; useful when site staff may add a closure but not rewrite
+      the week.</div></li>
+  <li><div><strong>One year rolled forward on paper.</strong> Read the special events
+      list top to bottom and check the priority order produces what the client
+      described.</div></li>
+</ol>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg></span>
+        <h3><a href="/services/bajaux-widgets/">bajaux widgets</a></h3>
+        <p>Custom Niagara web widgets built with bajaux and BajaScript: HTML5 dashboards, navigation, equipment views and charts, bound to live station ORDs and BQL.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
+      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
+      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
+      <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

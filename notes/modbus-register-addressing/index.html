@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why a Modbus Point Reads the Wrong Register</title>
+<meta name="description" content="Modbus decimal addressing is zero-based, vendor documentation is not, and the Address Format property decides which of the two you are typing.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/modbus-register-addressing/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Why a Modbus Point Reads the Wrong Register">
+<meta property="og:description" content="Modbus decimal addressing is zero-based, vendor documentation is not, and the Address Format property decides which of the two you are typing.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/modbus-register-addressing/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why a Modbus Point Reads the Wrong Register">
+<meta name="twitter:description" content="Modbus decimal addressing is zero-based, vendor documentation is not, and the Address Format property decides which of the two you are typing.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/modbus-register-addressing.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/modbus-register-addressing/#article",
+   "headline": "Why a Modbus point reads the wrong register",
+   "description": "Modbus decimal addressing is zero-based, vendor documentation is not, and the Address Format property decides which of the two you are typing.",
+   "url": "https://plantroomlabs.com/notes/modbus-register-addressing/",
+   "inLanguage": "en-GB",
+   "keywords": "Modbus, Integration, Station engineering",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/modbus-register-addressing/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Modbus addressing"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Modbus addressing</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>Why a Modbus point reads the wrong register</h1>
+    <p class="pl-lede">A Modbus point that is off by one, or reads half a number, is almost never a protocol problem. It is <strong>an addressing convention</strong> and <strong>a data type</strong>, and both are choices made at point creation.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Modbus</li><li class="pl-chip pl-chip--on-dark">Integration</li><li class="pl-chip pl-chip--on-dark">Station engineering</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+<h2>Four groups, and the address that identifies them</h2>
+<div class="pl-body">
+  <p>Everything a Modbus device exposes falls into one of four groups, and the leading
+     digit of the address the vendor publishes is what tells them apart.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Group</th><th scope="col">Address convention</th><th scope="col">Access</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Coils</th><td>00000&nbsp;&ndash;&nbsp;0nnnn, or 0x</td>
+        <td>Single-bit digital outputs. Read and write.</td></tr>
+    <tr><th scope="row">Inputs (status)</th><td>10000&nbsp;&ndash;&nbsp;1nnnn, or 1x</td>
+        <td>Single-bit digital inputs. Read only.</td></tr>
+    <tr><th scope="row">Input registers</th><td>30000&nbsp;&ndash;&nbsp;3nnnn, or 3x</td>
+        <td>16-bit values the device collects from the field. Read only.</td></tr>
+    <tr><th scope="row">Holding registers</th><td>40000&nbsp;&ndash;&nbsp;4nnnn, or 4x</td>
+        <td>16-bit general-purpose values. Read and write.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>A device is under no obligation to implement all four. A meter may have holding
+     registers and nothing else.</p>
+</div>
+
+<h2>The off-by-one</h2>
+<div class="pl-body">
+  <p>Decimal and hex addressing on the wire is <strong>zero-based</strong>: the first
+     item in a group is item 0. So holding register 108 is addressed as 107 decimal, or
+     006B hex. Vendor documentation, meanwhile, almost always lists a five-digit Modbus
+     address starting at 40001 &mdash; which is <strong>one-based</strong>.</p>
+  <p>Those two conventions differ by exactly one, which is why the symptom is a point
+     that reads a plausible but wrong value rather than a fault. Coil Modbus 109 is
+     decimal 108 and hex 6D. Read the neighbouring register of a meter and you get a
+     number, just not the one on the label.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Set Address Format to Modbus and the problem disappears.</strong> You then
+     type the vendor's address exactly as printed, with no arithmetic. On read-only
+     client points it also saves setting <code>Reg Type</code> at all &mdash; the
+     leading numeral does it, 3 for input registers and 4 for holding registers. For
+     coils the driver ignores leading zeros, so 00109 and 109 are the same address.</p>
+</div>
+
+<h2>The data type is a second, separate decision</h2>
+<div class="pl-body">
+  <p>Modbus does not describe its own payloads. The protocol moves 16-bit registers; what
+     those registers mean is entirely the vendor's choice, and the only place it is
+     written down is their documentation. Get it wrong and the point still polls
+     happily.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Data Type</th><th scope="col">Registers</th><th scope="col">Range</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Integer</th><td>1</td>
+        <td>Unsigned 16-bit, 0&nbsp;&ndash;&nbsp;65,535. The default on a newly created point,
+            and the usual reason a negative temperature reads as 65,000-something.</td></tr>
+    <tr><th scope="row">Signed Integer</th><td>1</td>
+        <td>&minus;32,768&nbsp;&ndash;&nbsp;32,767. Sometimes called a short.</td></tr>
+    <tr><th scope="row">Float</th><td>2 consecutive</td>
+        <td>32-bit single precision, with two byte-order schemes to choose from
+            (3-2-1-0 or 1-0-3-2).</td></tr>
+    <tr><th scope="row">Long</th><td>2 consecutive</td>
+        <td>Signed 32-bit. Same byte-order choice as float.</td></tr>
+    <tr><th scope="row">Double</th><td>4 consecutive</td>
+        <td>64-bit double precision. Available from Niagara 4.15.</td></tr>
+    <tr><th scope="row">Long 64-bit</th><td>4 consecutive</td>
+        <td>Signed 64-bit, with eight byte-order options. Also from 4.15.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>Two things follow from the multi-register types. The first is that byte order is
+     configured at the device, or globally at the network &mdash; so one wrong setting
+     scrambles every float on that device at once, which at least makes it obvious. The
+     second is that a float consumes the register you addressed <em>and the next one</em>,
+     so point counts and address planning have to allow for it.</p>
+  <p>Writes round before they go out. Integer and Signed Integer round to the nearest
+     whole number and clamp to their range; Long and Long 64-bit round; Float and Double
+     do not round at all. A write of 20.6 to an integer holding register arrives as 21,
+     and nothing reports that it was changed.</p>
+</div>
+
+<h2>Bit-packed registers</h2>
+<div class="pl-body">
+  <p>Vendors routinely pack several unrelated values into one 16-bit register. The driver
+     handles this with bit-level proxy extensions &mdash; <code>NumericBits</code> and
+     <code>EnumBits</code> variants &mdash; where several points share the same Data
+     Address and differ only in <strong>Beginning Bit</strong> and <strong>Number
+     Bits</strong>.</p>
+  <p>A meter's tariff configuration is the classic case: one holding register where bits
+     8&ndash;15 hold the tariff number, bits 2&ndash;7 the start hour and bits 0&ndash;1
+     the start quarter-hour. Three points, one address, three bit windows. Reading that
+     register as a plain integer produces a large meaningless number, which is what
+     usually gets reported as "the meter is sending rubbish".</p>
+</div>
+
+<h2>There is no discovery</h2>
+<div class="pl-body">
+  <p>Unlike most drivers, the Modbus point manager has no learn mode: no Discover button,
+     no Discovered and Database panes. The protocol carries no self-description, so there
+     is nothing to discover. Every point is created by hand from the vendor's register
+     map.</p>
+  <p>What the New Points window does give you is <strong>Number To Add</strong>, which
+     creates consecutively addressed points from a starting address in one go. Since
+     devices normally address related data consecutively, that covers most of a register
+     map in a handful of operations.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>A gap in the map is a fault, not a null.</strong> Requesting a range that
+     includes an unimplemented address makes the device return an illegal-data-address
+     exception for the whole request. If holding registers stop at 40015, a read of
+     40003&ndash;40015 is fine and a read of 40003&ndash;40017 fails entirely &mdash; so
+     one over-reaching point can take out a block of good ones.</p>
+</div>
+
+<h2>When a point goes to fault</h2>
+<div class="pl-body">
+  <p>Open the point and read <code>ProxyExt &gt; Fault Cause</code>. It normally contains
+     the Modbus exception verbatim, such as <em>Read fault: illegal data address</em>.
+     That string distinguishes the three failures people conflate: the address does not
+     exist, the device is not answering at all, and the address exists but the data type
+     is wrong &mdash; only the first two produce a fault.</p>
+</div>
+
+<h2>Serving data as a slave</h2>
+<div class="pl-body">
+  <p>Running the station as a Modbus server is the mirror image, and adds one rule worth
+     knowing before you start: <strong>every server point must fall inside a declared
+     register range or it sits in fault</strong>.</p>
+  <p>The four range tables &mdash; coils, status, holding registers, input registers
+     &mdash; each arrive from the palette enabled, with a starting address offset of 1
+     and a size of 64. A holding-register range with starting address 250 and size 75
+     covers Modbus 40250 to 40325. You can add further ranges, or disable one entirely so
+     that a master querying it gets an exception response, which is occasionally the
+     honest answer.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Do not overlap ranges.</strong> Any given address should appear in exactly
+     one range entry. Overlapping entries are accepted at configuration time and
+     misbehave later.</p>
+</div>
+
+<h2>The order that avoids all of this</h2>
+<ol class="pl-steps">
+  <li><div><strong>Get the vendor's register map first</strong>, with data types and byte
+      order. Without it you are guessing, and Modbus rewards guessing with plausible
+      numbers.</div></li>
+  <li><div><strong>Set Address Format to Modbus</strong> before creating a single point,
+      so the documented addresses go in unmodified.</div></li>
+  <li><div><strong>Create one point of each data type and prove it</strong> against a
+      known value on the device display before bulk-adding the rest.</div></li>
+  <li><div><strong>Set byte order at the device once</strong>, and check a float reads
+      sensibly, rather than discovering it on commissioning day.</div></li>
+  <li><div><strong>Group consecutive points deliberately</strong>, so device polls can
+      fetch them in single messages instead of one request per point.</div></li>
+</ol>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 3.5a5 5 0 0 0-6.8 6.3L3 14.5V21h6.5l4.7-4.7a5 5 0 0 0 6.3-6.8L17 12.5 11.5 7z"/></svg></span>
+        <h3><a href="/services/workbench-tooling/">Workbench tooling</a></h3>
+        <p>Custom Workbench views and tools for repetitive Niagara work: bulk renaming and retagging, station audits, provisioning helpers and module inventories.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
+      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
+      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
+      <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

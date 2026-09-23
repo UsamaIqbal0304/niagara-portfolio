@@ -3141,6 +3141,503 @@ NOTES += [
 """,
   related=["services/station-engineering/", "services/workbench-tooling/"],
  ),
+
+ dict(
+  slug="notes/modbus-register-addressing/",
+  date="2026-09-23",
+  nav="Modbus addressing",
+  title="Why a Modbus Point Reads the Wrong Register",
+  desc=("Modbus decimal addressing is zero-based, vendor documentation is not, and the "
+        "Address Format property decides which of the two you are typing."),
+  h1="Why a Modbus point reads the wrong register",
+  lede=("A Modbus point that is off by one, or reads half a number, is almost never a "
+        "protocol problem. It is <strong>an addressing convention</strong> and "
+        "<strong>a data type</strong>, and both are choices made at point creation."),
+  tags=["Modbus", "Integration", "Station engineering"],
+  body="""
+<h2>Four groups, and the address that identifies them</h2>
+<div class="pl-body">
+  <p>Everything a Modbus device exposes falls into one of four groups, and the leading
+     digit of the address the vendor publishes is what tells them apart.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Group</th><th scope="col">Address convention</th><th scope="col">Access</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Coils</th><td>00000&nbsp;&ndash;&nbsp;0nnnn, or 0x</td>
+        <td>Single-bit digital outputs. Read and write.</td></tr>
+    <tr><th scope="row">Inputs (status)</th><td>10000&nbsp;&ndash;&nbsp;1nnnn, or 1x</td>
+        <td>Single-bit digital inputs. Read only.</td></tr>
+    <tr><th scope="row">Input registers</th><td>30000&nbsp;&ndash;&nbsp;3nnnn, or 3x</td>
+        <td>16-bit values the device collects from the field. Read only.</td></tr>
+    <tr><th scope="row">Holding registers</th><td>40000&nbsp;&ndash;&nbsp;4nnnn, or 4x</td>
+        <td>16-bit general-purpose values. Read and write.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>A device is under no obligation to implement all four. A meter may have holding
+     registers and nothing else.</p>
+</div>
+
+<h2>The off-by-one</h2>
+<div class="pl-body">
+  <p>Decimal and hex addressing on the wire is <strong>zero-based</strong>: the first
+     item in a group is item 0. So holding register 108 is addressed as 107 decimal, or
+     006B hex. Vendor documentation, meanwhile, almost always lists a five-digit Modbus
+     address starting at 40001 &mdash; which is <strong>one-based</strong>.</p>
+  <p>Those two conventions differ by exactly one, which is why the symptom is a point
+     that reads a plausible but wrong value rather than a fault. Coil Modbus 109 is
+     decimal 108 and hex 6D. Read the neighbouring register of a meter and you get a
+     number, just not the one on the label.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Set Address Format to Modbus and the problem disappears.</strong> You then
+     type the vendor's address exactly as printed, with no arithmetic. On read-only
+     client points it also saves setting <code>Reg Type</code> at all &mdash; the
+     leading numeral does it, 3 for input registers and 4 for holding registers. For
+     coils the driver ignores leading zeros, so 00109 and 109 are the same address.</p>
+</div>
+
+<h2>The data type is a second, separate decision</h2>
+<div class="pl-body">
+  <p>Modbus does not describe its own payloads. The protocol moves 16-bit registers; what
+     those registers mean is entirely the vendor's choice, and the only place it is
+     written down is their documentation. Get it wrong and the point still polls
+     happily.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Data Type</th><th scope="col">Registers</th><th scope="col">Range</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Integer</th><td>1</td>
+        <td>Unsigned 16-bit, 0&nbsp;&ndash;&nbsp;65,535. The default on a newly created point,
+            and the usual reason a negative temperature reads as 65,000-something.</td></tr>
+    <tr><th scope="row">Signed Integer</th><td>1</td>
+        <td>&minus;32,768&nbsp;&ndash;&nbsp;32,767. Sometimes called a short.</td></tr>
+    <tr><th scope="row">Float</th><td>2 consecutive</td>
+        <td>32-bit single precision, with two byte-order schemes to choose from
+            (3-2-1-0 or 1-0-3-2).</td></tr>
+    <tr><th scope="row">Long</th><td>2 consecutive</td>
+        <td>Signed 32-bit. Same byte-order choice as float.</td></tr>
+    <tr><th scope="row">Double</th><td>4 consecutive</td>
+        <td>64-bit double precision. Available from Niagara 4.15.</td></tr>
+    <tr><th scope="row">Long 64-bit</th><td>4 consecutive</td>
+        <td>Signed 64-bit, with eight byte-order options. Also from 4.15.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>Two things follow from the multi-register types. The first is that byte order is
+     configured at the device, or globally at the network &mdash; so one wrong setting
+     scrambles every float on that device at once, which at least makes it obvious. The
+     second is that a float consumes the register you addressed <em>and the next one</em>,
+     so point counts and address planning have to allow for it.</p>
+  <p>Writes round before they go out. Integer and Signed Integer round to the nearest
+     whole number and clamp to their range; Long and Long 64-bit round; Float and Double
+     do not round at all. A write of 20.6 to an integer holding register arrives as 21,
+     and nothing reports that it was changed.</p>
+</div>
+
+<h2>Bit-packed registers</h2>
+<div class="pl-body">
+  <p>Vendors routinely pack several unrelated values into one 16-bit register. The driver
+     handles this with bit-level proxy extensions &mdash; <code>NumericBits</code> and
+     <code>EnumBits</code> variants &mdash; where several points share the same Data
+     Address and differ only in <strong>Beginning Bit</strong> and <strong>Number
+     Bits</strong>.</p>
+  <p>A meter's tariff configuration is the classic case: one holding register where bits
+     8&ndash;15 hold the tariff number, bits 2&ndash;7 the start hour and bits 0&ndash;1
+     the start quarter-hour. Three points, one address, three bit windows. Reading that
+     register as a plain integer produces a large meaningless number, which is what
+     usually gets reported as "the meter is sending rubbish".</p>
+</div>
+
+<h2>There is no discovery</h2>
+<div class="pl-body">
+  <p>Unlike most drivers, the Modbus point manager has no learn mode: no Discover button,
+     no Discovered and Database panes. The protocol carries no self-description, so there
+     is nothing to discover. Every point is created by hand from the vendor's register
+     map.</p>
+  <p>What the New Points window does give you is <strong>Number To Add</strong>, which
+     creates consecutively addressed points from a starting address in one go. Since
+     devices normally address related data consecutively, that covers most of a register
+     map in a handful of operations.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>A gap in the map is a fault, not a null.</strong> Requesting a range that
+     includes an unimplemented address makes the device return an illegal-data-address
+     exception for the whole request. If holding registers stop at 40015, a read of
+     40003&ndash;40015 is fine and a read of 40003&ndash;40017 fails entirely &mdash; so
+     one over-reaching point can take out a block of good ones.</p>
+</div>
+
+<h2>When a point goes to fault</h2>
+<div class="pl-body">
+  <p>Open the point and read <code>ProxyExt &gt; Fault Cause</code>. It normally contains
+     the Modbus exception verbatim, such as <em>Read fault: illegal data address</em>.
+     That string distinguishes the three failures people conflate: the address does not
+     exist, the device is not answering at all, and the address exists but the data type
+     is wrong &mdash; only the first two produce a fault.</p>
+</div>
+
+<h2>Serving data as a slave</h2>
+<div class="pl-body">
+  <p>Running the station as a Modbus server is the mirror image, and adds one rule worth
+     knowing before you start: <strong>every server point must fall inside a declared
+     register range or it sits in fault</strong>.</p>
+  <p>The four range tables &mdash; coils, status, holding registers, input registers
+     &mdash; each arrive from the palette enabled, with a starting address offset of 1
+     and a size of 64. A holding-register range with starting address 250 and size 75
+     covers Modbus 40250 to 40325. You can add further ranges, or disable one entirely so
+     that a master querying it gets an exception response, which is occasionally the
+     honest answer.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Do not overlap ranges.</strong> Any given address should appear in exactly
+     one range entry. Overlapping entries are accepted at configuration time and
+     misbehave later.</p>
+</div>
+
+<h2>The order that avoids all of this</h2>
+<ol class="pl-steps">
+  <li><div><strong>Get the vendor's register map first</strong>, with data types and byte
+      order. Without it you are guessing, and Modbus rewards guessing with plausible
+      numbers.</div></li>
+  <li><div><strong>Set Address Format to Modbus</strong> before creating a single point,
+      so the documented addresses go in unmodified.</div></li>
+  <li><div><strong>Create one point of each data type and prove it</strong> against a
+      known value on the device display before bulk-adding the rest.</div></li>
+  <li><div><strong>Set byte order at the device once</strong>, and check a float reads
+      sensibly, rather than discovering it on commissioning day.</div></li>
+  <li><div><strong>Group consecutive points deliberately</strong>, so device polls can
+      fetch them in single messages instead of one request per point.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/workbench-tooling/"],
+ ),
+
+ dict(
+  slug="notes/niagara-alarm-routing/",
+  date="2026-09-23",
+  nav="Alarm routing",
+  title="Why an Alarm Never Reached Anybody",
+  desc=("Detection, class and recipient are three separate objects in a Niagara station. "
+        "An alarm goes missing wherever the chain between them is not linked."),
+  h1="Why an alarm never reached anybody",
+  lede=("An alarm that nobody received is rarely an alarm that was never raised. It was "
+        "raised, stored, and <strong>routed nowhere</strong> &mdash; because routing is "
+        "a link somebody has to draw."),
+  tags=["Alarms", "Station engineering", "Commissioning"],
+  body="""
+<h2>Three objects, not one</h2>
+<div class="pl-body">
+  <p>Niagara splits alarming into three things that are configured independently, and the
+     split is the reason alarms go quiet.</p>
+  <ul>
+    <li>An <strong>alarm extension</strong> on a point decides <em>when</em> a condition
+       is an alarm.</li>
+    <li>An <strong>alarm class</strong> groups alarms that share handling &mdash;
+       acknowledgement, priority, escalation &mdash; and is the thing that routes.</li>
+    <li>An <strong>alarm recipient</strong> delivers: to a console, to another station,
+       to email, to an on-call rota.</li>
+  </ul>
+  <p>Break the chain at any point and the station carries on perfectly. The extension
+     still fires, the alarm still lands in the database, the counts on the alarm class
+     still increment. It simply never becomes anybody's problem.</p>
+</div>
+
+<h2>Choosing the extension that matches the failure</h2>
+<div class="pl-body">
+  <p>There are more extension types than most stations use, and the common reflex &mdash;
+     an out-of-range extension on everything &mdash; misses whole categories of fault.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Extension</th><th scope="col">What it catches</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Out Of Range</th>
+        <td>Numeric high and low limits with a deadband. The default choice, and the
+            right one for a measured value with absolute limits.</td></tr>
+    <tr><th scope="row">Float Limit</th>
+        <td>Limits expressed <em>relative to a setpoint</em> rather than as absolutes.
+            This is the one people want when they say "alarm if it cannot hold
+            setpoint" and reach for Out Of Range instead.</td></tr>
+    <tr><th scope="row">Status</th>
+        <td>Fires on any combination of status flags &mdash; fault, down, stale,
+            overridden, null. Applies to any point type. This is how you find out a
+            sensor died rather than reading zero degrees forever.</td></tr>
+    <tr><th scope="row">Command Failure</th>
+        <td>Boolean or enum. Compares the commanded value against a linked
+            <code>feedbackValue</code> and alarms if they disagree for longer than the
+            time delay. The only honest way to know a damper actually moved.</td></tr>
+    <tr><th scope="row">Change Of State / Value</th>
+        <td>Boolean, enum, numeric and string variants, for conditions defined by a set
+            of values rather than a range. The boolean and enum versions implement the
+            BACnet change-of-state algorithm.</td></tr>
+    <tr><th scope="row">Elapsed Active Time<br>Change Of State Count</th>
+        <td>In the <code>kitControl</code> palette. Alarm on accumulated runtime or on
+            accumulated starts &mdash; maintenance alarms rather than fault alarms. Both
+            reference a totaliser extension under the same point.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note">
+  <p><strong>Every extension carries two algorithms.</strong> An offnormal algorithm and
+     a fault algorithm sit inside each one. The fault algorithm's default implementation
+     raises nothing, so a point can be in fault without generating a fault alarm unless
+     you configure it or add a status extension.</p>
+</div>
+
+<h2>What the alarm class actually controls</h2>
+<div class="pl-body">
+  <p>The class is where acknowledgement, priority and escalation live. Priority runs 1 to
+     255 with a default of <strong>255</strong>, which is the lowest &mdash; so a station
+     where nobody set priorities has every alarm at the bottom of the queue, and the
+     colour coding operators rely on is meaningless.</p>
+  <p>The class also carries read-only counters worth looking at during commissioning:
+     total alarm count, open alarm count, in-alarm count, unacknowledged count, and the
+     time of the last alarm. If those numbers are climbing and nobody is receiving
+     anything, the detection half is working and the routing half is not. That single
+     observation cuts the diagnosis in half.</p>
+</div>
+
+<h2>Escalation, and why it needs somewhere to go</h2>
+<div class="pl-body">
+  <p>Three escalation levels re-route an alarm that stays unacknowledged. Each has an
+     enable flag, on by default, and a delay measured in hours and minutes with a
+     one-minute minimum. An alarm that survives all three has been offered to as many as
+     four recipients including the original; acknowledgement at any level stops the
+     chain.</p>
+  <p>Enabled by default, with no recipient linked at any level, means escalation is
+     switched on and pointed at nothing. It costs nothing and does nothing, which is the
+     worst combination because it looks configured.</p>
+</div>
+
+<h2>Recipients, and one that does not exist on a controller</h2>
+<div class="pl-body">
+  <p>Recipients are linked from the alarm class's alarm topic to the recipient's Alarm
+     action. Each can be restricted by time of day, by day of week, and to specific
+     transitions &mdash; so a recipient that is silent at 3am may be working exactly as
+     configured.</p>
+  <ul>
+    <li><strong>Console</strong> moves alarms between the alarm history and the alarm
+       console, and updates the history when they are acknowledged.</li>
+    <li><strong>Station</strong> forwards to a remote station, which is how a controller
+       gets alarms to a Supervisor.</li>
+    <li><strong>Email</strong>, <strong>SMS</strong> and <strong>on-call</strong> deliver
+       to people rather than to software.</li>
+    <li><strong>Printer</strong> and <strong>line printer</strong> require a station
+       running on Windows. On a QNX controller they are not an option, which is worth
+       knowing before it appears in a specification.</li>
+  </ul>
+</div>
+
+<div class="pl-note">
+  <p><strong>Tridium's own advice is to use more than one class.</strong> One alarm class
+     routing to a console recipient and a station recipient; a separate class routing to
+     email. Trying to make a single class serve both leaves you filtering at the
+     recipient for something the class should have separated.</p>
+</div>
+
+<h2>Station to station: the link everybody forgets</h2>
+<div class="pl-body">
+  <p>Getting alarms from a controller to a Supervisor needs configuration at both ends.
+     In the sending station, an alarm class and a station recipient in the
+     <code>AlarmService</code>, linked together. The two stations do not have to use the
+     same class names, though matching them is one legitimate approach; the receiving
+     side can also collapse everything onto one local class, or use a prepend or append
+     naming scheme to map classes by name.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>In the receiving station, link the alarm class to the alarm console.</strong>
+     Remote alarms arrive, are stored, and do not appear in any console unless the
+     associated alarm class is linked to the console component. This is the single most
+     common reason a Supervisor shows nothing while the controllers are alarming
+     correctly &mdash; and because the data is present in the database, it looks like a
+     display bug rather than a missing link.</p>
+</div>
+
+<h2>Reassigning classes without opening every point</h2>
+<div class="pl-body">
+  <p>Alarm extensions are scattered across hundreds of points, so changing a class point
+     by point is not viable on a real station. The <code>AlarmService</code> has an
+     <strong>Alarm Ext Manager</strong> view that lists every alarm extension in the
+     station; select any number of them, right-click, and set the alarm class in one
+     operation.</p>
+  <p>For alarms arriving from subsystems with their own class names, alarm class mapping
+     lets you associate imported classes with local definitions so they display, sort and
+     sound consistently instead of forming a separate vocabulary in the console.</p>
+</div>
+
+<h2>A commissioning check that takes ten minutes</h2>
+<ol class="pl-steps">
+  <li><div><strong>Force one alarm of each class</strong> and confirm it arrives at every
+      recipient that class is meant to reach. Not one alarm &mdash; one per
+      class.</div></li>
+  <li><div><strong>Check the class counters afterwards.</strong> Rising counts with no
+      delivery is a routing fault; flat counts is a detection fault.</div></li>
+  <li><div><strong>Leave one unacknowledged past the first escalation delay</strong> and
+      confirm level 1 goes somewhere.</div></li>
+  <li><div><strong>Confirm the Supervisor console shows it</strong>, not just the
+      Supervisor database.</div></li>
+  <li><div><strong>Check who can clear the alarm database.</strong> The maintenance view
+      can delete records outright; operators should have the read-only alarm database
+      view instead.</div></li>
+  <li><div><strong>Write alarm instructions on the points that matter</strong>, so the
+      operator receiving the alarm at 3am is told what to do about it.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/px-graphics/"],
+ ),
+
+ dict(
+  slug="notes/niagara-schedules-and-special-events/",
+  date="2026-09-23",
+  nav="Schedules",
+  title="Niagara Schedules: Special Events and Master Copies",
+  desc=("Special event priority is list order, a partly-filled special event falls back "
+        "to the weekly schedule, and an imported schedule cannot be edited locally."),
+  h1="Niagara schedules: special events and master copies",
+  lede=("Two things about Niagara scheduling surprise people on site: <strong>priority is "
+        "the order of a list</strong>, and a holiday that only half covers a day quietly "
+        "hands the rest back to the weekly schedule."),
+  tags=["Scheduling", "Station engineering", "Commissioning"],
+  body="""
+<h2>Set the facets before the events</h2>
+<div class="pl-body">
+  <p>Weekly schedules come in boolean, numeric, enum and string flavours. For an enum
+     schedule there is an ordering constraint that is easy to hit: define the range in
+     the schedule's facets <em>first</em>, on its property sheet, before adding any
+     events. Add events against an undefined range and you get to do them again.</p>
+</div>
+
+<h2>Special events belong to one schedule</h2>
+<div class="pl-body">
+  <p>Special events are exceptions to the normal week &mdash; holidays, one-off closures,
+     a plant shutdown. They apply to weekly schedules only, and <strong>each weekly
+     schedule has its own</strong>, configured on the Special Events tab of its scheduler
+     view. The tab sits bottom-left in Workbench and top-left in a browser, which is
+     enough of a difference to lose a few minutes the first time.</p>
+  <p>The consequence of "its own" is the part that matters on a real site: adding a bank
+     holiday to one schedule does nothing to the other forty. That is why a building runs
+     normally on Christmas Day in the three zones somebody missed.</p>
+</div>
+
+<h2>Priority is the order of the list</h2>
+<div class="pl-body">
+  <p>Every special event outranks every regular weekly event. Among special events
+     themselves, priority is simply position in the table: top of the list wins, bottom
+     of the list only applies where nothing above it is active during the same period.
+     Arrow buttons move an event up or down, and that is the whole priority
+     mechanism.</p>
+  <p>There is no numeric priority field to inspect, so a schedule that behaves oddly on
+     one day of the year is diagnosed by reading the list in order, not by hunting for a
+     setting.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>An empty period is a handback, not an override.</strong> Where a special
+     event has no event defined, it relinquishes control to the next lower-priority
+     special event and finally to the weekly schedule. To take a day out completely you
+     must configure the special event for the <em>entire</em> day. A holiday defined as
+     08:00&ndash;18:00 off leaves the weekly schedule running either side of it.</p>
+</div>
+
+<h2>One calendar, many schedules</h2>
+<div class="pl-body">
+  <p>A special event can be a reference type, pointing at a calendar schedule that owns
+     the days of occurrence. Edit that one calendar and every weekly schedule referencing
+     it changes together.</p>
+  <p>This is the answer to the bank-holiday problem above, and it is worth setting up on
+     day one rather than after the first missed holiday: one calendar schedule per class
+     of non-working day, referenced by every weekly schedule, so the annual update is one
+     edit rather than forty.</p>
+</div>
+
+<h2>Week 1 is not the first calendar week</h2>
+<div class="pl-body">
+  <p>When defining a recurring special event by week and day, two similar-looking options
+     mean different things.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Option</th><th scope="col">How the month is divided</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Week 1&nbsp;&ndash;&nbsp;Week 5</th>
+        <td>Seven-day blocks counted from the 1st of the month, regardless of weekday. In
+            a month starting on a Thursday, Week 1 is the 1st to the 7th. Week 5 can be
+            shorter than seven days.</td></tr>
+    <tr><th scope="row">Calendar Week 1&nbsp;&ndash;&nbsp;6</th>
+        <td>Conventional weeks ending on Saturday. If the month starts mid-week, Calendar
+            Week 1 is only the remaining days of that week &mdash; possibly one or
+            two.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>"First Monday of the month" is a calendar-week idea. Pick the wrong one and the
+     event lands a week out in roughly half the months of the year, which is exactly the
+     kind of fault that gets reported months later as intermittent.</p>
+</div>
+
+<h2>Master and slave schedules</h2>
+<div class="pl-body">
+  <p>Scheduling uses the driver architecture to share configuration. You import a schedule
+     component from another station &mdash; normally the Supervisor &mdash; and the
+     import creates a local copy you can link into control logic but
+     <strong>cannot edit</strong>. Events change in the master and propagate.</p>
+  <p>On the sending side, importing creates a schedule export descriptor under the
+     component representing the receiving station, which is where synchronisation is
+     managed and where you look when a site is not picking up a change.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>The read-only copy is the feature.</strong> Somebody will eventually ask why
+     they cannot edit the schedule on the controller. The answer is that it is a slave
+     copy, and the alternative &mdash; forty independently editable copies of the same
+     occupancy times &mdash; is the situation master/slave exists to prevent.</p>
+</div>
+
+<h2>Crossing into BACnet</h2>
+<div class="pl-body">
+  <p>The same architecture reaches BACnet devices, in both directions.</p>
+  <ul>
+    <li><strong>Import</strong> BACnet Schedule and Calendar objects from a device and
+       model them as schedule components in the station.</li>
+    <li><strong>Export</strong> a station schedule to existing Schedule or Calendar
+       objects in a BACnet device, with the station acting as master.</li>
+    <li><strong>Expose</strong> station schedules as BACnet Schedule or Calendar objects
+       for any device on the network, through the export table under the BACnet
+       network's local device.</li>
+  </ul>
+  <p>Third-party plant with its own scheduling therefore does not have to be scheduled
+     twice. Deciding which side owns the times, once, is most of the integration
+     work.</p>
+</div>
+
+<h2>What to settle before the schedules are built</h2>
+<ol class="pl-steps">
+  <li><div><strong>Who owns occupancy times</strong> &mdash; the Supervisor, each
+      controller, or a BACnet device. One answer, written down.</div></li>
+  <li><div><strong>Calendar schedules for holidays</strong>, referenced by every weekly
+      schedule, before the first holiday rather than after it.</div></li>
+  <li><div><strong>Full-day special events</strong> wherever the intent is a full-day
+      override, so nothing falls back to the weekly schedule.</div></li>
+  <li><div><strong>Permissions on special events</strong>, which can differ from the rest
+      of the schedule &mdash; useful when site staff may add a closure but not rewrite
+      the week.</div></li>
+  <li><div><strong>One year rolled forward on paper.</strong> Read the special events
+      list top to bottom and check the priority order produces what the client
+      described.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/bajaux-widgets/"],
+ ),
 ]
 
 NOTE_LOOKUP = {n["slug"]: n for n in NOTES}
