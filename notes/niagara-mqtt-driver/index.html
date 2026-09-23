@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What the Niagara MQTT Driver Will and Will Not Do</title>
+<meta name="description" content="It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-mqtt-driver/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="What the Niagara MQTT Driver Will and Will Not Do">
+<meta property="og:description" content="It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-mqtt-driver/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What the Niagara MQTT Driver Will and Will Not Do">
+<meta name="twitter:description" content="It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/niagara-mqtt-driver.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/niagara-mqtt-driver/#article",
+   "headline": "What the Niagara MQTT driver will and will not do",
+   "description": "It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker.",
+   "url": "https://plantroomlabs.com/notes/niagara-mqtt-driver/",
+   "inLanguage": "en-GB",
+   "keywords": "Integration, MQTT, Drivers",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-mqtt-driver/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "MQTT"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>MQTT</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>What the Niagara MQTT driver will and will not do</h1>
+    <p class="pl-lede">MQTT is the protocol people reach for when a vendor has a cloud and no driver. Niagara ships one, and it does <strong>less and more</strong> than the name suggests — the surprises are all in the first afternoon.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Integration</li><li class="pl-chip pl-chip--on-dark">MQTT</li><li class="pl-chip pl-chip--on-dark">Drivers</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#licensed-and-capped-below-the-licence">Licensed, and capped below the licence</a></li><li><a href="#what-it-can-carry">What it can carry</a></li><li><a href="#discover-does-not-contact-the-broker">Discover does not contact the broker</a></li><li><a href="#publish-and-subscribe-are-different-components">Publish and subscribe are different components</a></li><li><a href="#the-device-settings-that-decide-whether-it-survives-the-night">The device settings that decide whether it survives the night</a></li><li><a href="#the-order-to-work-in">The order to work in</a></li></ol>
+    </nav>
+<h2 id="licensed-and-capped-below-the-licence">Licensed, and capped below the licence</h2>
+<div class="pl-body">
+  <p>The <code>abstractMqttDriver</code> module is a licensed feature. Open License
+     Manager and look for the feature by name: if it is absent, the palette will still
+     open and the network will still install, and nothing will work. That is worth
+     confirming before a design depends on it.</p>
+  <p>There is a second ceiling underneath the licence. Since 4.10u10 and 4.14u1 the
+     driver applies a default device connection limit of <strong>25 on a JACE and 50 on
+     a Supervisor</strong>, regardless of what the GlobalCapacity licence allows. The
+     limit exists to protect driver performance, and only the Supervisor's is
+     configurable — to a maximum of 500. A design that assumed one MQTT device per
+     tenant meter is the design that discovers this.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Niagara configures the client, never the broker.</strong> There is no
+     broker in the station and none is going to appear. Somebody has to own a broker
+     before any of this is testable, and on most projects working out who is the
+     longest part of the job.</p>
+</div>
+
+<h2 id="what-it-can-carry">What it can carry</h2>
+<div class="pl-body">
+  <p>Four data types, and no others: Boolean, numeric, string and enum. Anything
+     structured — a JSON document with six fields in it, which is what most vendor
+     cloud topics actually publish — has to be taken apart somewhere. The driver will
+     not do it, so either the publisher changes shape or a module does the parsing, and
+     that decision belongs at design time rather than on site.</p>
+  <p>The device component comes in four kinds. <code>DefaultMqttDevice</code> is the
+     generic client for any broker and is the one to use; <code>AwsMqttDevice</code> and
+     <code>GcpMqttDevice</code> are shaped for AWS IoT and Google Cloud, with their own
+     certificate and RSA-key authenticators, and Azure IoT Hub is reached through a SAS
+     token authenticator on the default device. From 4.14 the default device and
+     authenticator also support client certificate authentication.</p>
+  <p><code>AbstractMqttDevice</code> is the fourth, and it is the one to be careful
+     about: it differs from the others only in that it has <strong>no authenticator at
+     all</strong>, and therefore no communication security. It is a testing component
+     that survives into production because it connects first time.</p>
+</div>
+
+<h2 id="discover-does-not-contact-the-broker">Discover does not contact the broker</h2>
+<div class="pl-body">
+  <p>This is the one that wastes an afternoon. The Mqtt Client Driver Point Manager has
+     a Discover button, and pressing it opens the <strong>BQL Query Builder</strong>.
+     It runs a query against points in your own station and lists what it finds, so that
+     you can publish them. It does not enumerate topics, it does not ask the broker
+     anything, and no amount of fixing the connection will make it behave like BACnet
+     discovery.</p>
+  <p>Anything arriving <em>from</em> the broker is added by hand, from the
+     <code>abstractMqttDriver</code> palette or the point manager's New button, with the
+     topic typed in. That is not a defect — it follows from MQTT itself, where a broker
+     has no obligation to tell a client what exists — but it does mean a hundred-point
+     integration is a hundred rows of typing, which is what a spreadsheet and the batch
+     editor are for.</p>
+</div>
+
+<h2 id="publish-and-subscribe-are-different-components">Publish and subscribe are different components</h2>
+<div class="pl-body">
+  <p>Each data type has a publish extension and a subscribe extension, and they are not
+     interchangeable. Publishing is a wire-sheet act: drop a publish point under the
+     device's <code>Points</code> folder and link the source point's output into it.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Property</th><th scope="col">Publish</th><th scope="col">Subscribe</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Topic</th><td>Yes</td><td>Yes</td></tr>
+    <tr><th scope="row">QoS</th><td>Yes</td><td>Yes</td></tr>
+    <tr><th scope="row">Retained</th><td>Yes, default true</td><td>&mdash;</td></tr>
+    <tr><th scope="row">Publish Message on Change</th><td>Yes, default true</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>A topic is levels separated by forward slashes, and it is typed, not chosen —
+     a typo is a point that never updates and never faults. QoS is per message:
+     <code>0</code> fire and forget, <code>1</code> at least once with confirmation,
+     <code>2</code> exactly once through a four-step handshake. A publisher and a
+     subscriber may use different levels on the same topic.</p>
+  <p><code>Retained</code> defaults to true on publish, which means the broker keeps
+     the last message and hands it to anyone who subscribes later. For plant status
+     that is what you want. For a command topic it is not — a retained command is
+     redelivered to every client that connects, including after a restart.</p>
+</div>
+
+<h2 id="the-device-settings-that-decide-whether-it-survives-the-night">The device settings that decide whether it survives the night</h2>
+<div class="pl-body">
+  <ul>
+    <li><strong>Clean Session</strong>, default false, so the session is persistent and
+       the broker delivers queued messages when the client returns. Setting it true
+       throws away everything on every disconnect.</li>
+    <li><strong>Keep Alive</strong> is the longest the client may stay silent. It sends
+       a PINGREQ inside that window and the broker must disconnect it if nothing
+       arrives. It exists specifically to deal with half-open connections — the failure
+       where both ends believe they are connected and nothing is moving.</li>
+    <li><strong>Connection Timeout</strong> caps how long the client waits on a request
+       to the broker.</li>
+    <li><strong>Enable LWT</strong> is <strong>false by default</strong>, so out of the
+       box nothing tells the broker this station has dropped. Turn it on and the last
+       will and testament is published on the client's behalf; Retained for LWT
+       defaults to true, so a late subscriber still learns the station is gone.</li>
+    <li><strong>Send Enum As</strong> chooses between the tag and the ordinal. TAG is
+       the default and is what a human reading the topic wants; an ordinal is what a
+       downstream system expecting a number wants. Changing it later changes every
+       payload.</li>
+  </ul>
+</div>
+
+<div class="pl-note">
+  <p><strong>Connect does nothing until the address is filled in.</strong> The Connect
+     and Disconnect actions need the broker IP address, the port and a Client ID
+     present on the device first. An action that appears to do nothing is usually a
+     blank field, not a broker problem.</p>
+</div>
+
+<h2 id="the-order-to-work-in">The order to work in</h2>
+<ol class="pl-steps">
+  <li><div><strong>Confirm the licence feature, then the connection count.</strong>
+      Both are cheaper to find now than after the point schedule is agreed.</div></li>
+  <li><div><strong>Settle the payload shape with whoever owns the broker.</strong> Four
+      scalar types is the whole vocabulary; if the topics carry JSON objects, decide
+      then who unpacks them.</div></li>
+  <li><div><strong>Bring one point up in each direction.</strong> One publish, one
+      subscribe, on a real broker. Everything after that is repetition.</div></li>
+  <li><div><strong>Set Keep Alive and LWT before handover</strong>, not after the first
+      silent disconnection.</div></li>
+</ol>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span>
+        <h3><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></h3>
+        <p>Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/getting-data-out-of-a-niagara-station/">Getting data out of a Niagara station</a></h3>
+      <p>REST, MQTT, a relational history database, file export or an HTTP client. Which suits which consumer, and what each one costs you to run.</p>
+      <ul class="pl-chips"><li class="pl-chip">Integration</li><li class="pl-chip">Histories</li><li class="pl-chip">MQTT</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-tls-certificates/">The certificate on a new JACE</a></h3>
+      <p>Every station starts with a self-signed certificate it generated itself. What that is good for, what it is not, and what breaks on the day it expires.</p>
+      <ul class="pl-chips"><li class="pl-chip">TLS</li><li class="pl-chip">Certificates</li><li class="pl-chip">Commissioning</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/modbus-register-addressing/">Why a Modbus point reads the wrong register</a></h3>
+      <p>Modbus decimal addressing is zero-based, vendor documentation is not, and the Address Format property decides which of the two you are typing.</p>
+      <ul class="pl-chips"><li class="pl-chip">Modbus</li><li class="pl-chip">Integration</li><li class="pl-chip">Station engineering</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

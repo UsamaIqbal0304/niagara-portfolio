@@ -4681,6 +4681,151 @@ NOTES += [
   related=["services/station-engineering/", "services/px-graphics/",
            "notes/bacnet-mstp-on-a-jace/", "notes/niagara-poll-rates-and-tuning-policies/"],
  ),
+
+ dict(
+  slug="notes/niagara-mqtt-driver/",
+  date="2026-09-23",
+  nav="MQTT",
+  title="What the Niagara MQTT Driver Will and Will Not Do",
+  desc=("It is licensed, it is capped below your licence, it is a client only, and "
+        "its Discover button never contacts the broker."),
+  h1="What the Niagara MQTT driver will and will not do",
+  lede=("MQTT is the protocol people reach for when a vendor has a cloud and no "
+        "driver. Niagara ships one, and it does <strong>less and more</strong> than "
+        "the name suggests — the surprises are all in the first afternoon."),
+  tags=["Integration", "MQTT", "Drivers"],
+  body="""
+<h2>Licensed, and capped below the licence</h2>
+<div class="pl-body">
+  <p>The <code>abstractMqttDriver</code> module is a licensed feature. Open License
+     Manager and look for the feature by name: if it is absent, the palette will still
+     open and the network will still install, and nothing will work. That is worth
+     confirming before a design depends on it.</p>
+  <p>There is a second ceiling underneath the licence. Since 4.10u10 and 4.14u1 the
+     driver applies a default device connection limit of <strong>25 on a JACE and 50 on
+     a Supervisor</strong>, regardless of what the GlobalCapacity licence allows. The
+     limit exists to protect driver performance, and only the Supervisor's is
+     configurable — to a maximum of 500. A design that assumed one MQTT device per
+     tenant meter is the design that discovers this.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Niagara configures the client, never the broker.</strong> There is no
+     broker in the station and none is going to appear. Somebody has to own a broker
+     before any of this is testable, and on most projects working out who is the
+     longest part of the job.</p>
+</div>
+
+<h2>What it can carry</h2>
+<div class="pl-body">
+  <p>Four data types, and no others: Boolean, numeric, string and enum. Anything
+     structured — a JSON document with six fields in it, which is what most vendor
+     cloud topics actually publish — has to be taken apart somewhere. The driver will
+     not do it, so either the publisher changes shape or a module does the parsing, and
+     that decision belongs at design time rather than on site.</p>
+  <p>The device component comes in four kinds. <code>DefaultMqttDevice</code> is the
+     generic client for any broker and is the one to use; <code>AwsMqttDevice</code> and
+     <code>GcpMqttDevice</code> are shaped for AWS IoT and Google Cloud, with their own
+     certificate and RSA-key authenticators, and Azure IoT Hub is reached through a SAS
+     token authenticator on the default device. From 4.14 the default device and
+     authenticator also support client certificate authentication.</p>
+  <p><code>AbstractMqttDevice</code> is the fourth, and it is the one to be careful
+     about: it differs from the others only in that it has <strong>no authenticator at
+     all</strong>, and therefore no communication security. It is a testing component
+     that survives into production because it connects first time.</p>
+</div>
+
+<h2>Discover does not contact the broker</h2>
+<div class="pl-body">
+  <p>This is the one that wastes an afternoon. The Mqtt Client Driver Point Manager has
+     a Discover button, and pressing it opens the <strong>BQL Query Builder</strong>.
+     It runs a query against points in your own station and lists what it finds, so that
+     you can publish them. It does not enumerate topics, it does not ask the broker
+     anything, and no amount of fixing the connection will make it behave like BACnet
+     discovery.</p>
+  <p>Anything arriving <em>from</em> the broker is added by hand, from the
+     <code>abstractMqttDriver</code> palette or the point manager's New button, with the
+     topic typed in. That is not a defect — it follows from MQTT itself, where a broker
+     has no obligation to tell a client what exists — but it does mean a hundred-point
+     integration is a hundred rows of typing, which is what a spreadsheet and the batch
+     editor are for.</p>
+</div>
+
+<h2>Publish and subscribe are different components</h2>
+<div class="pl-body">
+  <p>Each data type has a publish extension and a subscribe extension, and they are not
+     interchangeable. Publishing is a wire-sheet act: drop a publish point under the
+     device's <code>Points</code> folder and link the source point's output into it.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Property</th><th scope="col">Publish</th><th scope="col">Subscribe</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Topic</th><td>Yes</td><td>Yes</td></tr>
+    <tr><th scope="row">QoS</th><td>Yes</td><td>Yes</td></tr>
+    <tr><th scope="row">Retained</th><td>Yes, default true</td><td>&mdash;</td></tr>
+    <tr><th scope="row">Publish Message on Change</th><td>Yes, default true</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>A topic is levels separated by forward slashes, and it is typed, not chosen —
+     a typo is a point that never updates and never faults. QoS is per message:
+     <code>0</code> fire and forget, <code>1</code> at least once with confirmation,
+     <code>2</code> exactly once through a four-step handshake. A publisher and a
+     subscriber may use different levels on the same topic.</p>
+  <p><code>Retained</code> defaults to true on publish, which means the broker keeps
+     the last message and hands it to anyone who subscribes later. For plant status
+     that is what you want. For a command topic it is not — a retained command is
+     redelivered to every client that connects, including after a restart.</p>
+</div>
+
+<h2>The device settings that decide whether it survives the night</h2>
+<div class="pl-body">
+  <ul>
+    <li><strong>Clean Session</strong>, default false, so the session is persistent and
+       the broker delivers queued messages when the client returns. Setting it true
+       throws away everything on every disconnect.</li>
+    <li><strong>Keep Alive</strong> is the longest the client may stay silent. It sends
+       a PINGREQ inside that window and the broker must disconnect it if nothing
+       arrives. It exists specifically to deal with half-open connections — the failure
+       where both ends believe they are connected and nothing is moving.</li>
+    <li><strong>Connection Timeout</strong> caps how long the client waits on a request
+       to the broker.</li>
+    <li><strong>Enable LWT</strong> is <strong>false by default</strong>, so out of the
+       box nothing tells the broker this station has dropped. Turn it on and the last
+       will and testament is published on the client's behalf; Retained for LWT
+       defaults to true, so a late subscriber still learns the station is gone.</li>
+    <li><strong>Send Enum As</strong> chooses between the tag and the ordinal. TAG is
+       the default and is what a human reading the topic wants; an ordinal is what a
+       downstream system expecting a number wants. Changing it later changes every
+       payload.</li>
+  </ul>
+</div>
+
+<div class="pl-note">
+  <p><strong>Connect does nothing until the address is filled in.</strong> The Connect
+     and Disconnect actions need the broker IP address, the port and a Client ID
+     present on the device first. An action that appears to do nothing is usually a
+     blank field, not a broker problem.</p>
+</div>
+
+<h2>The order to work in</h2>
+<ol class="pl-steps">
+  <li><div><strong>Confirm the licence feature, then the connection count.</strong>
+      Both are cheaper to find now than after the point schedule is agreed.</div></li>
+  <li><div><strong>Settle the payload shape with whoever owns the broker.</strong> Four
+      scalar types is the whole vocabulary; if the topics carry JSON objects, decide
+      then who unpacks them.</div></li>
+  <li><div><strong>Bring one point up in each direction.</strong> One publish, one
+      subscribe, on a real broker. Everything after that is repetition.</div></li>
+  <li><div><strong>Set Keep Alive and LWT before handover</strong>, not after the first
+      silent disconnection.</div></li>
+</ol>
+""",
+  related=["services/niagara-modules/", "services/station-engineering/",
+           "notes/getting-data-out-of-a-niagara-station/", "notes/niagara-tls-certificates/"],
+ ),
 ]
 
 NOTE_LOOKUP = {n["slug"]: n for n in NOTES}
@@ -5009,6 +5154,7 @@ NOTE_GROUPS = [
     ("Data, alarms and time", "data-alarms-and-time",
      "What the station records, who it tells, and when it decides to act.",
      ["notes/getting-data-out-of-a-niagara-station/",
+      "notes/niagara-mqtt-driver/",
       "notes/niagara-history-capacity/",
       "notes/niagara-alarm-routing/",
       "notes/niagara-schedules-and-special-events/"]),

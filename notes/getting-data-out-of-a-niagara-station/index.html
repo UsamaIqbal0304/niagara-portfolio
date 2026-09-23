@@ -261,6 +261,10 @@
       <h2>Other things worth writing down</h2>
     </div>
     <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-mqtt-driver/">What the Niagara MQTT driver will and will not do</a></h3>
+      <p>It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker.</p>
+      <ul class="pl-chips"><li class="pl-chip">Integration</li><li class="pl-chip">MQTT</li><li class="pl-chip">Drivers</li></ul>
+    </div><div class="pl-card pl-card--link">
       <h3><a href="/notes/niagara-history-capacity/">History capacity on a JACE</a></h3>
       <p>The default capacity is 500 records, the default name collides, and one setting decides whether a full history overwrites data or stops collecting.</p>
       <ul class="pl-chips"><li class="pl-chip">Histories</li><li class="pl-chip">JACE</li><li class="pl-chip">Station engineering</li></ul>
@@ -268,10 +272,6 @@
       <h3><a href="/notes/modbus-register-addressing/">Why a Modbus point reads the wrong register</a></h3>
       <p>Modbus decimal addressing is zero-based, vendor documentation is not, and the Address Format property decides which of the two you are typing.</p>
       <ul class="pl-chips"><li class="pl-chip">Modbus</li><li class="pl-chip">Integration</li><li class="pl-chip">Station engineering</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
-      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
-      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
     </div></div>
   </div>
 </section>
