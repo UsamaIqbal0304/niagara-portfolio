@@ -35,6 +35,51 @@ EMAIL      = "info@plantroomlabs.com"
 TODAY      = date.today().isoformat()
 OUT        = os.path.dirname(os.path.abspath(__file__))
 
+# ------------------------------------------------- measurement and ranking
+# Two separate things, both off until the accounts behind them exist. See
+# TRAFFIC.md for the click-by-click; the accounts are Usama's, not mine.
+#
+# 1. How many people came, and from where. Cloudflare Web Analytics is
+#    cookieless, stores nothing about a visitor and needs no consent banner —
+#    which is why this site has no consent banner and is not going to grow
+#    one. It is free with no event cap, and works on a domain Cloudflare does
+#    not host, so nothing about the DNS at Squarespace has to change.
+ANALYTICS_TOKEN = ""     # the data-cf-beacon token, 32 hex characters
+
+# 2. What the site ranks for. Search Console and Bing Webmaster Tools are the
+#    only places the query, impression and position data exists; both want
+#    proof of ownership, and a meta tag is the proof this generator can own.
+#    A file proof would be a hand-placed file the next build deletes, and a
+#    DNS proof lives in Squarespace where the build cannot see it.
+VERIFY = {
+    "google-site-verification": "",
+    "msvalidate.01": "",                  # Bing Webmaster Tools
+}
+
+
+def analytics_html():
+    """The beacon, or nothing at all.
+
+    Nothing is the default and the honest one: an empty token here means no
+    third-party request is made from any page, rather than a script that
+    loads and silently measures nothing."""
+    if not ANALYTICS_TOKEN:
+        return ""
+    return ('\n<!-- Cookieless, no personal data, no consent banner needed. -->'
+            '\n<script defer src="https://static.cloudflareinsights.com/beacon.min.js"'
+            ' data-cf-beacon=\'{"token": "' + ANALYTICS_TOKEN + '"}\'></script>')
+
+
+def verify_html():
+    """Ownership proofs for the search consoles, on every page.
+
+    Google reads the home page and Bing reads the root, but a proof that
+    exists everywhere cannot be lost by whichever page they happen to pick,
+    and it costs one line."""
+    return "".join('\n<meta name="%s" content="%s">' % (k, html.escape(v, quote=True))
+                   for k, v in VERIFY.items() if v)
+
+
 def url(path=""):
     """Absolute URL for a site-relative path such as 'services/' or ''."""
     return f"{ORIGIN}/{path}" if path else f"{ORIGIN}/"
@@ -289,7 +334,7 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
 <title>{e(title)}</title>
 <meta name="description" content="{html.escape(desc, quote=True)}">
 <link rel="canonical" href="{canonical}">
-<meta name="author" content="{BRAND}">{"" if listed else chr(10) + '<meta name="robots" content="noindex, follow">'}
+<meta name="author" content="{BRAND}">{"" if listed else chr(10) + '<meta name="robots" content="noindex, follow">'}{verify_html()}
 
 <meta property="og:type" content="{og_type}">
 <meta property="og:site_name" content="{BRAND}">
@@ -323,7 +368,7 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
 {body.replace("{{CRUMBS}}", crumb_nav)}
 </main>
 {FOOTER}
-<script src="{href('assets/js/site.js')}" defer></script>
+<script src="{href('assets/js/site.js')}" defer></script>{analytics_html()}
 </body>
 </html>
 '''

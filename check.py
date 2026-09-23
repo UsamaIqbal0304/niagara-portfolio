@@ -147,6 +147,32 @@ for rel, src in docs:
         hit = re.search(pattern, body, re.I)
         check(not hit, f"{rel}: {why} — {hit.group(0) if hit else ''}")
 
+# Third-party requests. The only one this site is allowed to make is the
+# cookieless analytics beacon — anything else appearing here means a script
+# got pasted in that puts a visitor's browser in touch with someone we have
+# not told them about, which on a site with no consent banner is a promise
+# broken rather than a tidiness problem.
+ALLOWED_THIRD_PARTY = {"static.cloudflareinsights.com", ORIGIN.split("//", 1)[1]}
+beaconed, unbeaconed = [], []
+for rel, src in docs:
+    for host in set(re.findall(r'<(?:script|link|img)[^>]+(?:src|href)="https?://([^/"]+)', src)):
+        check(host in ALLOWED_THIRD_PARTY,
+              f"{rel}: loads a third-party resource from {host}")
+    beacon = 'data-cf-beacon' in src
+    if beacon:
+        check('src="https://static.cloudflareinsights.com/beacon.min.js" defer' in src
+              or 'defer src="https://static.cloudflareinsights.com/beacon.min.js"' in src,
+              f"{rel}: analytics beacon is not deferred")
+    # The demo frames are iframed by /work/, so a beacon in them would count
+    # one visit twice. Every page a visitor can land on is either counted or
+    # none of them are — a half-instrumented site produces numbers nobody can
+    # act on.
+    if 'content="noindex' in src:
+        continue
+    (beaconed if beacon else unbeaconed).append(rel)
+check(not beaconed or not unbeaconed,
+      f"analytics beacon on some indexable pages but not others: missing from {unbeaconed[:3]}")
+
 # The machine-readable layer: llms.txt, llms-full.txt and a markdown twin per
 # note. An answer engine that fetches the markdown instead of the HTML has to
 # get the same page, and a link into this layer that 404s is worse than not
