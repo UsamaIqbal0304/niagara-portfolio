@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why a Niagara Station Polls Too Slowly</title>
+<meta name="description" content="Slow, Normal and Fast are three numbers you choose, and one default tuning policy applied to every point is the usual reason a station feels sluggish.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-poll-rates-and-tuning-policies/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Why a Niagara Station Polls Too Slowly">
+<meta property="og:description" content="Slow, Normal and Fast are three numbers you choose, and one default tuning policy applied to every point is the usual reason a station feels sluggish.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-poll-rates-and-tuning-policies/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why a Niagara Station Polls Too Slowly">
+<meta name="twitter:description" content="Slow, Normal and Fast are three numbers you choose, and one default tuning policy applied to every point is the usual reason a station feels sluggish.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/niagara-poll-rates-and-tuning-policies.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/niagara-poll-rates-and-tuning-policies/#article",
+   "headline": "Why a station polls too slowly",
+   "description": "Slow, Normal and Fast are three numbers you choose, and one default tuning policy applied to every point is the usual reason a station feels sluggish.",
+   "url": "https://plantroomlabs.com/notes/niagara-poll-rates-and-tuning-policies/",
+   "inLanguage": "en-GB",
+   "keywords": "Station engineering, Performance, BACnet",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-poll-rates-and-tuning-policies/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Poll rates"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Poll rates</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>Why a station polls too slowly</h1>
+    <p class="pl-lede">Nobody ships a station that is deliberately slow. It gets slow because every proxy point was created against <strong>one default tuning policy</strong>, and nothing ever asked which of them needed to be fast.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Station engineering</li><li class="pl-chip pl-chip--on-dark">Performance</li><li class="pl-chip pl-chip--on-dark">BACnet</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+<h2>Where the speed is actually set</h2>
+<div class="pl-body">
+  <p>Each field-bus driver network carries a polling service — named <code>Poll
+     Service</code> or <code>Poll Scheduler</code> depending on the driver — and it
+     samples values at exactly three rates. The shipped intervals are:</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Rate</th><th scope="col">Default interval</th><th scope="col">What belongs here</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Fast</th><td>1 second</td>
+        <td>Points a control loop or an operator is watching change in real time. Very few of them.</td></tr>
+    <tr><th scope="row">Normal</th><td>5 seconds</td>
+        <td>The working majority: temperatures, set points, status, anything on a graphic.</td></tr>
+    <tr><th scope="row">Slow</th><td>30 seconds</td>
+        <td>Values that physically cannot move quickly, and anything only a history needs.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note">
+  <p><strong>These names mean nothing to the framework.</strong> Slow, Normal and Fast
+     are labels on three configurable intervals, and no logic enforces any relationship
+     between them. A station where Slow has been set faster than Normal is
+     misconfigured and will not complain.</p>
+</div>
+
+<div class="pl-body">
+  <p>There is a fourth group that is easy to miss: <code>Dibs Stack</code>, which
+     handles pollables that transition into a subscribed state — the temporary
+     subscription created when somebody opens a graphic, for instance. It is why a
+     station can look responsive while an operator is watching and still be logging
+     stale data the rest of the day.</p>
+</div>
+
+<h2>Which point gets which rate</h2>
+<div class="pl-body">
+  <p>This differs by driver, and it is the part that catches people moving between
+     them.</p>
+  <ul>
+    <li>Under a <strong>BacnetNetwork</strong>, the poll frequency is a property of the
+       <em>tuning policy</em>, and each proxy point is assigned a tuning policy. You do
+       not set a rate on the point.</li>
+    <li>Under <strong>most other drivers</strong>, <code>Poll Frequency</code> is a
+       property of the point's own proxy extension, and of the device object where a
+       device is pollable. It sits just below the address properties.</li>
+    <li>The <strong>NiagaraNetwork does not poll points at all</strong>. Station-to-station
+       values arrive by subscription, so a slow Niagara Network is a different
+       investigation entirely — look at its tuning policy's update times instead.</li>
+  </ul>
+</div>
+
+<h2>The single-policy trap</h2>
+<div class="pl-body">
+  <p>A driver's Tuning Policy Map ships with one default policy, and a station built
+     without touching it has every point in the building on that one policy. Tridium's
+     own documentation is unusually blunt about this: using only the single default
+     policy, particularly with all property values at defaults, can lead to problems in
+     many scenarios.</p>
+  <p>The fix is not clever. Duplicate the default policy three or four times, name the
+     copies after what they are for, set their poll frequency, and assign points to
+     them as the points are created. Done at engineering time it costs nothing. Done
+     afterwards it is a bulk re-assignment across several thousand points, which is a
+     different note.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Check Write On Start while you are in there.</strong> A tuning policy also
+     governs writes, and <code>Write On Start</code> decides whether the station pushes
+     its value out to the field device when it comes up. On plant that should not be
+     commanded by a station restart, that default matters more than any poll rate.</p>
+</div>
+
+<h2>Measure before changing anything</h2>
+<div class="pl-body">
+  <p>The polling service publishes its own statistics, and they answer the question
+     directly rather than by feel:</p>
+  <ul>
+    <li><strong>Busy Time</strong> — the percentage of the time the station spent
+       polling. This is the number that tells you whether the bus is saturated or the
+       problem is somewhere else entirely.</li>
+    <li><strong>Average Poll</strong> — the average time spent in each poll.</li>
+    <li><strong>Total Polls</strong>, against the elapsed milliseconds.</li>
+  </ul>
+  <p>Right-click the poll service and use <code>Actions &gt; Reset Statistics</code> to
+     start a clean window before and after a change, so the comparison is between two
+     measurements rather than between a measurement and a memory.</p>
+  <p>One caveat on reading them: the BACnet driver polls on multiple threads — two per
+     network port — and the statistics are the sum across all of them. There is no
+     per-thread breakdown, so a busy figure on a station with several trunks tells you
+     the station is busy, not which trunk is.</p>
+</div>
+
+<h2>The order to work in</h2>
+<ol class="pl-steps">
+  <li><div><strong>Reset the statistics and watch Busy Time.</strong> If it is low, the
+      polling is not your problem and re-rating points will not help.</div></li>
+  <li><div><strong>Count what is on Fast.</strong> Points that nobody reads at one
+      second each are the usual cause, and moving them costs nothing.</div></li>
+  <li><div><strong>Build the policies, then re-assign.</strong> Three or four named
+      policies covering fast, normal, slow and write-on-start behaviour.</div></li>
+  <li><div><strong>Re-measure.</strong> Same statistics, same reset, same window.
+      A tuning change you did not measure is a preference.</div></li>
+</ol>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 3.5a5 5 0 0 0-6.8 6.3L3 14.5V21h6.5l4.7-4.7a5 5 0 0 0 6.3-6.8L17 12.5 11.5 7z"/></svg></span>
+        <h3><a href="/services/workbench-tooling/">Workbench tooling</a></h3>
+        <p>Custom Workbench views and tools for repetitive Niagara work: bulk renaming and retagging, station audits, provisioning helpers and module inventories.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
+      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
+      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
+      <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

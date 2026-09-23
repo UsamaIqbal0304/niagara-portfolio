@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BACnet MS/TP on a JACE: What to Set</title>
+<meta name="description" content="Baud, MAC address, Max Master and Max Info Frames. Four settings on one Link component decide whether an RS-485 trunk works, crawls or drops the token.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/bacnet-mstp-on-a-jace/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="BACnet MS/TP on a JACE: What to Set">
+<meta property="og:description" content="Baud, MAC address, Max Master and Max Info Frames. Four settings on one Link component decide whether an RS-485 trunk works, crawls or drops the token.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/bacnet-mstp-on-a-jace/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BACnet MS/TP on a JACE: What to Set">
+<meta name="twitter:description" content="Baud, MAC address, Max Master and Max Info Frames. Four settings on one Link component decide whether an RS-485 trunk works, crawls or drops the token.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/bacnet-mstp-on-a-jace.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/bacnet-mstp-on-a-jace/#article",
+   "headline": "BACnet MS/TP on a JACE",
+   "description": "Baud, MAC address, Max Master and Max Info Frames. Four settings on one Link component decide whether an RS-485 trunk works, crawls or drops the token.",
+   "url": "https://plantroomlabs.com/notes/bacnet-mstp-on-a-jace/",
+   "inLanguage": "en-GB",
+   "keywords": "BACnet, MS/TP, Commissioning",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/bacnet-mstp-on-a-jace/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "BACnet MS/TP"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>BACnet MS/TP</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>BACnet MS/TP on a JACE</h1>
+    <p class="pl-lede">An MS/TP trunk that will not come up is rarely a wiring fault by the time anyone calls. It is usually <strong>one of four properties</strong> on the Link component, or a licence.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">BACnet</li><li class="pl-chip pl-chip--on-dark">MS/TP</li><li class="pl-chip pl-chip--on-dark">Commissioning</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+<h2>What MS/TP is, in one paragraph</h2>
+<div class="pl-body">
+  <p>MS/TP — master slave / token passing — is BACnet's link layer for RS-485 multidrop
+     wiring, used by the cheaper end of the device range. A token circulates between
+     master devices and only the holder may transmit. Everything that goes wrong on a
+     trunk is a consequence of that sentence: throughput is shared, one misbehaving
+     device slows every other one, and the network's speed is set by its slowest
+     participant.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Check the licence before the wiring.</strong> A QNX-based controller
+     supports direct MS/TP trunks — one per RS-485 port — <em>if it is licensed for
+     MS/TP</em>. A port that refuses to come up on a controller that has never run MS/TP
+     before is worth ruling out in thirty seconds, not after half a day with a
+     meter.</p>
+</div>
+
+<h2>Where the port lives</h2>
+<div class="pl-body">
+  <p>An <code>MstpPort</code> is dragged from the <code>bacnet</code> palette's
+     NetworkPorts node into <code>BacnetNetwork &gt; Bacnet Comm &gt; Network</code>. Two
+     things get configured, and they are at different levels:</p>
+  <ul>
+    <li>On the <strong>MstpPort</strong> itself, the <code>Network Number</code>. On an
+       existing installation this must match the number already in use for that segment
+       — a duplicate or wrong network number produces symptoms that look like anything
+       except a number.</li>
+    <li>On the <strong>Link</strong> component beneath it, everything physical.</li>
+  </ul>
+</div>
+
+<h2>The four properties that decide everything</h2>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Property</th><th scope="col">Default</th><th scope="col">What it does to you</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Port Name</th><td>none</td>
+        <td>Which physical RS-485 port. <code>COM3</code> for a standard option card; <code>COM3</code>, <code>COM4</code> or <code>COM5</code> with a dual-RS-485 card, to a maximum of three ports on one station.</td></tr>
+    <tr><th scope="row">Baud Rate</th><td>9600</td>
+        <td>Must match every device on the trunk. 9600 is the shipped value and, on most modern trunks, four times slower than the devices can manage — but one device that cannot go faster sets the ceiling for all of them.</td></tr>
+    <tr><th scope="row">Mstp Address</th><td>0</td>
+        <td>The station's BACnet MAC on the trunk, 0–127, and it must be unique on the segment. Leaving it at 0 is a deliberate choice, not laziness — see below.</td></tr>
+    <tr><th scope="row">Max Master</th><td>—</td>
+        <td>The highest master address the token will be offered to. Set it to the highest address actually in use plus a little room, not to 127.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>Two more are worth knowing about. <code>Max Info Frames</code> controls how many
+     messages the station sends before it passes the token on; the documented range is
+     0 to 100, and raising it towards 50 can improve throughput where the station is the
+     busiest talker on the trunk. <code>Support Extended Frames</code> is off by
+     default and enables larger frames, which helps only if the devices on the trunk
+     support them.</p>
+</div>
+
+<h2>Why Max Master is the one people get wrong</h2>
+<div class="pl-body">
+  <p>Each master polls for a successor up the address range as far as Max Master before
+     the token comes back round. Leave it at 127 on a trunk with eight devices addressed
+     1–8 and most of the token loop is spent offering the token to 119 addresses that do
+     not exist. The trunk works. It is simply slower than it needs to be, permanently,
+     and nothing anywhere reports it as a fault.</p>
+  <p>Set it on <em>every</em> master on the segment, not only on the station — the
+     setting is per-device, and one device left at 127 keeps the long loop.</p>
+</div>
+
+<h2>What address 0 actually buys you</h2>
+<div class="pl-body">
+  <p>If the token is ever lost, the device with the lowest MAC address regenerates it.
+     Leaving the station at address 0 makes the station that device, which is normally
+     what you want: it is the participant you can see the status of, restart, and take a
+     backup of. Whatever you choose, confirm no other device on the trunk is already
+     using it — a duplicate MAC is the classic cause of a trunk that works, intermittently,
+     in a way that looks like noise.</p>
+</div>
+
+<h2>Bringing it up</h2>
+<ol class="pl-steps">
+  <li><div><strong>Save the Link changes</strong> before doing anything else; the port
+      does not pick them up otherwise.</div></li>
+  <li><div><strong>Right-click the MstpPort and run Actions &gt; Enable.</strong> Its
+      Status should report <code>{ok}</code>. Anything else, and no amount of device
+      discovery will help.</div></li>
+  <li><div><strong>Then discover.</strong> A device that does not appear after the port
+      is healthy is a baud, MAC or Max Master problem on the device, in that
+      order.</div></li>
+  <li><div><strong>Record the trunk.</strong> Addresses, baud, Max Master and which port
+      — on the drawing, not in somebody's head. The next person on site has a meter and
+      no idea what address 12 is.</div></li>
+</ol>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span>
+        <h3><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></h3>
+        <p>Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
+      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
+      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
+      <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

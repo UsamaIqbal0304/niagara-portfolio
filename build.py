@@ -2180,6 +2180,7 @@ NOTES = [
 """,
   related=["services/niagara-modules/", "services/station-engineering/"],
  ),
+
 ]
 NOTES += [
 
@@ -2536,6 +2537,320 @@ NOTES += [
 </ol>
 """,
   related=["services/station-engineering/", "services/workbench-tooling/"],
+ ),
+
+ dict(
+  slug="notes/niagara-poll-rates-and-tuning-policies/",
+  date="2026-09-23",
+  nav="Poll rates",
+  title="Why a Niagara Station Polls Too Slowly",
+  desc=("Slow, Normal and Fast are three numbers you choose, and one default tuning "
+        "policy applied to every point is the usual reason a station feels sluggish."),
+  h1="Why a station polls too slowly",
+  lede=("Nobody ships a station that is deliberately slow. It gets slow because every "
+        "proxy point was created against <strong>one default tuning policy</strong>, "
+        "and nothing ever asked which of them needed to be fast."),
+  tags=["Station engineering", "Performance", "BACnet"],
+  body="""
+<h2>Where the speed is actually set</h2>
+<div class="pl-body">
+  <p>Each field-bus driver network carries a polling service — named <code>Poll
+     Service</code> or <code>Poll Scheduler</code> depending on the driver — and it
+     samples values at exactly three rates. The shipped intervals are:</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Rate</th><th scope="col">Default interval</th><th scope="col">What belongs here</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Fast</th><td>1 second</td>
+        <td>Points a control loop or an operator is watching change in real time. Very few of them.</td></tr>
+    <tr><th scope="row">Normal</th><td>5 seconds</td>
+        <td>The working majority: temperatures, set points, status, anything on a graphic.</td></tr>
+    <tr><th scope="row">Slow</th><td>30 seconds</td>
+        <td>Values that physically cannot move quickly, and anything only a history needs.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note">
+  <p><strong>These names mean nothing to the framework.</strong> Slow, Normal and Fast
+     are labels on three configurable intervals, and no logic enforces any relationship
+     between them. A station where Slow has been set faster than Normal is
+     misconfigured and will not complain.</p>
+</div>
+
+<div class="pl-body">
+  <p>There is a fourth group that is easy to miss: <code>Dibs Stack</code>, which
+     handles pollables that transition into a subscribed state — the temporary
+     subscription created when somebody opens a graphic, for instance. It is why a
+     station can look responsive while an operator is watching and still be logging
+     stale data the rest of the day.</p>
+</div>
+
+<h2>Which point gets which rate</h2>
+<div class="pl-body">
+  <p>This differs by driver, and it is the part that catches people moving between
+     them.</p>
+  <ul>
+    <li>Under a <strong>BacnetNetwork</strong>, the poll frequency is a property of the
+       <em>tuning policy</em>, and each proxy point is assigned a tuning policy. You do
+       not set a rate on the point.</li>
+    <li>Under <strong>most other drivers</strong>, <code>Poll Frequency</code> is a
+       property of the point's own proxy extension, and of the device object where a
+       device is pollable. It sits just below the address properties.</li>
+    <li>The <strong>NiagaraNetwork does not poll points at all</strong>. Station-to-station
+       values arrive by subscription, so a slow Niagara Network is a different
+       investigation entirely — look at its tuning policy's update times instead.</li>
+  </ul>
+</div>
+
+<h2>The single-policy trap</h2>
+<div class="pl-body">
+  <p>A driver's Tuning Policy Map ships with one default policy, and a station built
+     without touching it has every point in the building on that one policy. Tridium's
+     own documentation is unusually blunt about this: using only the single default
+     policy, particularly with all property values at defaults, can lead to problems in
+     many scenarios.</p>
+  <p>The fix is not clever. Duplicate the default policy three or four times, name the
+     copies after what they are for, set their poll frequency, and assign points to
+     them as the points are created. Done at engineering time it costs nothing. Done
+     afterwards it is a bulk re-assignment across several thousand points, which is a
+     different note.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Check Write On Start while you are in there.</strong> A tuning policy also
+     governs writes, and <code>Write On Start</code> decides whether the station pushes
+     its value out to the field device when it comes up. On plant that should not be
+     commanded by a station restart, that default matters more than any poll rate.</p>
+</div>
+
+<h2>Measure before changing anything</h2>
+<div class="pl-body">
+  <p>The polling service publishes its own statistics, and they answer the question
+     directly rather than by feel:</p>
+  <ul>
+    <li><strong>Busy Time</strong> — the percentage of the time the station spent
+       polling. This is the number that tells you whether the bus is saturated or the
+       problem is somewhere else entirely.</li>
+    <li><strong>Average Poll</strong> — the average time spent in each poll.</li>
+    <li><strong>Total Polls</strong>, against the elapsed milliseconds.</li>
+  </ul>
+  <p>Right-click the poll service and use <code>Actions &gt; Reset Statistics</code> to
+     start a clean window before and after a change, so the comparison is between two
+     measurements rather than between a measurement and a memory.</p>
+  <p>One caveat on reading them: the BACnet driver polls on multiple threads — two per
+     network port — and the statistics are the sum across all of them. There is no
+     per-thread breakdown, so a busy figure on a station with several trunks tells you
+     the station is busy, not which trunk is.</p>
+</div>
+
+<h2>The order to work in</h2>
+<ol class="pl-steps">
+  <li><div><strong>Reset the statistics and watch Busy Time.</strong> If it is low, the
+      polling is not your problem and re-rating points will not help.</div></li>
+  <li><div><strong>Count what is on Fast.</strong> Points that nobody reads at one
+      second each are the usual cause, and moving them costs nothing.</div></li>
+  <li><div><strong>Build the policies, then re-assign.</strong> Three or four named
+      policies covering fast, normal, slow and write-on-start behaviour.</div></li>
+  <li><div><strong>Re-measure.</strong> Same statistics, same reset, same window.
+      A tuning change you did not measure is a preference.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/workbench-tooling/"],
+ ),
+
+ dict(
+  slug="notes/px-relative-ords/",
+  date="2026-09-23",
+  nav="Relative ORDs",
+  title="One PX Sheet for Every AHU: Relative ORDs",
+  desc=("The Px editor binds absolutely by default, which is why a graphic works for "
+        "AHU-01 and nothing else. Relativised, one sheet serves the whole plant."),
+  h1="One PX sheet for every AHU",
+  lede=("A graphic drawn for one air handler and copied twenty times is twenty "
+        "graphics to maintain. The difference between that and <strong>one sheet</strong> "
+        "is how its ORDs were bound."),
+  tags=["PX graphics", "Standard sheets", "Reuse"],
+  body="""
+<h2>Why the copies happen</h2>
+<div class="pl-body">
+  <p>When you bind a widget with the Px Editor tools, the ORD you get is absolute by
+     default. It looks like this:</p>
+  <p><code>station:|slot:/Logic/HousingUnit/AirHandler/DamperPosition</code></p>
+  <p>That path resolves to one unique component, always, wherever the sheet is used
+     from. Attach the same sheet to a different air handler and every widget on it still
+     points at the first one. The graphic is not broken — it is doing exactly what it
+     was told — so the usual response is to copy the file, re-point every binding, and
+     do it again for the next unit.</p>
+</div>
+
+<h2>What relative binding changes</h2>
+<div class="pl-body">
+  <p>A relative ORD resolves against the <em>parent ORD of the view it is in</em>. The
+     same sheet, opened as the view of AHU-02, resolves its bindings under AHU-02. One
+     file serves every identically shaped piece of plant on the site.</p>
+  <p>You do not have to retype anything to get there. In Edit mode, the Bound Ords area
+     of the Px Editor lists the sheet's bindings and has a <strong>Relativize Ords</strong>
+     button; it opens a window listing every ORD that can be relativised, and the paths
+     in the Bound Ords area shorten when you accept.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>The catch, and it is the whole job.</strong> Relative binding works only
+     where the child slot names match. <code>DamperPosition</code> has to be called
+     <code>DamperPosition</code> under every air handler, not <code>Damper Pos</code>
+     under one and <code>DmpPos</code> under the next. The reusable graphic is a
+     consequence of a naming standard, not a substitute for one.</p>
+</div>
+
+<h2>When one sheet is not quite enough: ORD variables</h2>
+<div class="pl-body">
+  <p>Relativising handles "the same sheet against different equipment". The other case
+     is a sheet that embeds a smaller sheet several times over, each instance pointed at
+     something different — a plant overview holding four identical pump panels. That is
+     what ORD variables are for.</p>
+  <p>Inside the child sheet, the variable part of a binding is written
+     <code>$(name)</code> — for example <code>$(Child1)/Variable1</code>. The parent
+     embeds the child with a <strong>PxInclude</strong> widget and supplies a value for
+     each variable, so the same child file renders against a different branch of the
+     tree in each instance.</p>
+</div>
+
+<h2>What this is worth</h2>
+<div class="pl-body">
+  <p>The saving is not in drawing time; drawing the second copy is quick. It is in
+     everything afterwards. A relatively-bound standard sheet means a change to how an
+     AHU is presented — a new alarm indicator, a corrected unit, a different colour rule
+     — is made once and appears on every AHU on the site. Twenty copies mean twenty
+     edits and, in practice, nineteen: one always gets missed, and the one that got
+     missed is the one the client opens.</p>
+</div>
+
+<h2>Retrofitting an estate that was built the other way</h2>
+<ol class="pl-steps">
+  <li><div><strong>Pick the best existing sheet</strong> rather than starting again.
+      Whichever copy has had the most correction applied to it is the one closest to
+      what everybody actually wanted.</div></li>
+  <li><div><strong>Fix the naming first.</strong> Relativising against inconsistent slot
+      names produces a sheet that works on some units and shows nulls on others, which
+      is worse than the copies because it looks finished.</div></li>
+  <li><div><strong>Relativise, then test against the odd one out</strong> — the unit
+      with the extra sensor or the missing valve, not the one the sheet was drawn
+      from.</div></li>
+  <li><div><strong>Repoint the navigation, then delete the copies.</strong> Leaving them
+      in place guarantees somebody edits one in two years' time and cannot work out why
+      nothing changed on screen.</div></li>
+</ol>
+""",
+  related=["services/px-graphics/", "services/bajaux-widgets/"],
+ ),
+
+ dict(
+  slug="notes/bacnet-mstp-on-a-jace/",
+  date="2026-09-23",
+  nav="BACnet MS/TP",
+  title="BACnet MS/TP on a JACE: What to Set",
+  desc=("Baud, MAC address, Max Master and Max Info Frames. Four settings on one Link "
+        "component decide whether an RS-485 trunk works, crawls or drops the token."),
+  h1="BACnet MS/TP on a JACE",
+  lede=("An MS/TP trunk that will not come up is rarely a wiring fault by the time "
+        "anyone calls. It is usually <strong>one of four properties</strong> on the "
+        "Link component, or a licence."),
+  tags=["BACnet", "MS/TP", "Commissioning"],
+  body="""
+<h2>What MS/TP is, in one paragraph</h2>
+<div class="pl-body">
+  <p>MS/TP — master slave / token passing — is BACnet's link layer for RS-485 multidrop
+     wiring, used by the cheaper end of the device range. A token circulates between
+     master devices and only the holder may transmit. Everything that goes wrong on a
+     trunk is a consequence of that sentence: throughput is shared, one misbehaving
+     device slows every other one, and the network's speed is set by its slowest
+     participant.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Check the licence before the wiring.</strong> A QNX-based controller
+     supports direct MS/TP trunks — one per RS-485 port — <em>if it is licensed for
+     MS/TP</em>. A port that refuses to come up on a controller that has never run MS/TP
+     before is worth ruling out in thirty seconds, not after half a day with a
+     meter.</p>
+</div>
+
+<h2>Where the port lives</h2>
+<div class="pl-body">
+  <p>An <code>MstpPort</code> is dragged from the <code>bacnet</code> palette's
+     NetworkPorts node into <code>BacnetNetwork &gt; Bacnet Comm &gt; Network</code>. Two
+     things get configured, and they are at different levels:</p>
+  <ul>
+    <li>On the <strong>MstpPort</strong> itself, the <code>Network Number</code>. On an
+       existing installation this must match the number already in use for that segment
+       — a duplicate or wrong network number produces symptoms that look like anything
+       except a number.</li>
+    <li>On the <strong>Link</strong> component beneath it, everything physical.</li>
+  </ul>
+</div>
+
+<h2>The four properties that decide everything</h2>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Property</th><th scope="col">Default</th><th scope="col">What it does to you</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Port Name</th><td>none</td>
+        <td>Which physical RS-485 port. <code>COM3</code> for a standard option card; <code>COM3</code>, <code>COM4</code> or <code>COM5</code> with a dual-RS-485 card, to a maximum of three ports on one station.</td></tr>
+    <tr><th scope="row">Baud Rate</th><td>9600</td>
+        <td>Must match every device on the trunk. 9600 is the shipped value and, on most modern trunks, four times slower than the devices can manage — but one device that cannot go faster sets the ceiling for all of them.</td></tr>
+    <tr><th scope="row">Mstp Address</th><td>0</td>
+        <td>The station's BACnet MAC on the trunk, 0–127, and it must be unique on the segment. Leaving it at 0 is a deliberate choice, not laziness — see below.</td></tr>
+    <tr><th scope="row">Max Master</th><td>—</td>
+        <td>The highest master address the token will be offered to. Set it to the highest address actually in use plus a little room, not to 127.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>Two more are worth knowing about. <code>Max Info Frames</code> controls how many
+     messages the station sends before it passes the token on; the documented range is
+     0 to 100, and raising it towards 50 can improve throughput where the station is the
+     busiest talker on the trunk. <code>Support Extended Frames</code> is off by
+     default and enables larger frames, which helps only if the devices on the trunk
+     support them.</p>
+</div>
+
+<h2>Why Max Master is the one people get wrong</h2>
+<div class="pl-body">
+  <p>Each master polls for a successor up the address range as far as Max Master before
+     the token comes back round. Leave it at 127 on a trunk with eight devices addressed
+     1–8 and most of the token loop is spent offering the token to 119 addresses that do
+     not exist. The trunk works. It is simply slower than it needs to be, permanently,
+     and nothing anywhere reports it as a fault.</p>
+  <p>Set it on <em>every</em> master on the segment, not only on the station — the
+     setting is per-device, and one device left at 127 keeps the long loop.</p>
+</div>
+
+<h2>What address 0 actually buys you</h2>
+<div class="pl-body">
+  <p>If the token is ever lost, the device with the lowest MAC address regenerates it.
+     Leaving the station at address 0 makes the station that device, which is normally
+     what you want: it is the participant you can see the status of, restart, and take a
+     backup of. Whatever you choose, confirm no other device on the trunk is already
+     using it — a duplicate MAC is the classic cause of a trunk that works, intermittently,
+     in a way that looks like noise.</p>
+</div>
+
+<h2>Bringing it up</h2>
+<ol class="pl-steps">
+  <li><div><strong>Save the Link changes</strong> before doing anything else; the port
+      does not pick them up otherwise.</div></li>
+  <li><div><strong>Right-click the MstpPort and run Actions &gt; Enable.</strong> Its
+      Status should report <code>{ok}</code>. Anything else, and no amount of device
+      discovery will help.</div></li>
+  <li><div><strong>Then discover.</strong> A device that does not appear after the port
+      is healthy is a baud, MAC or Max Master problem on the device, in that
+      order.</div></li>
+  <li><div><strong>Record the trunk.</strong> Addresses, baud, Max Master and which port
+      — on the drawing, not in somebody's head. The next person on site has a meter and
+      no idea what address 12 is.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/niagara-modules/"],
  ),
 ]
 
