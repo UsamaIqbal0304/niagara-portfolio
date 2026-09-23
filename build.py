@@ -3638,6 +3638,793 @@ NOTES += [
 """,
   related=["services/station-engineering/", "services/bajaux-widgets/"],
  ),
+
+ dict(
+  slug="notes/niagara-hierarchies/",
+  date="2026-09-23",
+  nav="Hierarchies",
+  title="A Navigation Tree That Builds Itself",
+  desc=("Hierarchies generate the nav tree from tags and NEQL queries instead of "
+        "hand-placed nodes — and the cache hides your edits until you rebuild it."),
+  h1="A navigation tree that builds itself",
+  lede=("A hand-built nav file is a second copy of the building, maintained by hand, "
+        "that drifts the moment anything changes. A hierarchy is <strong>a set of rules "
+        "that regenerates the tree</strong> from what the station already knows."),
+  tags=["Hierarchies", "Tagging", "Station engineering"],
+  body="""
+<h2>The problem with a hand-built tree</h2>
+<div class="pl-body">
+  <p>Every station needs a navigation structure that matches how people think about the
+     building &mdash; site, then building, then floor, then plant &mdash; rather than
+     how the drivers happened to be laid out. The obvious way to get one is to place
+     every node by hand.</p>
+  <p>That works exactly once. Add twenty points, rename a plant item, commission a second
+     floor, and the tree and the station disagree. Nobody notices until an operator
+     cannot find a point that has existed for a month.</p>
+  <p>The <code>HierarchyService</code>, installed by default under Services and supplied
+     by the <code>hierarchy</code> module, takes the other approach: you describe the
+     levels, and the station generates the tree by querying itself.</p>
+</div>
+
+<h2>Level definitions: two families</h2>
+<div class="pl-body">
+  <p>A hierarchy is a tree of level definitions, one per node level. They come in two
+     kinds, and mixing them up is the usual first mistake.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Level definition</th><th scope="col">Family</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">GroupLevelDef</th><td>Group</td>
+        <td>Creates a node per distinct <em>value</em> of a tag. One node per building,
+            one per floor. Marker tags do not belong here &mdash; they have no values to
+            group by.</td></tr>
+    <tr><th scope="row">ListLevelDef</th><td>Group</td>
+        <td>Creates nodes from one or more named group definitions, each carrying its own
+            query. Here both marker and value tags are fair game. A list level with no
+            named group inside it produces nothing.</td></tr>
+    <tr><th scope="row">QueryLevelDef</th><td>Entity</td>
+        <td>The level that actually shows data. An NEQL query over tags, returning the
+            components that match.</td></tr>
+    <tr><th scope="row">RelationLevelDef</th><td>Entity</td>
+        <td>Also shows data, but follows a <em>relation</em> from the parent node rather
+            than querying tags in isolation. This is how "the AHUs that serve this floor"
+            becomes a tree level.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note">
+  <p><strong>Group levels are scaffolding; entity levels are content.</strong> A
+     hierarchy made only of group levels produces a tidy set of empty folders. Nothing
+     appears under them until a query or relation level is added at the bottom.</p>
+</div>
+
+<h2>NEQL, briefly</h2>
+<div class="pl-body">
+  <p>The queries are written in NEQL, the same language the Search bar uses, so anything
+     you can find by searching you can turn into a tree level. A few forms cover most
+     real hierarchies:</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Query</th><th scope="col">Matches</th></tr></thead>
+  <tbody>
+    <tr><th scope="row"><code>n:device</code></th>
+        <td>Everything carrying the device marker tag.</td></tr>
+    <tr><th scope="row"><code>n:type = "baja:Folder"</code></th>
+        <td>Entities of a given Niagara type.</td></tr>
+    <tr><th scope="row"><code>n:name like ".*Switch.*"</code></th>
+        <td>Name matching a regular expression. Useful for estates that never got a
+            naming standard.</td></tr>
+    <tr><th scope="row"><code>t:foo and not t:herp</code></th>
+        <td>Boolean combinations, including negation.</td></tr>
+    <tr><th scope="row"><code>n:parent-&gt;hs:floor = 2</code></th>
+        <td>Relation traversal &mdash; children of entities whose floor tag is 2.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Tags are case sensitive.</strong> A query with the wrong case returns
+     nothing at all, silently, and looks identical to a query against a tag nobody
+     applied. This is the single most common reason a level comes back empty.</p>
+</div>
+
+<div class="pl-body">
+  <p>Two extras are worth knowing. A BQL query can be appended to an NEQL query with a
+     pipe, which is handy for building report tables &mdash; the documentation warns
+     plainly that it can be expensive, so it belongs in a report rather than in a tree
+     level somebody expands fifty times a day. And from Niagara 4.6 the <code>sys</code>
+     ORD scheme redirects a query at the System Database, so a hierarchy can span an
+     estate rather than a station.</p>
+</div>
+
+<h2>Scope</h2>
+<div class="pl-body">
+  <p>Each hierarchy has a scope container. The default is the whole station, and the
+     scope ORD narrows it to a branch &mdash; pointing it at a model folder for one
+     building, for instance. The alternative is to narrow with extra level definitions
+     instead. Scoping is usually cheaper, because the query never visits the rest of the
+     station.</p>
+</div>
+
+<h2>Who sees which tree</h2>
+<div class="pl-body">
+  <p>Visibility is granted role by role: the Role Manager has a <strong>Viewable
+     Hierarchies</strong> field, and a role may be given more than one. Because a station
+     can hold several hierarchies, a facilities manager and a plant operator can navigate
+     the same station through completely different structures.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Assigning a hierarchy to a role only exposes the top of it.</strong>
+     Everything below is still filtered by that role's category permissions. Handing
+     somebody a hierarchy does not hand them the points in it, which is the correct
+     behaviour but surprises people who expect one setting to do both jobs.</p>
+</div>
+
+<h2>The cache, and the trap inside it</h2>
+<div class="pl-body">
+  <p>From Niagara 4.4 a hierarchy can be cached on the station side, which makes
+     expanding a large tree in Workbench or a browser dramatically faster. The cost is
+     station heap, and it is applied per hierarchy, by hand, through an action on the
+     hierarchy's right-click menu. The cache lives in memory only, so it is rebuilt at
+     every station start unless <code>Cache On Station Started</code> is set.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>A cached hierarchy does not notice changes &mdash; including permission
+     changes.</strong> Edit the definition, or revoke a user's access to part of the
+     tree, and the cache serves the old answer until somebody clears and rebuilds it. A
+     user you have just locked out can keep browsing. Whoever makes the change owns
+     rebuilding the cache, and that needs to be written down rather than assumed.</p>
+</div>
+
+<div class="pl-body">
+  <p>Separately, and much less alarmingly: editing a hierarchy definition does not
+     refresh a tree that is already open. Right-click the hierarchy node and refresh it,
+     or spend ten minutes convinced your edit did nothing.</p>
+</div>
+
+<h2>Doing it in the right order</h2>
+<ol class="pl-steps">
+  <li><div><strong>Draw the tree on paper first.</strong> The level definitions follow
+      from the structure; deriving the structure from the level definitions goes
+      badly.</div></li>
+  <li><div><strong>List the tags it will need</strong> and check they exist, with
+      consistent naming and consistent case. Tags may come from any dictionary or be ad
+      hoc; what they cannot be is improvised per building.</div></li>
+  <li><div><strong>Add the relations</strong> the tree depends on &mdash; a floor to its
+      air handlers, say &mdash; before writing the relation level that walks
+      them.</div></li>
+  <li><div><strong>Build it iteratively.</strong> Save, evaluate, look at the tree, add
+      the next level. Copy and paste level definitions between hierarchies rather than
+      retyping them.</div></li>
+  <li><div><strong>Set the timeout deliberately.</strong> Hierarchy query processing
+      defaults to a 45-second ceiling; a level that regularly hits it is a level that
+      needs scoping, not a bigger number.</div></li>
+  <li><div><strong>Decide the cache policy before handover</strong>, including who
+      rebuilds it after a permissions change.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/px-graphics/"],
+ ),
+
+ dict(
+  slug="notes/niagara-templates/",
+  date="2026-09-23",
+  nav="Templates",
+  title="Templates: Build the AHU Once, Deploy It Fifty Times",
+  desc=("Component, application and station templates do different jobs — and only one "
+        "of them supports bulk deployment from a spreadsheet and upgrade in place."),
+  h1="Templates: build the AHU once, deploy it fifty times",
+  lede=("Copy-and-paste engineering produces fifty air handlers that were identical on "
+        "the day they were made. A template keeps them identical &mdash; and lets you "
+        "<strong>upgrade all fifty at once</strong>."),
+  tags=["Templates", "Bulk engineering", "Station engineering"],
+  body="""
+<h2>Three things called templates</h2>
+<div class="pl-body">
+  <p>Niagara uses the word for three different mechanisms with different constraints.
+     Picking the wrong one is expensive later, because two of the three cannot be
+     upgraded afterwards.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Type</th><th scope="col">Deployed to</th><th scope="col">Instances</th><th scope="col">Upgradeable</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Station template</th>
+        <td>Used by Workbench when creating a <em>new</em> station. Not installable into a
+            running one.</td>
+        <td>One, at birth</td>
+        <td>No</td></tr>
+    <tr><th scope="row">Application template</th>
+        <td>Installed into a running station, at the root of Config, replacing most of
+            the station's contents.</td>
+        <td>One per station</td>
+        <td>Yes</td></tr>
+    <tr><th scope="row">Component (device) template</th>
+        <td>Deployed into any suitable container, with a name you choose at
+            deployment.</td>
+        <td>Many</td>
+        <td>Yes</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>All three can carry graphics and subtemplates, and <strong>subtemplates are always
+     component templates</strong> regardless of what contains them. Only the component
+     template can define inputs, outputs and references, which is what makes it the one
+     you reach for when the repeated thing is a plant item rather than a whole
+     application.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Installing an application template deletes what is there.</strong> That is
+     deliberate &mdash; it guarantees no fragment of the old application survives and no
+     names collide &mdash; but it means an application template is a replacement
+     operation, not an addition. Know which of the two you are doing before you click
+     it.</p>
+</div>
+
+<h2>Exposed properties are the whole point</h2>
+<div class="pl-body">
+  <p>A template with no exposed properties is a photocopier. The Configuration tab of the
+     template view lets you pick individual properties from inside the logic and expose
+     them; each exposed property can be renamed to something meaningful and given a
+     default value. At deployment the job prompts for those values.</p>
+  <p>So the design decision is: what differs between the fifty air handlers? Setpoint
+     limits, addresses, zone names, run-on times. Expose exactly those, and the
+     deployment becomes a form rather than an engineering exercise. Expose too little and
+     people edit inside the deployed instance, which defeats the upgrade path.</p>
+</div>
+
+<h2>Bulk deployment from a spreadsheet</h2>
+<div class="pl-body">
+  <p>Component templates can be deployed one at a time, or in bulk from an exported Excel
+     file through the Template Manager. The export contains one worksheet per template,
+     named from the template's vendor and title, with the first two columns identifying
+     the instance &mdash; parent path, component name, display name, location &mdash; and
+     the remaining columns carrying inputs, outputs, relations, exposed configuration
+     properties and optional string tags. One row is one instance.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Worksheet order is not cosmetic.</strong> The deployment job works left to
+     right, creating every template item before it creates any links or relations. If
+     one template needs something another template creates, its worksheet must sit to the
+     <em>right</em> of the one that creates it. Reordering tabs is a legitimate part of
+     preparing the file.</p>
+</div>
+
+<div class="pl-body">
+  <p>Three more things the file will teach you the hard way otherwise. The top six rows
+     are metadata that must not be edited &mdash; to change them, edit the template's
+     information properties in Workbench and export again. Header cells carry comments
+     explaining each column, which is faster than guessing. And from Niagara 4.14 each
+     input, output and relation gains an extra column for slot path scope, so an older
+     spreadsheet is not a current one.</p>
+  <p>If the template holds credentials the export is encrypted and prompts for a password
+     on import. Keep it encrypted; it is a file full of passwords sitting in somebody's
+     downloads folder otherwise.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Cancelling a bulk deployment does not undo it.</strong> Cancel stops the job
+     where it is and leaves everything already created in place. On a large sheet, test
+     with two rows before running four hundred.</p>
+</div>
+
+<h2>Upgrade, downgrade, redeploy &mdash; and detach</h2>
+<div class="pl-body">
+  <p>The reason to accept the discipline of templates is here. Fix a fault in the
+     template, and upgrade propagates the fix to every deployed instance through the same
+     provisioning machinery that runs any other estate-wide job. Downgrade and redeploy
+     use the same process. The Template Manager shows each deployment's status, so "is
+     every AHU on the current version" is a view rather than an investigation.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Detach is one-way.</strong> Detaching a deployed template makes it an
+     ordinary set of components again &mdash; and it can never be upgraded. It is the
+     right call when you are deliberately abandoning a template line, and a quiet
+     disaster when somebody does it to make one local edit easier.</p>
+</div>
+
+<h2>Where the effort actually goes</h2>
+<ol class="pl-steps">
+  <li><div><strong>Decide the unit.</strong> One template per plant type, not per
+      variant. Variants are exposed properties.</div></li>
+  <li><div><strong>Expose properties generously</strong> and name them for the engineer
+      filling in the spreadsheet, not for the slot they came from.</div></li>
+  <li><div><strong>Deploy two instances by hand first.</strong> Everything wrong with a
+      template is obvious at two instances and expensive at two hundred.</div></li>
+  <li><div><strong>Order the worksheets by dependency</strong> before the first bulk
+      run.</div></li>
+  <li><div><strong>Never edit inside a deployed instance.</strong> Fix the template and
+      upgrade, or the next upgrade overwrites the local fix and nobody remembers it was
+      there.</div></li>
+</ol>
+""",
+  related=["services/workbench-tooling/", "services/station-engineering/"],
+ ),
+
+ dict(
+  slug="notes/niagara-provisioning-jobs/",
+  date="2026-09-23",
+  nav="Provisioning",
+  title="Doing One Thing to Fifty Stations at Once",
+  desc=("Provisioning runs platform tasks across a whole NiagaraNetwork from one "
+        "Supervisor connection — and the obvious backup action is the wrong one."),
+  h1="Doing one thing to fifty stations at once",
+  lede=("Fifty controllers means fifty platform connections, or one provisioning job. "
+        "The job is <strong>repeatable, schedulable and logged</strong>; the fifty "
+        "connections are an afternoon nobody records."),
+  tags=["Provisioning", "Estate management", "Supervisor"],
+  body="""
+<h2>What it replaces</h2>
+<div class="pl-body">
+  <p>Provisioning is a licensed feature of a station running on a Supervisor. It
+     automates tasks on the remote hosts in that station's NiagaraNetwork &mdash; and
+     these are mostly <em>platform</em> tasks, the kind that would otherwise mean opening
+     a platform connection to each host in turn, or tunnelling to it.</p>
+  <p>Two consequences follow, and the second one is easy to miss.</p>
+  <ul>
+    <li>You need <strong>one station connection to the Supervisor</strong> and nothing
+       else. The job runs from wherever you can reach that station.</li>
+    <li>That includes a web browser. Ordinary platform tasks cannot be done from Web
+       Workbench at all &mdash; provisioning is the exception, because the Supervisor is
+       doing the platform work, not your client.</li>
+  </ul>
+</div>
+
+<h2>Two kinds of job</h2>
+<div class="pl-body">
+  <p>The distinction matters because only one of them is suitable for anything recurring.</p>
+  <ul>
+    <li>A <strong>one-shot job</strong>, built in the Niagara Network Job Builder &mdash;
+       the default view of the <code>ProvisioningNwExt</code> under the NiagaraNetwork.
+       Right for a software rollout you are performing once, now.</li>
+    <li>A <strong>prototype job</strong>, a <code>NiagaraNetworkJobPrototype</code> from
+       the palette, which is reusable and can be linked to a trigger schedule. Right for
+       anything periodic, and it can still be run on demand.</li>
+  </ul>
+  <p>Adding the network extension also creates a set of provisioning device extensions
+     under every Niagara station in the network automatically, including stations added
+     later.</p>
+</div>
+
+<h2>What actually happens when a job runs</h2>
+<div class="pl-body">
+  <p>Reading the execution order once saves a lot of confusion later, because the step
+     count on the progress bar moves while you watch it.</p>
+  <ul>
+    <li>Adjacent software-install, file-copy and upgrade steps are <strong>combined
+       before execution</strong>, to avoid repeating dependency checks and to minimise
+       reboots.</li>
+    <li>If the job includes a licence update it runs <strong>first and once</strong>, as
+       a single silent enquiry to the licensing server covering every host in the
+       job.</li>
+    <li>The remaining steps then run <strong>sequentially per station</strong>, working
+       down the station list. A station reports Running, then Success or Failed.</li>
+    <li>A failed step <strong>ends that station</strong> &mdash; no further steps run on
+       it &mdash; and the job moves to the next one. The job as a whole reports Failed if
+       even one step failed anywhere.</li>
+    <li>Cancelling marks the current station and every station after it as Canceled.</li>
+  </ul>
+  <p>The total step count changes mid-run because of that step combination, the licence
+     step being created automatically, and the steps skipped after a failure. It is not a
+     bug and it is not a progress bar worth staring at.</p>
+  <p>From Niagara 4.7 jobs can run in parallel across stations. The maximum is ten; the
+     practical minimum follows the Supervisor's core count, and the ceiling is set by
+     <code>Max Provisioning Threads</code> on the batch job service.</p>
+</div>
+
+<h2>The backup action almost everybody uses first</h2>
+<div class="pl-body">
+  <p>The NiagaraNetwork has a Start Backup action that backs up every station. On a site
+     with four controllers it is fine. Tridium's own documentation recommends against it
+     as soon as the estate grows, for three reasons.</p>
+  <ul>
+    <li>It builds <strong>one enormous job</strong> that can take a very long time.</li>
+    <li>It loads the whole system at whatever moment somebody happened to click it, which
+       is usually during the working day.</li>
+    <li><strong>The files it leaves behind are not governed by any retention
+       policy.</strong> They accumulate on the Supervisor until a human deletes them, and
+       the eventual symptom is a full disk.</li>
+  </ul>
+</div>
+
+<div class="pl-note">
+  <p><strong>The recommended shape instead.</strong> Several job prototypes, each
+     covering a subset of stations, each linked to its own trigger schedule, staggered
+     &mdash; ten minutes apart is the documented example &mdash; and run out of hours.
+     Each prototype then has its own retention policy, which is the part the action
+     cannot give you.</p>
+</div>
+
+<h2>Retention, because jobs keep files</h2>
+<div class="pl-body">
+  <p>Provisioning persists everything by default: who submitted the job, when it started
+     and ended, the detail of each step and its log output. For backup jobs the saved
+     distribution file is kept too, and can be restored straight from the step log, which
+     launches another provisioning job to do it.</p>
+  <p>That persistence is the feature and the risk. Each job prototype carries a retention
+     policy with three shapes:</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Policy</th><th scope="col">Behaviour</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Retain permanently</th>
+        <td>Nothing is ever deleted automatically. Appropriate for a one-off migration
+            record, wrong for a nightly backup.</td></tr>
+    <tr><th scope="row">Dispose after a period</th>
+        <td>Deleted relative to the job's end time. Defaults to seven days.</td></tr>
+    <tr><th scope="row">Keep a number of executions</th>
+        <td>Keeps the most recent <em>n</em>. By default it counts only successful runs
+            &mdash; clear the checkbox and failures count too, which changes how far back
+            your retained history actually reaches.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>A separate enforcement frequency, one hour by default, decides how often the policy
+     is applied, and there is an action to enforce it immediately. Disposing of a job
+     deletes its files as well as its record &mdash; including the backup distribution
+     file, so "tidying up the job list" is not a cosmetic operation.</p>
+</div>
+
+<h2>Two things to check before relying on it</h2>
+<div class="pl-body">
+  <p>Jobs can raise an alarm on failure, on success, or both. Configure failure alarms at
+     minimum, or an unattended nightly job is only as reliable as somebody's habit of
+     looking at a list.</p>
+  <p>And mixed estates need care: where AX-3.8 hosts share a network with Niagara 4 ones,
+     limitations apply, largely from the security changes in N4, and job steps introduced
+     in later versions are not always backward compatible. A provisioning job that works
+     across the new half of the estate is not evidence that it works across the
+     old half.</p>
+</div>
+
+<h2>What to set up on a Supervisor</h2>
+<ol class="pl-steps">
+  <li><div><strong>The network extension</strong>, so every station gets its provisioning
+      extensions without anyone remembering to add them.</div></li>
+  <li><div><strong>Backup prototypes in groups</strong>, staggered, out of hours, each
+      with a retention policy that matches the disk you actually have.</div></li>
+  <li><div><strong>Failure alarms</strong> routed to somebody who reads them.</div></li>
+  <li><div><strong>One restore, proved</strong>, from a job step log onto spare hardware
+      &mdash; the only evidence that any of this worked.</div></li>
+  <li><div><strong>A note of the parallel thread count</strong> you settled on, and why,
+      so the next person does not raise it to ten on a small Supervisor.</div></li>
+</ol>
+""",
+  related=["services/workbench-tooling/", "services/station-engineering/"],
+ ),
+
+ dict(
+  slug="notes/niagara-roles-and-permissions/",
+  date="2026-09-23",
+  nav="Roles and permissions",
+  title="Roles, Categories and the Grid Between Them",
+  desc=("Niagara permissions are a grid of category against level — which is why a user "
+        "can log in successfully and still be told they have no access."),
+  h1="Roles, categories and the grid between them",
+  lede=("Niagara does not grant permissions to people. It grants <strong>a level of "
+        "access to a category of objects</strong>, to a role, which a person then "
+        "holds. Every confusing symptom comes from one of those four words."),
+  tags=["Station security", "Permissions", "Commissioning"],
+  body="""
+<h2>The four things, in order</h2>
+<div class="pl-body">
+  <p>Access control in a Niagara station is a chain, and you cannot reason about any one
+     link without the others.</p>
+  <ul>
+    <li>Every component belongs to at least one <strong>category</strong>.</li>
+    <li>Every slot has a <strong>permission level</strong> &mdash; operator or admin.</li>
+    <li>A <strong>role</strong> holds a permissions map: for each category, what rights
+       it grants at each level.</li>
+    <li>A <strong>user</strong> is assigned one or more roles, and their permissions are
+       the union of them.</li>
+  </ul>
+  <p>Rights themselves are three: read, write, and invoke an action. They apply to
+     component slots, folders, files and histories alike.</p>
+</div>
+
+<h2>Categories cost memory, so keep them few</h2>
+<div class="pl-body">
+  <p>A new station arrives with two basic categories: <strong>User</strong> (category 1)
+     and <strong>Admin</strong> (category 2). Everything lands in User except three
+     services &mdash; the user service, the category service and the program service
+     &mdash; and the entire file space, which go to Admin.</p>
+  <p>Categories can also be inherited from a parent rather than explicitly assigned, and
+     the two mechanisms can be mixed. What cannot happen is a component in no category
+     at all.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Every component carries a bitmap of its category membership.</strong> The
+     first eight categories occupy one byte; every additional eight adds another byte to
+     every component record in the station. On a controller that is a real number.
+     Minimise the count, and keep the indexes contiguous rather than leaving gaps where
+     deleted categories used to be.</p>
+</div>
+
+<div class="pl-body">
+  <p>Beyond that, how you group is a modelling decision: by equipment type &mdash;
+     lighting, door access, HVAC &mdash; or by geography, floor by floor. Which one is
+     right depends entirely on how the roles will be drawn, so decide the roles
+     first.</p>
+</div>
+
+<h2>Operator and admin are a property of the slot</h2>
+<div class="pl-body">
+  <p>This is the part that is genuinely unintuitive. The operator/admin distinction is
+     not a property of the user or the role &mdash; it is a <strong>config flag on the
+     slot</strong>. If a slot's Operator flag is set, the slot is at operator level. If
+     it is cleared, the slot is at admin level.</p>
+  <p>Most slots default to admin level. The notable exception is the <code>out</code>
+     slot, which is normally operator level &mdash; which is exactly why an operator can
+     watch a value without being able to touch the logic that produces it.</p>
+  <p>Admin level carries more than write access to values: it lets a user see and change
+     the slot flags themselves on the slot sheet. Granting admin rights broadly hands
+     out the ability to reconfigure the permission model.</p>
+</div>
+
+<h2>The permissions map</h2>
+<div class="pl-body">
+  <p>Editing a role opens a grid with one row per category and columns for the operator
+     and admin levels. Rights are written in a shorthand worth reading fluently: lower
+     case for operator level, upper case for admin. <code>r</code> is operator read,
+     <code>rw</code> operator read and write, <code>rR</code> adds admin read, and
+     <code>rwRW</code> is full rights at both levels.</p>
+  <p>A super user sidesteps all of it &mdash; every permission, every category, every
+     object &mdash; and can create further super users. Ordinary users cannot grant what
+     they do not hold, so a non-super user cannot promote anybody to super user.</p>
+</div>
+
+<h2>Two symptoms that account for most of the calls</h2>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>"User does not have access to station. Check permissions."</strong> The
+     credentials were correct &mdash; that is the point of the message. Either no role is
+     assigned to the user, or the roles they hold grant nothing. A role needs permissions
+     on at least one component before the user can enter the station at all.</p>
+</div>
+
+<div class="pl-body">
+  <p>The second is users who cannot change their own password, and the fix is specific.
+     The user service has its own permission scheme, unlike every other component:</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Slot level</th><th scope="col">Role grants</th><th scope="col">The user can</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Operator</th><td><code>r</code></td>
+        <td>Read their own account's properties. Other users are hidden.</td></tr>
+    <tr><th scope="row">Operator</th><td><code>rw</code></td>
+        <td>Read and write their own account &mdash; <strong>this is the setting that
+            lets somebody change their own password</strong>. Other users still
+            hidden.</td></tr>
+    <tr><th scope="row">Admin</th><td><code>rR</code></td>
+        <td>Read every user's properties.</td></tr>
+    <tr><th scope="row">Admin</th><td><code>rwRW</code></td>
+        <td>Read and write all non-super users, add and delete users, and use the User
+            Manager and Permissions Browser.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>So: leave the Authenticator slot at operator level, which is its default, and give
+     every non-super-user role operator-level write on the category holding the user
+     service. By default the new station wizard puts that service in the Admin category,
+     which is why the permission people want is in a place they do not think to look.</p>
+</div>
+
+<h2>Ancestors are granted automatically</h2>
+<div class="pl-body">
+  <p>Giving somebody access to a point buried six levels deep would be useless if they
+     could not see the folders above it. The station handles this: it automatically
+     grants operator-level read on every ancestor of a component a user can reach, so the
+     nav tree is navigable.</p>
+  <p>It does so periodically rather than instantly, which is why a freshly granted
+     permission sometimes appears not to work. The category service has an
+     <strong>Update</strong> action that forces it.</p>
+</div>
+
+<h2>Files have their own rules</h2>
+<div class="pl-body">
+  <p>The whole file space defaults to the Admin category, and file permissions behave
+     mostly at operator level.</p>
+  <ul>
+    <li>Operator read to view a file; operator write to edit one.</li>
+    <li>Operator read on a folder to list it and copy children out; operator write to
+       create or delete children.</li>
+    <li>A few views want admin-level write &mdash; the nav file editor among them.</li>
+    <li>Operators typically need operator-level read on the standard folders: nav, px,
+       images, html.</li>
+  </ul>
+  <p>Some rules are not yours to set. System module files are automatically restricted to
+     operator-level read. Non-super users are denied everything outside the station home
+     directory. A Supervisor's provisioning folder needs admin-level read to be visible
+     at all. And the station's own <code>config.bog</code> and its backup are not
+     accessible in the file space to anybody, super user included.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Do not solve a file-access problem by granting Admin.</strong> The
+     documented advice, and the right one, is to create a new category containing only
+     what that person needs. Raising somebody to Admin to let them open one folder grants
+     them the three services and the whole file space as well.</p>
+</div>
+
+<h2>A model that survives handover</h2>
+<ol class="pl-steps">
+  <li><div><strong>Write the roles down first</strong> &mdash; duty by duty, not person
+      by person. Categories follow from roles; roles do not follow from
+      categories.</div></li>
+  <li><div><strong>Keep the category count small and contiguous.</strong> Every one of
+      them is bytes on every component.</div></li>
+  <li><div><strong>Give every non-super role operator write on the user service
+      category</strong>, so password changes are self-service on day one.</div></li>
+  <li><div><strong>Log in as each role and try to break it.</strong> The category browser
+      tells you what a role can reach; actually logging in tells you what it feels
+      like.</div></li>
+  <li><div><strong>Count the super users</strong> before handover, and again after. The
+      number should be small and deliberate.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/workbench-tooling/"],
+ ),
+
+ dict(
+  slug="notes/ax-to-n4-migration/",
+  date="2026-09-23",
+  nav="AX to N4",
+  title="What Actually Blocks an AX to N4 Migration",
+  desc=("A station cannot migrate until every module it uses has been refactored for "
+        "Niagara 4 — and licences, users and permissions all change shape on the way."),
+  h1="What actually blocks an AX to N4 migration",
+  lede=("The migration tool is the easy part. What stops a job is <strong>one custom "
+        "module nobody has the source for</strong>, found on the day the Supervisor was "
+        "meant to go live."),
+  tags=["Migration", "Estate management", "Module development"],
+  body="""
+<h2>Find the blockers before you plan the dates</h2>
+<div class="pl-body">
+  <p>Most of the risk in a migration is discovered in the survey, not in the conversion.
+     Four questions decide whether a date is realistic.</p>
+  <ul>
+    <li><strong>Is every controller at AX 3.8 or later?</strong> That is the floor for
+       compatibility with Niagara 4.</li>
+    <li><strong>Is every driver and application it runs supported in N4?</strong></li>
+    <li><strong>What custom or third-party modules are installed?</strong> Connect to the
+       platform, open the Software Manager, and sort by installed version &mdash;
+       anything not from Tridium is on the list. Modules that are installed but not used
+       by the running station do not matter.</li>
+    <li><strong>Were any modules built from Program components</strong> with the program
+       module builder? Those need refactoring too, and they are easy to forget because
+       nobody thinks of them as modules.</li>
+  </ul>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>A station cannot be migrated until every module it uses has been refactored
+     for Niagara 4.</strong> Not "should not" &mdash; cannot. If a third party wrote it,
+     the refactor is theirs to do, and that is a lead time you do not control. This is
+     the single item most likely to move a migration date, and the only defence is
+     finding it early.</p>
+</div>
+
+<h2>The direction is not symmetrical</h2>
+<div class="pl-body">
+  <p>If a controller runs something unsupported in N4 and genuinely cannot change, you
+     can leave it on AX-3.8 and still integrate it with a Niagara 4 Supervisor. The
+     reverse does not work: <strong>an AX-3.8 Supervisor cannot integrate Niagara 4
+     controllers</strong>.</p>
+  <p>Which fixes the order of work. The Supervisor migrates first, then controllers
+     follow at whatever pace the estate allows, and the awkward ones can be left behind
+     indefinitely rather than holding up everything else.</p>
+</div>
+
+<h2>Licences, before anything else</h2>
+<div class="pl-body">
+  <p>AX licences do not work in Niagara 4. Request N4 licences for every platform being
+     migrated and <strong>confirm they are ready before you start</strong>, because a
+     converted controller without a licence is a controller that is off.</p>
+  <p>The host ID is almost always unchanged, so the request is straightforward. The
+     exception worth checking: on Windows, moving between a 32-bit and a 64-bit
+     installation changes the host ID. Archive the old AX licence files as well &mdash;
+     they are the only record of what was licensed, and they are needed if any part of
+     the estate stays on AX.</p>
+</div>
+
+<h2>Running the migration tool</h2>
+<div class="pl-body">
+  <p>The tool takes an AX-3.8 station backup distribution file and writes out an
+     N4-compatible station folder, plus a log, into the Workbench user home. The source
+     file is never modified, and the output always goes somewhere new, so a failed run
+     costs nothing but time. AX does not need to be installed on the machine &mdash; only
+     the backup file does.</p>
+  <p>It asks which migration template to use, controller or Supervisor, and takes the
+     target station name from inside the backup. The result is installed onto the
+     converted platform with the N4 station copier over an ordinary platform
+     connection.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Run it in a standalone Niagara console, not the console embedded in
+     Workbench.</strong> The embedded console is not supported and does not handle the
+     interactive input correctly &mdash; which matters precisely when the AX station
+     holds encrypted passwords and the tool needs a pass phrase from you.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Configure code signing first.</strong> From Niagara 4.3 the migration tool
+     signs every program object it encounters, using the code-signing certificate
+     configured in Workbench, and prompts for that certificate's password the first time.
+     Sorting this out beforehand turns a mid-run surprise into a non-event.</p>
+</div>
+
+<h2>Users and permissions change shape</h2>
+<div class="pl-body">
+  <p>Two structural changes happen to security during migration, and both are worth
+     explaining to whoever owns the system before they see them.</p>
+  <p><strong>Authentication becomes user-specific.</strong> The password moves inside an
+     Authenticator container alongside its configuration, and each user gains an
+     authentication scheme name &mdash; typically a digest scheme by default &mdash;
+     backed by a required authentication service. For migrated users this normally needs
+     no attention; it is new users where the flexibility shows up.</p>
+  <p><strong>Permissions move from users to roles.</strong> In AX, each user carried a
+     permissions map. In N4 that map lives on a role, and users are assigned roles. To
+     preserve behaviour exactly, the migration creates <em>one role per user, named
+     identically to the user</em>, holding that user's old map.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>That one-to-one mapping is a compatibility shim, not a design.</strong> It
+     leaves you with as many roles as users, which is the situation roles exist to
+     prevent. The cleanup &mdash; create duty-specific roles, reassign users to
+     combinations of them, delete the per-user roles &mdash; is small, and it is much
+     easier in the weeks after a migration than in the years after.</p>
+  <p>One quirk while doing it: the role manager can create, edit and delete roles but
+     cannot assign them to users. Assignment happens in the user manager or on the user's
+     property sheet.</p>
+</div>
+
+<h2>Two details that bite later</h2>
+<div class="pl-body">
+  <p><strong>Environment files.</strong> Anything customised under the framework's lib
+     directory &mdash; a modified units file, custom colour coding &mdash; is not
+     automatically carried across in a meaningful way. Check whether the values in them
+     need re-applying, because the symptom is not an error; it is a graphic that displays
+     the wrong units a month later.</p>
+  <p><strong>User prototypes, if you synchronise users to a station staying on AX.</strong>
+     AX has no equivalent of the HTML5 profile, so the migration assigns the first
+     prototype in the list &mdash; which is not the one you want. Enabling the
+     user-defined configuration flag on the web profile config for each user prototype
+     slot in the AX station avoids it.</p>
+</div>
+
+<h2>After the last controller</h2>
+<ol class="pl-steps">
+  <li><div><strong>Verify platform daemon communications</strong> between the Supervisor
+      and every controller read ok. This is the check that catches a conversion that
+      looked fine.</div></li>
+  <li><div><strong>Revisit provisioning.</strong> A migrated Supervisor with provisioning
+      configured needs post-migration attention, and a mixed estate constrains which job
+      steps are safe to run.</div></li>
+  <li><div><strong>Collapse the per-user roles</strong> into something a new engineer can
+      read.</div></li>
+  <li><div><strong>Re-apply environment customisations</strong> and prove one graphic per
+      unit type displays correctly.</div></li>
+  <li><div><strong>Write down which controllers stayed on AX and why</strong>, with the
+      module and the vendor named. That list is the plan for the next migration, and
+      without it somebody surveys the estate again from scratch.</div></li>
+</ol>
+""",
+  related=["services/niagara-5-migration/", "services/niagara-modules/"],
+ ),
 ]
 
 NOTE_LOOKUP = {n["slug"]: n for n in NOTES}

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roles, Categories and the Grid Between Them</title>
+<meta name="description" content="Niagara permissions are a grid of category against level — which is why a user can log in successfully and still be told they have no access.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-roles-and-permissions/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Roles, Categories and the Grid Between Them">
+<meta property="og:description" content="Niagara permissions are a grid of category against level — which is why a user can log in successfully and still be told they have no access.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-roles-and-permissions/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Roles, Categories and the Grid Between Them">
+<meta name="twitter:description" content="Niagara permissions are a grid of category against level — which is why a user can log in successfully and still be told they have no access.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/niagara-roles-and-permissions.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/niagara-roles-and-permissions/#article",
+   "headline": "Roles, categories and the grid between them",
+   "description": "Niagara permissions are a grid of category against level — which is why a user can log in successfully and still be told they have no access.",
+   "url": "https://plantroomlabs.com/notes/niagara-roles-and-permissions/",
+   "inLanguage": "en-GB",
+   "keywords": "Station security, Permissions, Commissioning",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-roles-and-permissions/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Roles and permissions"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Roles and permissions</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>Roles, categories and the grid between them</h1>
+    <p class="pl-lede">Niagara does not grant permissions to people. It grants <strong>a level of access to a category of objects</strong>, to a role, which a person then holds. Every confusing symptom comes from one of those four words.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Station security</li><li class="pl-chip pl-chip--on-dark">Permissions</li><li class="pl-chip pl-chip--on-dark">Commissioning</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+<h2>The four things, in order</h2>
+<div class="pl-body">
+  <p>Access control in a Niagara station is a chain, and you cannot reason about any one
+     link without the others.</p>
+  <ul>
+    <li>Every component belongs to at least one <strong>category</strong>.</li>
+    <li>Every slot has a <strong>permission level</strong> &mdash; operator or admin.</li>
+    <li>A <strong>role</strong> holds a permissions map: for each category, what rights
+       it grants at each level.</li>
+    <li>A <strong>user</strong> is assigned one or more roles, and their permissions are
+       the union of them.</li>
+  </ul>
+  <p>Rights themselves are three: read, write, and invoke an action. They apply to
+     component slots, folders, files and histories alike.</p>
+</div>
+
+<h2>Categories cost memory, so keep them few</h2>
+<div class="pl-body">
+  <p>A new station arrives with two basic categories: <strong>User</strong> (category 1)
+     and <strong>Admin</strong> (category 2). Everything lands in User except three
+     services &mdash; the user service, the category service and the program service
+     &mdash; and the entire file space, which go to Admin.</p>
+  <p>Categories can also be inherited from a parent rather than explicitly assigned, and
+     the two mechanisms can be mixed. What cannot happen is a component in no category
+     at all.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Every component carries a bitmap of its category membership.</strong> The
+     first eight categories occupy one byte; every additional eight adds another byte to
+     every component record in the station. On a controller that is a real number.
+     Minimise the count, and keep the indexes contiguous rather than leaving gaps where
+     deleted categories used to be.</p>
+</div>
+
+<div class="pl-body">
+  <p>Beyond that, how you group is a modelling decision: by equipment type &mdash;
+     lighting, door access, HVAC &mdash; or by geography, floor by floor. Which one is
+     right depends entirely on how the roles will be drawn, so decide the roles
+     first.</p>
+</div>
+
+<h2>Operator and admin are a property of the slot</h2>
+<div class="pl-body">
+  <p>This is the part that is genuinely unintuitive. The operator/admin distinction is
+     not a property of the user or the role &mdash; it is a <strong>config flag on the
+     slot</strong>. If a slot's Operator flag is set, the slot is at operator level. If
+     it is cleared, the slot is at admin level.</p>
+  <p>Most slots default to admin level. The notable exception is the <code>out</code>
+     slot, which is normally operator level &mdash; which is exactly why an operator can
+     watch a value without being able to touch the logic that produces it.</p>
+  <p>Admin level carries more than write access to values: it lets a user see and change
+     the slot flags themselves on the slot sheet. Granting admin rights broadly hands
+     out the ability to reconfigure the permission model.</p>
+</div>
+
+<h2>The permissions map</h2>
+<div class="pl-body">
+  <p>Editing a role opens a grid with one row per category and columns for the operator
+     and admin levels. Rights are written in a shorthand worth reading fluently: lower
+     case for operator level, upper case for admin. <code>r</code> is operator read,
+     <code>rw</code> operator read and write, <code>rR</code> adds admin read, and
+     <code>rwRW</code> is full rights at both levels.</p>
+  <p>A super user sidesteps all of it &mdash; every permission, every category, every
+     object &mdash; and can create further super users. Ordinary users cannot grant what
+     they do not hold, so a non-super user cannot promote anybody to super user.</p>
+</div>
+
+<h2>Two symptoms that account for most of the calls</h2>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>"User does not have access to station. Check permissions."</strong> The
+     credentials were correct &mdash; that is the point of the message. Either no role is
+     assigned to the user, or the roles they hold grant nothing. A role needs permissions
+     on at least one component before the user can enter the station at all.</p>
+</div>
+
+<div class="pl-body">
+  <p>The second is users who cannot change their own password, and the fix is specific.
+     The user service has its own permission scheme, unlike every other component:</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Slot level</th><th scope="col">Role grants</th><th scope="col">The user can</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Operator</th><td><code>r</code></td>
+        <td>Read their own account's properties. Other users are hidden.</td></tr>
+    <tr><th scope="row">Operator</th><td><code>rw</code></td>
+        <td>Read and write their own account &mdash; <strong>this is the setting that
+            lets somebody change their own password</strong>. Other users still
+            hidden.</td></tr>
+    <tr><th scope="row">Admin</th><td><code>rR</code></td>
+        <td>Read every user's properties.</td></tr>
+    <tr><th scope="row">Admin</th><td><code>rwRW</code></td>
+        <td>Read and write all non-super users, add and delete users, and use the User
+            Manager and Permissions Browser.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>So: leave the Authenticator slot at operator level, which is its default, and give
+     every non-super-user role operator-level write on the category holding the user
+     service. By default the new station wizard puts that service in the Admin category,
+     which is why the permission people want is in a place they do not think to look.</p>
+</div>
+
+<h2>Ancestors are granted automatically</h2>
+<div class="pl-body">
+  <p>Giving somebody access to a point buried six levels deep would be useless if they
+     could not see the folders above it. The station handles this: it automatically
+     grants operator-level read on every ancestor of a component a user can reach, so the
+     nav tree is navigable.</p>
+  <p>It does so periodically rather than instantly, which is why a freshly granted
+     permission sometimes appears not to work. The category service has an
+     <strong>Update</strong> action that forces it.</p>
+</div>
+
+<h2>Files have their own rules</h2>
+<div class="pl-body">
+  <p>The whole file space defaults to the Admin category, and file permissions behave
+     mostly at operator level.</p>
+  <ul>
+    <li>Operator read to view a file; operator write to edit one.</li>
+    <li>Operator read on a folder to list it and copy children out; operator write to
+       create or delete children.</li>
+    <li>A few views want admin-level write &mdash; the nav file editor among them.</li>
+    <li>Operators typically need operator-level read on the standard folders: nav, px,
+       images, html.</li>
+  </ul>
+  <p>Some rules are not yours to set. System module files are automatically restricted to
+     operator-level read. Non-super users are denied everything outside the station home
+     directory. A Supervisor's provisioning folder needs admin-level read to be visible
+     at all. And the station's own <code>config.bog</code> and its backup are not
+     accessible in the file space to anybody, super user included.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Do not solve a file-access problem by granting Admin.</strong> The
+     documented advice, and the right one, is to create a new category containing only
+     what that person needs. Raising somebody to Admin to let them open one folder grants
+     them the three services and the whole file space as well.</p>
+</div>
+
+<h2>A model that survives handover</h2>
+<ol class="pl-steps">
+  <li><div><strong>Write the roles down first</strong> &mdash; duty by duty, not person
+      by person. Categories follow from roles; roles do not follow from
+      categories.</div></li>
+  <li><div><strong>Keep the category count small and contiguous.</strong> Every one of
+      them is bytes on every component.</div></li>
+  <li><div><strong>Give every non-super role operator write on the user service
+      category</strong>, so password changes are self-service on day one.</div></li>
+  <li><div><strong>Log in as each role and try to break it.</strong> The category browser
+      tells you what a role can reach; actually logging in tells you what it feels
+      like.</div></li>
+  <li><div><strong>Count the super users</strong> before handover, and again after. The
+      number should be small and deliberate.</div></li>
+</ol>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 3.5a5 5 0 0 0-6.8 6.3L3 14.5V21h6.5l4.7-4.7a5 5 0 0 0 6.3-6.8L17 12.5 11.5 7z"/></svg></span>
+        <h3><a href="/services/workbench-tooling/">Workbench tooling</a></h3>
+        <p>Custom Workbench views and tools for repetitive Niagara work: bulk renaming and retagging, station audits, provisioning helpers and module inventories.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
+      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
+      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-runs-on-a-jace/">Pure Java, or it will not run on a JACE</a></h3>
+      <p>A controller is an ARM host with a fraction of a server's memory. Native libraries, JNI and heavyweight dependencies do not survive the move from a PC.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Controllers</li><li class="pl-chip">Module development</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>
