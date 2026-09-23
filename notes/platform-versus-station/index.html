@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Platform or Station: Two Connections, Two Sets of Logins</title>
+<meta name="description" content="Two processes, two Java VMs, two logins and two file trees — and most “it works in Workbench but not the browser” starts here.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/platform-versus-station/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="Platform or Station: Two Connections, Two Sets of Logins">
+<meta property="og:description" content="Two processes, two Java VMs, two logins and two file trees — and most “it works in Workbench but not the browser” starts here.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/platform-versus-station/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Platform or Station: Two Connections, Two Sets of Logins">
+<meta name="twitter:description" content="Two processes, two Java VMs, two logins and two file trees — and most “it works in Workbench but not the browser” starts here.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/platform-versus-station.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/platform-versus-station/#article",
+   "headline": "Platform or station: two connections, two sets of logins",
+   "description": "Two processes, two Java VMs, two logins and two file trees — and most “it works in Workbench but not the browser” starts here.",
+   "url": "https://plantroomlabs.com/notes/platform-versus-station/",
+   "inLanguage": "en-GB",
+   "keywords": "Platform, Station engineering, Workbench",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/platform-versus-station/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Platform vs station"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Platform vs station</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>Platform or station: two connections, two sets of logins</h1>
+    <p class="pl-lede">Half the confusion in a first Niagara job comes from one fact nobody says out loud: the <strong>platform and the station are separate programs</strong>, and almost nothing crosses between them.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Platform</li><li class="pl-chip pl-chip--on-dark">Station engineering</li><li class="pl-chip pl-chip--on-dark">Workbench</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#two-processes-two-virtual-machines">Two processes, two virtual machines</a></li><li><a href="#two-sets-of-credentials-and-neither-manages-the-other">Two sets of credentials, and neither manages the other</a></li><li><a href="#platformservices-the-station-s-window-onto-the-platform">PlatformServices: the station's window onto the platform</a></li><li><a href="#where-the-files-actually-live">Where the files actually live</a></li><li><a href="#the-application-director-is-the-platform-s-view-of-the-station">The Application Director is the platform's view of the station</a></li><li><a href="#move-stations-with-the-station-copier-not-the-file-system">Move stations with the Station Copier, not the file system</a></li></ol>
+    </nav>
+<h2 id="two-processes-two-virtual-machines">Two processes, two virtual machines</h2>
+<div class="pl-body">
+  <p>The platform daemon, <code>niagarad</code>, is pre-installed on every controller
+     from the factory and starts whenever the hardware boots. It is Java, running in
+     its own Hotspot VM, and it runs whether or not there is a station — a brand-new
+     controller with no station installed is still fully manageable. The station, when
+     one exists, runs in a <em>second and separate</em> VM that the daemon starts and
+     stops.</p>
+  <p>Which is why there are two kinds of connection. A platform connection is Workbench
+     talking to the daemon, on HTTPS 5011 where TLS is available and 3011 where it is
+     not. A station connection is Workbench, or another station, talking to the station
+     over Fox. They authenticate differently, they show different views, and one being
+     up tells you nothing about the other.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>A platform connection needs Workbench.</strong> There is no browser
+     equivalent — no amount of WebService configuration will expose Software Manager or
+     the Station Copier to a browser. The one indirect route is a Supervisor station
+     reaching a remote platform through its <code>ProvisioningService</code>, which is
+     exactly why provisioning exists.</p>
+</div>
+
+<h2 id="two-sets-of-credentials-and-neither-manages-the-other">Two sets of credentials, and neither manages the other</h2>
+<div class="pl-body">
+  <p>Platform users live in the daemon. There can be up to twenty, every one of them a
+     full administrator able to create more, and there is no way to hand out a
+     restricted one. Station users live in the station database, with roles, categories
+     and permissions, and can be as narrow as you like.</p>
+  <p>Deleting a station user does not affect platform access. Losing the platform
+     password does not lock you out of the station, and vice versa. On a site where
+     somebody has left, both lists need checking, and the platform list is the one that
+     usually gets forgotten because it is only visible over a platform connection in
+     the first place.</p>
+</div>
+
+<h2 id="platformservices-the-station-s-window-onto-the-platform">PlatformServices: the station's window onto the platform</h2>
+<div class="pl-body">
+  <p>There is one deliberate hole in the wall. Every running station has a
+     <code>PlatformServices</code> container under Config &rarr; Services, reachable
+     over an ordinary Fox connection by any station user with admin permission on
+     Services — no platform connection involved. It exposes a subset of the platform
+     views, and a few settings that exist <em>nowhere else</em>.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Service</th><th>Where</th><th>What it gives you</th></tr></thead>
+  <tbody>
+    <tr><td>TcpIpPlatformService</td><td>PC and controller</td>
+        <td>the same addressing as the platform's TCP/IP view</td></tr>
+    <tr><td>LicensePlatformService</td><td>PC and controller</td>
+        <td>the same licences as License Manager</td></tr>
+    <tr><td>CertManagerService</td><td>PC and controller</td>
+        <td>key store, trust store and allowed-host exceptions</td></tr>
+    <tr><td>SyslogPlatformService</td><td>PC and controller</td>
+        <td>ships Niagara log messages to a remote syslog server</td></tr>
+    <tr><td>SerialPortService</td><td>controller only</td>
+        <td>which serial ports the host actually has</td></tr>
+    <tr><td>NtpPlatformService</td><td>controller only</td>
+        <td>the QNX NTP daemon and its list of time servers</td></tr>
+    <tr><td>DataRecoveryService</td><td>controller only</td>
+        <td>the static RAM buffers behind battery-less operation</td></tr>
+    <tr><td>HardwareScanService</td><td>controller only</td>
+        <td>a labelled diagram of the ports on this model, if
+            <code>platHwScan</code> is installed</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>Two things about this container catch people out. It is built dynamically when the
+     station starts, so it does not exist in an offline station — open the .bog in
+     Workbench and there is nothing to look at. And its settings are <em>not</em> stored
+     in the station database: they go to <code>platform.bog</code> or to the operating
+     system, which means they survive the station being replaced, and a station backup
+     does not carry them.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>Be careful who gets admin on Services.</strong> This is the part of the
+     station that holds host licences and IP settings, and the right-click menu on
+     PlatformServices includes Restart Station. A permission model that is careful
+     about setpoints and casual about Services has the wrong shape.</p>
+</div>
+
+<h2 id="where-the-files-actually-live">Where the files actually live</h2>
+<div class="pl-body">
+  <p>A controller has exactly two homes, and both are visible under Platform &rarr;
+     Remote File System.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Home</th><th>Alias</th><th>ORD</th><th>Path</th><th>Contents</th></tr></thead>
+  <tbody>
+    <tr><td>System Home</td><td><code>niagara_home</code></td><td><code>!</code></td>
+        <td><code>/opt/niagara</code></td><td>the installed software; read-only</td></tr>
+    <tr><td>daemon User Home</td><td><code>niagara_user_home</code></td><td><code>~</code></td>
+        <td><code>/home/niagara</code></td><td>configuration and the installed station</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>Inside the station folder there is a second split, and this one changed at N4. The
+     station root is the <strong>protected station home</strong>, which only core
+     Niagara modules may touch: <code>config.bog</code> and its timestamped backups
+     sit there, along with <code>alarm</code>, <code>history</code>,
+     <code>dataRecovery</code>, <code>provisioningNiagara</code> and the virtual driver
+     folder. The <code>shared</code> sub-folder is the ordinary one, writable by any
+     module, and it holds <code>px</code>, <code>images</code>, <code>nav</code> and
+     everything else a graphic refers to.</p>
+  <p>The consequence for anyone writing a module: the <code>^</code> ORD, which in AX
+     pointed at the station root, now points at <code>shared</code>. The Java Security
+     Manager enforces it, so a module that writes to the station root does not misbehave
+     quietly — it fails. On the other hand N4 no longer needs the file blacklists AX
+     relied on, because the boundary is structural.</p>
+</div>
+
+<h2 id="the-application-director-is-the-platform-s-view-of-the-station">The Application Director is the platform's view of the station</h2>
+<div class="pl-body">
+  <p>One platform view is worth learning properly. On a controller the Application
+     Director lists exactly one station — a Windows host may list several — and its
+     Details column is the fastest answer to "why can I not reach it": <code>fox=</code>
+     and <code>foxs=</code> for Workbench, <code>http=</code> and <code>https=</code>
+     for browsers, <code>foxwss=</code> for Fox over WebSocket. Each reads
+     <code>n/a</code> when that protocol is disabled or the station is not running, and
+     a station with <code>http=n/a</code> is not a network problem.</p>
+  <p>Two properties decide what happens without you. <strong>Auto-Start</strong> starts
+     the station after the daemon does, which covers every reboot, every dist file
+     installation, every TCP/IP change and every module upgrade — all of which restart
+     the station whether you asked or not. <strong>Restart on Failure</strong> has the
+     daemon restart a station that exits with an error, such as one the engine watchdog
+     killed for a deadlock. It gives up after three automatic restarts in ten minutes,
+     leaving the station failed rather than flapping; the count is the
+     <code>Failure Reboot Limit</code> property on the station's PlatformService.</p>
+  <p>Note that this view does not behave like the rest of Workbench: there is no Save
+     button, and every checkbox and button applies the moment you click it. Stop shuts
+     the station down cleanly, saving <code>config.bog</code> and history. Kill does not
+     — it terminates the process, and whatever was unsaved is gone. Between the two,
+     Verify Software is the quiet one worth using: it parses
+     <code>config.bog</code> and <code>platform.bog</code> and tells you which modules
+     the station references but the host does not have.</p>
+</div>
+
+<h2 id="move-stations-with-the-station-copier-not-the-file-system">Move stations with the Station Copier, not the file system</h2>
+<div class="pl-body">
+  <p>It is tempting to drag a station folder across with the file transfer client, and
+     it produces a station nobody can log into. The Station Copier transcodes user
+     passwords for the target host as part of the copy; a raw file copy does not, so
+     the users arrive unusable. It also checks the target for the modules the station
+     depends on before it starts, and refuses rather than installing something that
+     cannot run.</p>
+  <p>Module signatures are checked on the way in too. Warnings on a dependency raise a
+     Signature Warning window you can accept; a signature <em>error</em> fails the copy
+     outright. That is the same gate a module faces at install time, arriving at the
+     least convenient moment — which is an argument for getting signing right long
+     before the station moves.</p>
+</div>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
+      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-roles-and-permissions/">Roles, categories and the grid between them</a></h3>
+      <p>Niagara permissions are a grid of category against level — which is why a user can log in successfully and still be told they have no access.</p>
+      <ul class="pl-chips"><li class="pl-chip">Station security</li><li class="pl-chip">Permissions</li><li class="pl-chip">Commissioning</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/commissioning-a-jace-8000/">Commissioning a JACE-8000 without locking yourself out</a></h3>
+      <p>The factory address, the passphrase and the account you are made to delete — the commissioning steps that strand a new controller.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Commissioning</li><li class="pl-chip">Deployment</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

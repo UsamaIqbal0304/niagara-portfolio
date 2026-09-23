@@ -130,6 +130,7 @@ than from memory, and free to quote. Index at https://plantroomlabs.com/notes/.
 - [Why a writable point ignores the value you set](https://plantroomlabs.com/notes/niagara-writable-point-priority/): Sixteen priority inputs, two of them reserved for right-click actions, a fallback underneath, and a BACnet scheme wired to none of it. Markdown: https://plantroomlabs.com/notes/niagara-writable-point-priority.md
 - [What the Niagara MQTT driver will and will not do](https://plantroomlabs.com/notes/niagara-mqtt-driver/): It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker. Markdown: https://plantroomlabs.com/notes/niagara-mqtt-driver.md
 - [Commissioning a JACE-8000 without locking yourself out](https://plantroomlabs.com/notes/commissioning-a-jace-8000/): The factory address, the passphrase and the account you are made to delete — the commissioning steps that strand a new controller. Markdown: https://plantroomlabs.com/notes/commissioning-a-jace-8000.md
+- [Platform or station: two connections, two sets of logins](https://plantroomlabs.com/notes/platform-versus-station/): Two processes, two Java VMs, two logins and two file trees — and most “it works in Workbench but not the browser” starts here. Markdown: https://plantroomlabs.com/notes/platform-versus-station.md
 
 ## Honest limits
 
