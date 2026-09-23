@@ -1,64 +1,409 @@
 {
-  "site": { "name": "NO.7 OLD PARK LANE", "view": "Level 01 — Master Systems",
-            "city": "LONDON, UK", "time": "11:30 AM", "date": "03-APR-26", "oat": "23.0" },
+  "site": {
+    "name": "NO.7 OLD PARK LANE",
+    "view": "Level 01 — Master Systems",
+    "city": "LONDON, UK",
+    "time": "11:30 AM",
+    "date": "03-APR-26",
+    "oat": "23.0"
+  },
   "blocks": [
-    { "type": "kpis", "tiles": [
-      { "id": "kpi-demand", "label": "Total Demand", "value": "1497.36", "units": "kW-hr",
-        "icon": "power", "tone": "active", "delta": "-11%", "caption": "· last 24 h", "live": true,
-        "ord": "station:|slot:/Drivers/BacnetNetwork/MainMeter/points/kWhr" },
-      { "id": "kpi-chw", "label": "Chilled Water", "value": "6.4", "units": "°C",
-        "icon": "cooling", "tone": "info", "delta": "setpoint 6.0", "caption": "· last 24 h",
-        "ord": "station:|slot:/Drivers/BacnetNetwork/CHW/points/FlowTemp" },
-      { "id": "kpi-lthw", "label": "LTHW Flow", "value": "68.2", "units": "°C",
-        "icon": "heating", "tone": "healthy", "delta": "stable", "caption": "· last 24 h",
-        "ord": "station:|slot:/Drivers/BacnetNetwork/LTHW/points/FlowTemp" },
-      { "id": "kpi-faults", "label": "Open Faults", "value": "2", "units": "",
-        "icon": "bell", "tone": "fault", "delta": "+1 today", "good": false, "caption": "· last 24 h",
-        "ord": "station:|slot:/Services/AlarmService" } ] },
-
-    { "type": "values", "span": 4, "title": "Cards, Values & Actions", "icon": "meter", "rows": [
-      { "id": "sched", "label": "Time Schedule", "value": "UNOCCUPIED",
-        "ord": "station:|slot:/Services/ScheduleService/Occupancy" },
-      { "id": "vrf", "label": "VRF Control", "value": "AUTO", "action": "edit",
-        "ord": "station:|slot:/Drivers/BacnetNetwork/VRF/points/Mode" },
-      { "id": "coolsp", "label": "Comfort Cool SP", "value": "20.0", "units": "°C", "action": "edit",
-        "ord": "station:|slot:/Drivers/BacnetNetwork/L1East/points/CoolSp" },
-      { "divider": true },
-      { "id": "dbt1", "label": "DB-T1-01", "value": "1497.36", "units": "kW-hr", "action": "open",
-        "ord": "station:|slot:/Drivers/BacnetNetwork/DBT101" },
-      { "id": "wmeter", "label": "Water Meter", "value": "0.14", "units": "m³", "action": "open",
-        "ord": "station:|slot:/Drivers/BacnetNetwork/WaterMeter" } ] },
-
-    { "type": "split", "span": 5, "title": "Plant Monitoring", "icon": "boiler",
-      "left": [
-        { "id": "frost", "label": "Frost Protection", "chip": "INACTIVE", "state": "inactive",
-          "ord": "station:|slot:/Drivers/BacnetNetwork/LTHW/points/FrostStat" },
-        { "id": "smoke", "label": "Smoke Extract Status", "chip": "HEALTHY", "state": "healthy" },
-        { "id": "damper", "label": "Fire Damper Status", "chip": "FAULT", "state": "fault" } ],
-      "right": [
-        { "id": "tank1", "label": "CWS Tank 1 Level", "chip": "HEALTHY", "state": "healthy" },
-        { "id": "tank2", "label": "CWS Tank 2 Level", "chip": "HEALTHY", "state": "healthy" },
-        { "id": "booster", "label": "CWS Booster Status", "chip": "HEALTHY", "state": "healthy" } ] },
-
-    { "type": "callouts", "span": 3, "title": "Tooltips & Callouts", "items": [
-      { "title": "DRAIN PUMP 1", "icon": "pump", "bar": "ok", "chip": "HEALTHY", "state": "healthy" },
-      { "id": "fcu", "title": "FCU/LG/01", "icon": "temp", "bar": "info",
-        "value": "0.00", "units": "°C",
-        "ord": "station:|slot:/Drivers/BacnetNetwork/FCU_LG_01/points/SpaceTemp" },
-      { "title": "CO₂", "icon": "co2", "bar": "ok", "note": "WITHIN LIMITS", "place": "MEETING ROOM",
-        "pairs": [["VALUE", "624 ppm"], ["LIMIT", "< 800 ppm"]] } ] },
-
-    { "type": "table", "span": 7, "title": "Equipment Status", "icon": "grid",
-      "head": ["Equipment", "Status", "Value", "Unit", "Updated"],
+    {
+      "type": "kpis",
+      "tiles": [
+        {
+          "id": "kpi-demand",
+          "label": "Total Demand",
+          "value": "1497.36",
+          "units": "kW-hr",
+          "icon": "power",
+          "tone": "active",
+          "delta": "-11%",
+          "caption": "· last 24 h",
+          "live": true,
+          "ord": "station:|slot:/Drivers/BacnetNetwork/MainMeter/points/kWhr"
+        },
+        {
+          "id": "kpi-chw",
+          "label": "Chilled Water",
+          "value": "6.4",
+          "units": "°C",
+          "icon": "cooling",
+          "tone": "info",
+          "delta": "setpoint 6.0",
+          "caption": "· last 24 h",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/CHW/points/FlowTemp"
+        },
+        {
+          "id": "kpi-lthw",
+          "label": "LTHW Flow",
+          "value": "68.2",
+          "units": "°C",
+          "icon": "heating",
+          "tone": "healthy",
+          "delta": "stable",
+          "caption": "· last 24 h",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/LTHW/points/FlowTemp"
+        },
+        {
+          "id": "kpi-faults",
+          "label": "Open Faults",
+          "value": "2",
+          "units": "",
+          "icon": "bell",
+          "tone": "fault",
+          "delta": "+1 today",
+          "good": false,
+          "caption": "· last 24 h",
+          "ord": "station:|slot:/Services/AlarmService"
+        }
+      ]
+    },
+    {
+      "type": "values",
+      "span": 4,
+      "title": "Cards, Values & Actions",
+      "icon": "meter",
       "rows": [
-        ["CHW Pump 01", "healthy", "42.1", "m³/h", "10:28 AM"],
-        ["CHW Pump 02", "healthy", "41.8", "m³/h", "10:22 AM"],
-        ["Supply Temp", "healthy", "21.0", "°C", "10:18 AM"],
-        ["Return Temp", "healthy", "18.2", "°C", "10:15 AM"],
-        ["Drain Pump 2", "fault", "0.0", "l/s", "10:12 AM"],
-        ["AHU-03 Filter", "warn", "248", "Pa", "10:09 AM"] ] },
-
-    { "type": "visual", "span": 5, "title": "Technical Visuals",
-      "caption": "Buildings, floorplans and plant diagrams stay uncarded" }
+        {
+          "id": "sched",
+          "label": "Time Schedule",
+          "value": "UNOCCUPIED",
+          "ord": "station:|slot:/Services/ScheduleService/Occupancy"
+        },
+        {
+          "id": "vrf",
+          "label": "VRF Control",
+          "value": "AUTO",
+          "action": "edit",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/VRF/points/Mode"
+        },
+        {
+          "id": "coolsp",
+          "label": "Comfort Cool SP",
+          "value": "20.0",
+          "units": "°C",
+          "action": "edit",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/L1East/points/CoolSp"
+        },
+        {
+          "divider": true
+        },
+        {
+          "id": "dbt1",
+          "label": "DB-T1-01",
+          "value": "1497.36",
+          "units": "kW-hr",
+          "action": "open",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/DBT101"
+        },
+        {
+          "id": "wmeter",
+          "label": "Water Meter",
+          "value": "0.14",
+          "units": "m³",
+          "action": "open",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/WaterMeter"
+        }
+      ]
+    },
+    {
+      "type": "split",
+      "span": 5,
+      "title": "Plant Monitoring",
+      "icon": "boiler",
+      "left": [
+        {
+          "id": "frost",
+          "label": "Frost Protection",
+          "chip": "INACTIVE",
+          "state": "inactive",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/LTHW/points/FrostStat"
+        },
+        {
+          "id": "smoke",
+          "label": "Smoke Extract Status",
+          "chip": "HEALTHY",
+          "state": "healthy"
+        },
+        {
+          "id": "damper",
+          "label": "Fire Damper Status",
+          "chip": "FAULT",
+          "state": "fault"
+        }
+      ],
+      "right": [
+        {
+          "id": "tank1",
+          "label": "CWS Tank 1 Level",
+          "chip": "HEALTHY",
+          "state": "healthy"
+        },
+        {
+          "id": "tank2",
+          "label": "CWS Tank 2 Level",
+          "chip": "HEALTHY",
+          "state": "healthy"
+        },
+        {
+          "id": "booster",
+          "label": "CWS Booster Status",
+          "chip": "HEALTHY",
+          "state": "healthy"
+        }
+      ]
+    },
+    {
+      "type": "callouts",
+      "span": 3,
+      "title": "Tooltips & Callouts",
+      "items": [
+        {
+          "title": "DRAIN PUMP 1",
+          "icon": "pump",
+          "bar": "ok",
+          "chip": "HEALTHY",
+          "state": "healthy"
+        },
+        {
+          "id": "fcu",
+          "title": "FCU/LG/01",
+          "icon": "temp",
+          "bar": "info",
+          "value": "0.00",
+          "units": "°C",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/FCU_LG_01/points/SpaceTemp"
+        },
+        {
+          "title": "CO₂",
+          "icon": "co2",
+          "bar": "ok",
+          "note": "WITHIN LIMITS",
+          "place": "MEETING ROOM",
+          "pairs": [
+            [
+              "VALUE",
+              "624 ppm"
+            ],
+            [
+              "LIMIT",
+              "< 800 ppm"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "span": 7,
+      "title": "Equipment Status",
+      "icon": "grid",
+      "head": [
+        "Equipment",
+        "Status",
+        "Value",
+        "Unit",
+        "Updated"
+      ],
+      "rows": [
+        [
+          "CHW Pump 01",
+          "healthy",
+          "42.1",
+          "m³/h",
+          "10:28 AM"
+        ],
+        [
+          "CHW Pump 02",
+          "healthy",
+          "41.8",
+          "m³/h",
+          "10:22 AM"
+        ],
+        [
+          "Supply Temp",
+          "healthy",
+          "21.0",
+          "°C",
+          "10:18 AM"
+        ],
+        [
+          "Return Temp",
+          "healthy",
+          "18.2",
+          "°C",
+          "10:15 AM"
+        ],
+        [
+          "Drain Pump 2",
+          "fault",
+          "0.0",
+          "l/s",
+          "10:12 AM"
+        ],
+        [
+          "AHU-03 Filter",
+          "warn",
+          "248",
+          "Pa",
+          "10:09 AM"
+        ]
+      ]
+    },
+    {
+      "type": "schematic",
+      "span": 5,
+      "title": "Plant Schematic",
+      "caption": "Chilled and heating water — every reading is its own point",
+      "width": 480,
+      "height": 290,
+      "nodes": [
+        {
+          "id": "chiller-duty",
+          "kind": "plant",
+          "label": "Chiller 01",
+          "icon": "cooling",
+          "cx": 64,
+          "cy": 56,
+          "value": "58",
+          "units": "%",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/CHW/points/Duty"
+        },
+        {
+          "id": "chwp-speed",
+          "kind": "pump",
+          "label": "CHW-P1",
+          "icon": "pump",
+          "cx": 214,
+          "cy": 56,
+          "value": "62",
+          "units": "%",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/CHW/points/Pump1Speed"
+        },
+        {
+          "id": "chw-valve",
+          "kind": "plant",
+          "label": "AHU Cooling Coils",
+          "icon": "temp",
+          "cx": 386,
+          "cy": 56,
+          "value": "44",
+          "units": "%",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/L1East/points/ChwValve"
+        },
+        {
+          "id": "boiler-duty",
+          "kind": "plant",
+          "label": "Boiler 01",
+          "icon": "boiler",
+          "cx": 64,
+          "cy": 196,
+          "value": "46",
+          "units": "%",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/LTHW/points/Duty"
+        },
+        {
+          "id": "lthwp-speed",
+          "kind": "pump",
+          "label": "LTHW-P1",
+          "icon": "pump",
+          "cx": 214,
+          "cy": 196,
+          "value": "52",
+          "units": "%",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/LTHW/points/Pump1Speed"
+        },
+        {
+          "id": "lthw-valve",
+          "kind": "plant",
+          "label": "AHU Heating Coils",
+          "icon": "heating",
+          "cx": 386,
+          "cy": 196,
+          "value": "38",
+          "units": "%",
+          "ord": "station:|slot:/Drivers/BacnetNetwork/L1East/points/LthwValve"
+        }
+      ],
+      "pipes": [
+        {
+          "from": "chiller-duty",
+          "to": "chwp-speed",
+          "tone": "chw"
+        },
+        {
+          "from": "chwp-speed",
+          "to": "chw-valve",
+          "tone": "chw",
+          "label": {
+            "id": "schem-chw-flow",
+            "value": "6.4",
+            "units": "°C",
+            "ord": "station:|slot:/Drivers/BacnetNetwork/CHW/points/FlowTemp"
+          }
+        },
+        {
+          "from": "chw-valve",
+          "to": "chiller-duty",
+          "tone": "chw",
+          "dim": true,
+          "via": [
+            [
+              386,
+              118
+            ],
+            [
+              64,
+              118
+            ]
+          ],
+          "label": {
+            "id": "schem-chw-ret",
+            "value": "12.1",
+            "units": "°C",
+            "ord": "station:|slot:/Drivers/BacnetNetwork/CHW/points/ReturnTemp"
+          }
+        },
+        {
+          "from": "boiler-duty",
+          "to": "lthwp-speed",
+          "tone": "lthw"
+        },
+        {
+          "from": "lthwp-speed",
+          "to": "lthw-valve",
+          "tone": "lthw",
+          "label": {
+            "id": "schem-lthw-flow",
+            "value": "68.2",
+            "units": "°C",
+            "ord": "station:|slot:/Drivers/BacnetNetwork/LTHW/points/FlowTemp"
+          }
+        },
+        {
+          "from": "lthw-valve",
+          "to": "boiler-duty",
+          "tone": "lthw",
+          "dim": true,
+          "via": [
+            [
+              386,
+              258
+            ],
+            [
+              64,
+              258
+            ]
+          ],
+          "label": {
+            "id": "schem-lthw-ret",
+            "value": "58.9",
+            "units": "°C",
+            "ord": "station:|slot:/Drivers/BacnetNetwork/LTHW/points/ReturnTemp"
+          }
+        }
+      ]
+    }
   ]
 }

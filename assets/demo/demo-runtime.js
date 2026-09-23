@@ -139,6 +139,18 @@
 
     var host = document.getElementById('demo-host');
 
+    /* The harness owns the failure message: a widget that throws must not
+       leave a blank frame behind with nothing to read in it. */
+    function fail(err) {
+      host.innerHTML = '<div class="demo-error"><strong>This demo failed to start.</strong>' +
+        '<pre>' + String(err && err.stack || err).replace(/[<&]/g, function (c) {
+          return c === '<' ? '&lt;' : '&amp;';
+        }) + '</pre>' +
+        '<p>The widget itself is fine — this is the demo harness. ' +
+        'The screenshots on the Work page show the same views.</p></div>';
+      try { parent.postMessage({ demo: cfg.id, status: 'error' }, '*'); } catch (e) {}
+    }
+
     // Properties come from the PX WebWidget element in a real view; here they
     // come from the demo definition, which is the same data by another route.
     var props = {};

@@ -876,19 +876,61 @@
 .rgx-root .gx-table .when { color: var(--gx-text-faint); white-space: nowrap; }
 .rgx-root .gx-table tbody tr.is-fault td:first-child { box-shadow: inset 3px 0 0 var(--gx-bad); }
 
-/* ============================================== 11. UNCARDED TECHNICAL VISUAL
+/* ================================================ 11. UNCARDED PLANT SCHEMATIC
    The master sheet is explicit: buildings, floorplans and plant diagrams stay
    uncarded. No border, no fill, no shadow — the drawing sits directly on the
-   canvas so nothing competes with its own linework. */
+   canvas so nothing competes with its own linework. Symbols carry the only
+   fills here, because a pipe has to be able to pass behind one. */
 
-.rgx-root .gx-visual { display: flex; flex-direction: column; gap: var(--gx-s-4); }
-.rgx-root .gx-visual__frame {
-  position: relative;
+.rgx-root .gx-schem { display: flex; flex-direction: column; gap: var(--gx-s-4); }
+.rgx-root .gx-schem__frame {
   display: grid; place-items: center;
-  min-height: 190px; padding: var(--gx-s-5);
+  padding: var(--gx-s-5);
   /* deliberately: no background, no border, no radius */
 }
-.rgx-root .gx-visual__caption { text-align: center; }
+.rgx-root .gx-schem svg { width: 100%; max-width: 560px; height: auto; }
+.rgx-root .gx-schem__caption { text-align: center; }
+
+.rgx-root .gx-schem__box { fill: var(--gx-surface); stroke: var(--gx-line-strong); stroke-width: 1; }
+.rgx-root .gx-schem__icon { stroke: var(--gx-text-faint); fill: none; stroke-width: 1.8; }
+/* Muted, not faint: these are 8px. The audit in ux/CONTRAST-AUDIT.md records
+   where the sheet's faint tone already falls under 4.5:1 on small text, and
+   new drawing is not the place to add another one. */
+.rgx-root .gx-schem__label {
+  fill: var(--gx-text-muted);
+  font-size: 8px; font-weight: var(--gx-fw-bold);
+  letter-spacing: var(--gx-track-eyebrow); text-transform: uppercase;
+}
+.rgx-root .gx-schem__value {
+  fill: var(--gx-text);
+  font-size: 15px; font-weight: var(--gx-fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+.rgx-root .gx-schem__value--sm { font-size: 11px; }
+.rgx-root .gx-schem__unit { fill: var(--gx-text-muted); font-size: 8.5px; font-weight: var(--gx-fw-medium); }
+.rgx-root .gx-schem__tag {
+  fill: var(--gx-text-muted);
+  font-size: 9.5px; font-weight: var(--gx-fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.rgx-root .gx-schem__pipe { fill: none; stroke-width: 3; }
+.rgx-root .gx-schem__pipe.is-chw  { stroke: var(--gx-info); }
+.rgx-root .gx-schem__pipe.is-lthw { stroke: var(--gx-warn); }
+.rgx-root .gx-schem__pipe.is-return { opacity: 0.4; }
+
+/* The dashes run along the pipe in the direction of flow. It is the one piece
+   of motion in the view, it is slow, and it stops for anyone who has asked
+   their system for less of it. */
+.rgx-root .gx-schem__flow {
+  fill: none; stroke: var(--gx-canvas); stroke-width: 1.5;
+  stroke-dasharray: 3 13;
+  animation: gx-flow 2.4s linear infinite;
+}
+@keyframes gx-flow { to { stroke-dashoffset: -32; } }
+@media (prefers-reduced-motion: reduce) {
+  .rgx-root .gx-schem__flow { animation: none; opacity: 0; }
+}
 
 /* ================================================================ 12. LAYOUT */
 

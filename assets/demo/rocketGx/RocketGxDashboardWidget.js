@@ -3,7 +3,7 @@
  *
  * The top bar plus the block grid: KPI tiles, value rows with edit/open
  * actions, two-column plant-monitoring lists, callouts, an equipment table, and
- * uncarded technical visuals.
+ * plant schematics whose symbols and pipe readings are bound points.
  *
  * Every block that shows a reading declares an `ord`. Values arrive through the
  * standard bajaux subscriber mix-in, so the same file runs against a live
@@ -269,7 +269,7 @@ define([
       case 'split':    return this.$split(b);
       case 'callouts': return this.$callouts(b);
       case 'table':    return this.$table(b);
-      case 'visual':   return this.$visual(b);
+      case 'schematic':return this.$schematic(b);
       default:         return '';
     }
   };
@@ -398,44 +398,140 @@ define([
         }).join('') + '</tbody></table></div></section>';
   };
 
-  /* Uncarded — no border, no fill, no shadow. A drawing has its own linework;
-     a card around it adds a second frame that competes. */
-  RocketGxDashboardWidget.prototype.$visual = function (b) {
-    var L = 'var(--gx-text-muted)', F = 'var(--gx-surface-sunk)', S = 'var(--gx-rail)';
-    return '<section class="gx-c' + (b.span || 5) + ' gx-visual">' +
+  /* A plant schematic: equipment symbols, the pipes between them, and a
+     reading on each one bound to its own point. Uncarded — the linework is
+     the drawing, and a card around it adds a second frame that competes.
+
+     Geometry comes from the config the same way a PX author places a symbol
+     on a sheet: every node carries its own centre, so the composition is the
+     engineer's rather than this file's. The only thing computed here is the
+     pipe routing between two symbols, which is tedious to hand-place and has
+     one right answer. */
+  RocketGxDashboardWidget.prototype.$schematic = function (b) {
+    var w = b.width || 480, h = b.height || 290,
+        nodes = b.nodes || [], byId = {};
+
+    nodes.forEach(function (n) {
+      n.w = n.w || (n.kind === 'pump' ? 0 : 104);
+      n.h = n.h || (n.kind === 'pump' ? 0 : 62);
+      n.r = n.r || (n.kind === 'pump' ? 20 : 0);
+      byId[n.id || n.label] = n;
+    });
+
+    function glyph(name, x, y, s) {
+      return '<g class="gx-schem__icon" transform="translate(' + x + ',' + y + ') scale(' + s + ')">' +
+             '<path d="' + (ICONS[name] || ICONS.grid) + '"/></g>';
+    }
+
+    /* A reading, drawn as one <text> so the value can be replaced on a push
+       without taking its unit with it — the same split the KPI tiles use. */
+    function reading(r, x, y, cls, anchorAt) {
+      if (!r || r.value === undefined) { return ''; }
+      return '<text class="' + cls + '" x="' + x + '" y="' + y + '"' +
+             (anchorAt ? ' text-anchor="' + anchorAt + '"' : '') + '>' +
+               '<tspan' + (r.id ? ' data-point="' + esc(r.id) + '"' : '') + '>' +
+                 esc(r.value) + '</tspan>' +
+               (r.units ? '<tspan class="gx-schem__unit" dx="3">' + esc(r.units) + '</tspan>' : '') +
+             '</text>';
+    }
+
+    function symbol(n) {
+      if (n.kind === 'pump') {
+        return '<circle class="gx-schem__box" cx="' + n.cx + '" cy="' + n.cy + '" r="' + n.r + '"/>' +
+               glyph(n.icon || 'pump', n.cx - 8.4, n.cy - 8.4, 0.7) +
+               '<text class="gx-schem__label" x="' + n.cx + '" y="' + (n.cy + n.r + 13) +
+                 '" text-anchor="middle">' + esc(n.label) + '</text>' +
+               reading(n, n.cx, n.cy - n.r - 9, 'gx-schem__value gx-schem__value--sm', 'middle');
+      }
+      /* The name sits above the casing rather than inside it. Plant names are
+         as long as the site's naming convention makes them, and a name that
+         has to fit inside a symbol is a name that gets clipped. */
+      var x0 = n.cx - n.w / 2, y0 = n.cy - n.h / 2;
+      return '<text class="gx-schem__label" x="' + x0 + '" y="' + (y0 - 7) + '">' +
+               esc(n.label) + '</text>' +
+             '<rect class="gx-schem__box" x="' + x0 + '" y="' + y0 + '" width="' + n.w +
+               '" height="' + n.h + '" rx="8"/>' +
+             glyph(n.icon || 'grid', x0 + 13, n.cy - 9, 0.75) +
+             reading(n, x0 + 42, n.cy + 6, 'gx-schem__value');
+    }
+
+    /* Where a pipe meets a symbol: the face it approaches from, so the line
+       stops at the casing instead of running under it. */
+    function anchor(n, tx, ty) {
+      if (n.kind === 'pump') {
+        var dx = tx - n.cx, dy = ty - n.cy, m = Math.sqrt(dx * dx + dy * dy) || 1;
+        return [n.cx + dx / m * n.r, n.cy + dy / m * n.r];
+      }
+      if (Math.abs(tx - n.cx) * n.h >= Math.abs(ty - n.cy) * n.w) {
+        return [n.cx + (tx >= n.cx ? n.w / 2 : -n.w / 2), n.cy];
+      }
+      return [n.cx, n.cy + (ty >= n.cy ? n.h / 2 : -n.h / 2)];
+    }
+
+    function route(p) {
+      var from = byId[p.from], to = byId[p.to];
+      if (!from || !to) { return null; }
+      var via = p.via || [],
+          first = via.length ? via[0] : [to.cx, to.cy],
+          last = via.length ? via[via.length - 1] : [from.cx, from.cy],
+          pts = [anchor(from, first[0], first[1])];
+
+      via.forEach(function (v) { pts.push([v[0], v[1]]); });
+      pts.push(anchor(to, last[0], last[1]));
+
+      // Square the corners: a pipe run turns, it does not cut across.
+      var squared = [pts[0]], i, a, c;
+      for (i = 1; i < pts.length; i++) {
+        a = squared[squared.length - 1];
+        c = pts[i];
+        if (a[0] !== c[0] && a[1] !== c[1]) { squared.push([c[0], a[1]]); }
+        squared.push(c);
+      }
+      return squared;
+    }
+
+    function midpoint(pts) {
+      var total = 0, seg = [], i, d;
+      for (i = 1; i < pts.length; i++) {
+        d = Math.abs(pts[i][0] - pts[i - 1][0]) + Math.abs(pts[i][1] - pts[i - 1][1]);
+        seg.push(d);
+        total += d;
+      }
+      var half = total / 2, run = 0;
+      for (i = 0; i < seg.length; i++) {
+        if (run + seg[i] >= half) {
+          var t = seg[i] ? (half - run) / seg[i] : 0;
+          return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * t,
+                  pts[i][1] + (pts[i + 1][1] - pts[i][1]) * t];
+        }
+        run += seg[i];
+      }
+      return pts[0];
+    }
+
+    var pipes = (b.pipes || []).map(function (p) {
+      var pts = route(p);
+      if (!pts) { return ''; }
+      var d = 'M' + pts.map(function (q) { return q[0] + ' ' + q[1]; }).join('L'),
+          cls = 'gx-schem__pipe is-' + esc(p.tone || 'chw') + (p.dim ? ' is-return' : ''),
+          mid = midpoint(pts),
+          label = p.label
+            ? reading(p.label, mid[0], mid[1] - 7, 'gx-schem__tag', 'middle')
+            : '';
+      return '<path class="' + cls + '" d="' + d + '"/>' +
+             '<path class="gx-schem__flow" d="' + d + '"/>' + label;
+    }).join('');
+
+    return '<section class="gx-c' + (b.span || 5) + ' gx-schem">' +
       '<div class="gx-section__head"><span class="gx-eyebrow">' + esc(b.title) +
         '</span><span class="gx-section__rule"></span></div>' +
-      '<div class="gx-visual__frame">' +
-        '<svg viewBox="0 0 420 150" style="width:100%;max-width:520px;height:auto" fill="none" ' +
-             'stroke-linecap="round" stroke-linejoin="round">' +
-          '<g stroke="' + L + '" stroke-width="1.2">' +
-            '<path d="M20 106 60 84l40 22v30l-40 22-40-22z" fill="' + F + '"/>' +
-            '<path d="M60 84V52l40 22v32M20 106V74l40-22"/>' +
-            '<path d="M60 52 20 74l40 22 40-22z" fill="' + S + '"/>' +
-            '<path d="M32 88v12M44 81v12M76 88v12M88 81v12" stroke-width="0.9"/>' +
-          '</g>' +
-          '<g stroke="' + L + '" stroke-width="1.2" transform="translate(150,40)">' +
-            '<path d="M0 46 52-4l58 32-52 50z" fill="' + F + '"/>' +
-            '<path d="M18 36 62 12M40 68 84 44M26 22l30 17" stroke-width="0.9"/>' +
-            '<rect x="30" y="30" width="14" height="9" rx="1.5" fill="var(--gx-run)" ' +
-              'opacity="0.5" stroke="none"/>' +
-            '<rect x="52" y="40" width="14" height="9" rx="1.5" fill="var(--gx-info)" ' +
-              'opacity="0.5" stroke="none"/>' +
-          '</g>' +
-          '<g transform="translate(285,18)">' +
-            '<path d="M12 22h96v92H12z" stroke="' + L + '" stroke-width="1" opacity="0.32"/>' +
-            '<path d="M12 42h56v54" stroke="var(--gx-bad)" stroke-width="1.6"/>' +
-            '<path d="M108 42H80v54h28" stroke="var(--gx-info)" stroke-width="1.6"/>' +
-            '<g fill="var(--gx-surface)" stroke="' + L + '" stroke-width="1.2">' +
-              '<circle cx="12" cy="42" r="8"/><circle cx="12" cy="78" r="8"/>' +
-              '<circle cx="12" cy="114" r="8"/></g>' +
-            '<circle cx="68" cy="96" r="7" fill="var(--gx-bad-tint)" stroke="var(--gx-bad)" ' +
-              'stroke-width="1.4"/>' +
-            '<path d="M68 92.5v4M68 99h.01" stroke="var(--gx-bad)" stroke-width="1.6"/>' +
-          '</g>' +
+      '<div class="gx-schem__frame">' +
+        '<svg viewBox="0 0 ' + w + ' ' + h + '" fill="none" stroke-linecap="round" ' +
+             'stroke-linejoin="round" role="img" aria-label="' + esc(b.caption || b.title) + '">' +
+          pipes + nodes.map(symbol).join('') +
         '</svg>' +
       '</div>' +
-      '<div class="gx-visual__caption gx-eyebrow">' + esc(b.caption || '') + '</div>' +
+      '<div class="gx-schem__caption gx-eyebrow">' + esc(b.caption || '') + '</div>' +
     '</section>';
   };
 
