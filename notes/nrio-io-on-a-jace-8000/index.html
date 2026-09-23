@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A JACE-8000 Has No Onboard I/O: Using the Nrio Driver</title>
+<meta name="description" content="Remote IO-R modules on RS-485, one network per port, and the conversion list Workbench will happily let you get wrong.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/nrio-io-on-a-jace-8000/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="A JACE-8000 Has No Onboard I/O: Using the Nrio Driver">
+<meta property="og:description" content="Remote IO-R modules on RS-485, one network per port, and the conversion list Workbench will happily let you get wrong.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/nrio-io-on-a-jace-8000/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="A JACE-8000 Has No Onboard I/O: Using the Nrio Driver">
+<meta name="twitter:description" content="Remote IO-R modules on RS-485, one network per port, and the conversion list Workbench will happily let you get wrong.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/nrio-io-on-a-jace-8000.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "HVAC controls software",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   }
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/nrio-io-on-a-jace-8000/#article",
+   "headline": "A JACE-8000 has no onboard I/O: using the Nrio driver",
+   "description": "Remote IO-R modules on RS-485, one network per port, and the conversion list Workbench will happily let you get wrong.",
+   "url": "https://plantroomlabs.com/notes/nrio-io-on-a-jace-8000/",
+   "inLanguage": "en-GB",
+   "keywords": "JACE, Drivers, Commissioning",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-23",
+   "dateModified": "2026-09-23",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/nrio-io-on-a-jace-8000/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Onboard I/O"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Onboard I/O</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>A JACE-8000 has no onboard I/O: using the Nrio driver</h1>
+    <p class="pl-lede">Anyone arriving from a JACE-6 or -7 expects terminals on the controller. On a JACE-8000 there are none — the I/O is <strong>remote modules on an RS-485 trunk</strong>, and the driver is engineered accordingly.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">JACE</li><li class="pl-chip pl-chip--on-dark">Drivers</li><li class="pl-chip pl-chip--on-dark">Commissioning</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#what-actually-connects">What actually connects</a></li><li><a href="#port-name-and-trunk-decide-which-wires-you-are-talking-to">Port Name and Trunk decide which wires you are talking to</a></li><li><a href="#sixteen-addresses-and-a-board-that-uses-two-of-them">Sixteen addresses, and a board that uses two of them</a></li><li><a href="#universal-inputs-are-configured-in-software">Universal inputs are configured in software</a></li><li><a href="#conversions-and-the-list-that-does-not-filter-itself">Conversions, and the list that does not filter itself</a></li><li><a href="#engineering-before-the-hardware-exists">Engineering before the hardware exists</a></li><li><a href="#what-the-outputs-do-when-the-jace-stops-talking">What the outputs do when the JACE stops talking</a></li></ol>
+    </nav>
+<h2 id="what-actually-connects">What actually connects</h2>
+<div class="pl-body">
+  <p>The Nrio driver started life serving integral I/O on an M2M JACE, and grew remote
+     modules later; from 4.3 it supports IO-R-16 and IO-R-34 modules wired to a
+     JACE-8000. There is no onboard-I/O case for this controller, only remote modules
+     on RS-485, so every point comes in over a trunk.</p>
+  <p>Architecturally it is a normal driver: network &rarr; module &rarr; points
+     extension &rarr; proxy points, under Drivers, with Learn Mode discovery in the
+     manager views. The one structural difference is that <code>points</code> is the
+     <em>only</em> device extension an NrioModule has. There is no alarm or history
+     extension at device level, no virtual component space — configuring and proxying
+     hardware terminals is all the driver is for.</p>
+  <p>The <code>nrio</code> module has to be installed on the controller. If it is not,
+     adding the network fails with an explicit missing-module error rather than
+     anything subtle, so it is a five-second thing to rule out.</p>
+</div>
+
+<h2 id="port-name-and-trunk-decide-which-wires-you-are-talking-to">Port Name and Trunk decide which wires you are talking to</h2>
+<div class="pl-body">
+  <p>Two properties on the network do the real work, and both are on the property
+     sheet rather than anywhere obvious. <strong>Port Name</strong> names the physical
+     port, and the legal value depends on the controller.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Controller</th><th>Onboard I/O</th><th>Onboard RS-485</th>
+             <th>RS-485 option card, ports A &amp; B</th></tr></thead>
+  <tbody>
+    <tr><td>JACE-8000</td><td>—</td><td>COM1, COM2</td><td>—</td></tr>
+    <tr><td>JACE-7 series</td><td>—</td><td>COM2</td><td>COM3, COM4</td></tr>
+    <tr><td>M2M JACE</td><td>COM3</td><td>COM2</td><td>COM7, COM8</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p><strong>Trunk</strong> is a number, unique per network, starting at 1. It selects
+     the low-level access-control daemon that does the actual polling, which is why two
+     networks sharing a trunk value do not merely look untidy — they fight. Both
+     properties are writable on an <code>NrioNetwork</code>; on the older
+     <code>M2mIoNetwork</code> they are fixed at COM3 and 1.</p>
+  <p>Each separate access path needs its own network. Two ports with modules on them is
+     two NrioNetworks, not one network with more devices under it.</p>
+</div>
+
+<h2 id="sixteen-addresses-and-a-board-that-uses-two-of-them">Sixteen addresses, and a board that uses two of them</h2>
+<div class="pl-body">
+  <p>Every module on a network holds an Address from 1 to 16. An IO-R-34 takes
+     <em>two</em> of those slots, because it is physically two controllers on one board:
+     the Nrio Device Manager shows the primary in the Address column and the second in
+     SecAddr. Plan the trunk with that in mind — three 34-point modules is six
+     addresses, not three.</p>
+  <p>Address is not something you type. It is derived during an online Discover, along
+     with the module's Uid, a six-byte identifier burned in at manufacture, and both
+     are read-only afterwards. The practical consequence is that the station cannot be
+     finished without the hardware present — which is what the next section is
+     about.</p>
+</div>
+
+<h2 id="universal-inputs-are-configured-in-software">Universal inputs are configured in software</h2>
+<div class="pl-body">
+  <p>No jumpers, no DIP switches: a UI terminal becomes an input type when you pick the
+     type in the Add dialog of the Nrio Point Manager. Five choices, and the one you
+     pick determines the proxy extension.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Type</th><th>Reads</th><th>Produces</th></tr></thead>
+  <tbody>
+    <tr><td>VoltageInputPoint</td><td>0–10 Vdc</td>
+        <td>volts, or scaled units — also the choice for 4–20 mA</td></tr>
+    <tr><td>ResistiveInputPoint</td><td>0–100 kΩ</td><td>ohms, or scaled units</td></tr>
+    <tr><td>ThermistorInputPoint</td><td>a thermistor</td>
+        <td>temperature, through a response curve</td></tr>
+    <tr><td>CounterInputPoint</td><td>contact closures</td>
+        <td>a running total or a calculated rate</td></tr>
+    <tr><td>BooleanInputPoint</td><td>a contact</td><td>two boolean states</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>Outputs get no such choice: a discovered relay terminal becomes a
+     RelayOutputWritable and an analogue terminal a VoltageOutputWritable, both
+     preselected, both with the ordinary writable priority array behind them.</p>
+</div>
+
+<div class="pl-note pl-note--warn">
+  <p><strong>The type cannot be changed after the point is added.</strong> Name,
+     address, conversion and facets are all editable; type is not. Getting it wrong
+     means deleting the point and adding it again, which takes the alarm extensions,
+     history extensions and links with it. The single exception is resistive versus
+     thermistor — those are the same point with a different conversion, so that one is
+     recoverable.</p>
+</div>
+
+<h2 id="conversions-and-the-list-that-does-not-filter-itself">Conversions, and the list that does not filter itself</h2>
+<div class="pl-body">
+  <p>Workbench offers the full Conversion drop-down on every Nrio point regardless of
+     type, so a relay output will cheerfully offer you Thermistor Type 3. Only a few
+     combinations mean anything.</p>
+  <p><strong>Linear</strong> takes a Scale and an Offset and is what most 0–10 V and
+     resistive sensors want. <strong>Thermistor Type 3</strong> is the built-in
+     resistance-to-temperature curve. <strong>Generic Tabular</strong> takes a custom
+     source-and-result curve as an XML file, for a sensor that is not linear and not a
+     standard thermistor.</p>
+  <p><strong>500 Ohm Shunt</strong> is the interesting one. A 4–20 mA sensor is read on
+     a UI with a 500 Ω resistor across the terminals, making the signal 2–10 V, and
+     this conversion exists because the input circuit clamps protectively above 3.9 V —
+     a plain Linear conversion loses resolution at the top of the range where the
+     clamping happens. Selecting it produces a <em>second</em> conversion drop-down,
+     again showing everything, of which exactly two entries are valid: Linear for the
+     usual linear sensor, Generic Tabular for a non-linear one. If you feed the tabular
+     route a curve, the source values run 0 to 10, each milliamp figure multiplied by
+     500.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Leave a counter's conversion on Default.</strong> Anything else interferes
+     with the rate calculation. To scale the count, add a LinearCalibrationExt to the
+     point instead and put the quantity-per-pulse in its Scale.</p>
+</div>
+
+<div class="pl-body">
+  <p>The rate itself is worth setting up rather than computing downstream. A counter
+     outputs either Count or Rate, chosen with Output Select, and the rate Scale folds
+     the time unit and the pulse weight together: a meter at 0.15 kWh per pulse
+     reporting kW is 3600 × 0.15 = 54; a flow meter at 0.375 litres per pulse reporting
+     litres per minute is 60 × 0.375 = 22.5. Three calculators are available — fixed
+     window (the default), sliding window, and trigger — with an Interval property on
+     the first two and a Windows count on the sliding one.</p>
+</div>
+
+<h2 id="engineering-before-the-hardware-exists">Engineering before the hardware exists</h2>
+<div class="pl-body">
+  <p>Because addresses come from Discover, a station cannot be fully built from a
+     desk — but it can be built almost all the way. The Nrio Device Manager has an
+     <strong>Add Offline Hardware</strong> button (you still need a station connection,
+     just not the I/O) that creates a module with Address and Uid both zero and a fault
+     reading "Invalid UID: Do Discover and Match." Under it you can still discover and
+     add points, add history and alarm extensions, and link the lot into control logic.
+     Everything sits in fault until the hardware turns up.</p>
+</div>
+
+<ol class="pl-steps">
+  <li><div>On site, connect and open the Nrio Device Manager in Learn mode. The real
+      modules appear in the discovered pane.</div></li>
+  <li><div>Right-click a discovered module and <strong>Wink</strong> it. It cycles its
+      first relay output on and off for ten seconds, which is how you tell which panel
+      you are looking at.</div></li>
+  <li><div><strong>Match</strong> the winked module to the offline one you created. It
+      takes the real Uid and address, the fault clears, and the discovered entry greys
+      out so it cannot be matched twice.</div></li>
+  <li><div>Repeat for each module, then hide the <code>winkDevice</code> slot from the
+      module's slot sheet. Wink drives a real output, and there is no reason to leave
+      that one right-click away for the next three years.</div></li>
+</ol>
+
+<h2 id="what-the-outputs-do-when-the-jace-stops-talking">What the outputs do when the JACE stops talking</h2>
+<div class="pl-body">
+  <p>Remote I/O introduces a failure mode onboard terminals do not have: the trunk can
+     go quiet while the plant carries on. From 4.3 the network carries an Output
+     Failsafe Config with two timers that every child module inherits.</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th>Property</th><th>Range and default</th><th>What it governs</th></tr></thead>
+  <tbody>
+    <tr><td>Comm Loss Timeout</td><td>8–900 s, default 8</td>
+        <td>how long silence lasts before the module declares comm loss and applies its
+            default output values</td></tr>
+    <tr><td>Startup Timeout</td><td>8–900 s, default 600</td>
+        <td>how long a module waits after power-up for the station to take control
+            before it does the same</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>The ten-minute startup default is deliberate: it is long enough for a controller
+     to boot and a station to start after a site power cut, so the plant does not snap
+     to failsafe values in the gap. Either timer can be disabled per module in its
+     OutputDefaultValues component — which is occasionally right and usually worth
+     arguing about, because the defaults it disables are the only thing deciding
+     whether a valve sits open or shut when the trunk fails.</p>
+</div>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01"/><path d="M8 17.5h.01"/><path d="M12 10v4"/></svg></span>
+        <h3><a href="/services/station-engineering/">Station engineering</a></h3>
+        <p>Niagara station and controller setup end to end: platform commissioning, TLS, users and roles, BACnet and Modbus, tagging, histories, alarms, backups.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/bacnet-mstp-on-a-jace/">BACnet MS/TP on a JACE</a></h3>
+      <p>Baud, MAC address, Max Master and Max Info Frames. Four settings on one Link component decide whether an RS-485 trunk works, crawls or drops the token.</p>
+      <ul class="pl-chips"><li class="pl-chip">BACnet</li><li class="pl-chip">MS/TP</li><li class="pl-chip">Commissioning</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-writable-point-priority/">Why a writable point ignores the value you set</a></h3>
+      <p>Sixteen priority inputs, two of them reserved for right-click actions, a fallback underneath, and a BACnet scheme wired to none of it.</p>
+      <ul class="pl-chips"><li class="pl-chip">Station engineering</li><li class="pl-chip">BACnet</li><li class="pl-chip">Commissioning</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/commissioning-a-jace-8000/">Commissioning a JACE-8000 without locking yourself out</a></h3>
+      <p>The factory address, the passphrase and the account you are made to delete — the commissioning steps that strand a new controller.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Commissioning</li><li class="pl-chip">Deployment</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent Niagara Framework development: custom modules, bajaux widgets,
+          PX graphics, station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>
