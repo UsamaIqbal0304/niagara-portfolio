@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>The four things, in order</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#the-four-things-in-order">The four things, in order</a></li><li><a href="#categories-cost-memory-so-keep-them-few">Categories cost memory, so keep them few</a></li><li><a href="#operator-and-admin-are-a-property-of-the-slot">Operator and admin are a property of the slot</a></li><li><a href="#the-permissions-map">The permissions map</a></li><li><a href="#two-symptoms-that-account-for-most-of-the-calls">Two symptoms that account for most of the calls</a></li><li><a href="#ancestors-are-granted-automatically">Ancestors are granted automatically</a></li><li><a href="#files-have-their-own-rules">Files have their own rules</a></li><li><a href="#a-model-that-survives-handover">A model that survives handover</a></li></ol>
+    </nav>
+<h2 id="the-four-things-in-order">The four things, in order</h2>
 <div class="pl-body">
   <p>Access control in a Niagara station is a chain, and you cannot reason about any one
      link without the others.</p>
@@ -177,7 +180,7 @@
      component slots, folders, files and histories alike.</p>
 </div>
 
-<h2>Categories cost memory, so keep them few</h2>
+<h2 id="categories-cost-memory-so-keep-them-few">Categories cost memory, so keep them few</h2>
 <div class="pl-body">
   <p>A new station arrives with two basic categories: <strong>User</strong> (category 1)
      and <strong>Admin</strong> (category 2). Everything lands in User except three
@@ -203,7 +206,7 @@
      first.</p>
 </div>
 
-<h2>Operator and admin are a property of the slot</h2>
+<h2 id="operator-and-admin-are-a-property-of-the-slot">Operator and admin are a property of the slot</h2>
 <div class="pl-body">
   <p>This is the part that is genuinely unintuitive. The operator/admin distinction is
      not a property of the user or the role &mdash; it is a <strong>config flag on the
@@ -217,7 +220,7 @@
      out the ability to reconfigure the permission model.</p>
 </div>
 
-<h2>The permissions map</h2>
+<h2 id="the-permissions-map">The permissions map</h2>
 <div class="pl-body">
   <p>Editing a role opens a grid with one row per category and columns for the operator
      and admin levels. Rights are written in a shorthand worth reading fluently: lower
@@ -229,7 +232,7 @@
      they do not hold, so a non-super user cannot promote anybody to super user.</p>
 </div>
 
-<h2>Two symptoms that account for most of the calls</h2>
+<h2 id="two-symptoms-that-account-for-most-of-the-calls">Two symptoms that account for most of the calls</h2>
 
 <div class="pl-note pl-note--warn">
   <p><strong>"User does not have access to station. Check permissions."</strong> The
@@ -267,7 +270,7 @@
      which is why the permission people want is in a place they do not think to look.</p>
 </div>
 
-<h2>Ancestors are granted automatically</h2>
+<h2 id="ancestors-are-granted-automatically">Ancestors are granted automatically</h2>
 <div class="pl-body">
   <p>Giving somebody access to a point buried six levels deep would be useless if they
      could not see the folders above it. The station handles this: it automatically
@@ -278,7 +281,7 @@
      <strong>Update</strong> action that forces it.</p>
 </div>
 
-<h2>Files have their own rules</h2>
+<h2 id="files-have-their-own-rules">Files have their own rules</h2>
 <div class="pl-body">
   <p>The whole file space defaults to the Admin category, and file permissions behave
      mostly at operator level.</p>
@@ -304,7 +307,7 @@
      them the three services and the whole file space as well.</p>
 </div>
 
-<h2>A model that survives handover</h2>
+<h2 id="a-model-that-survives-handover">A model that survives handover</h2>
 <ol class="pl-steps">
   <li><div><strong>Write the roles down first</strong> &mdash; duty by duty, not person
       by person. Categories follow from roles; roles do not follow from

@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>What MS/TP is, in one paragraph</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#what-ms-tp-is-in-one-paragraph">What MS/TP is, in one paragraph</a></li><li><a href="#where-the-port-lives">Where the port lives</a></li><li><a href="#the-four-properties-that-decide-everything">The four properties that decide everything</a></li><li><a href="#why-max-master-is-the-one-people-get-wrong">Why Max Master is the one people get wrong</a></li><li><a href="#what-address-0-actually-buys-you">What address 0 actually buys you</a></li><li><a href="#bringing-it-up">Bringing it up</a></li></ol>
+    </nav>
+<h2 id="what-ms-tp-is-in-one-paragraph">What MS/TP is, in one paragraph</h2>
 <div class="pl-body">
   <p>MS/TP — master slave / token passing — is BACnet's link layer for RS-485 multidrop
      wiring, used by the cheaper end of the device range. A token circulates between
@@ -179,7 +182,7 @@
      meter.</p>
 </div>
 
-<h2>Where the port lives</h2>
+<h2 id="where-the-port-lives">Where the port lives</h2>
 <div class="pl-body">
   <p>An <code>MstpPort</code> is dragged from the <code>bacnet</code> palette's
      NetworkPorts node into <code>BacnetNetwork &gt; Bacnet Comm &gt; Network</code>. Two
@@ -193,7 +196,7 @@
   </ul>
 </div>
 
-<h2>The four properties that decide everything</h2>
+<h2 id="the-four-properties-that-decide-everything">The four properties that decide everything</h2>
 <table class="pl-spec">
   <thead><tr><th scope="col">Property</th><th scope="col">Default</th><th scope="col">What it does to you</th></tr></thead>
   <tbody>
@@ -217,7 +220,7 @@
      support them.</p>
 </div>
 
-<h2>Why Max Master is the one people get wrong</h2>
+<h2 id="why-max-master-is-the-one-people-get-wrong">Why Max Master is the one people get wrong</h2>
 <div class="pl-body">
   <p>Each master polls for a successor up the address range as far as Max Master before
      the token comes back round. Leave it at 127 on a trunk with eight devices addressed
@@ -228,7 +231,7 @@
      setting is per-device, and one device left at 127 keeps the long loop.</p>
 </div>
 
-<h2>What address 0 actually buys you</h2>
+<h2 id="what-address-0-actually-buys-you">What address 0 actually buys you</h2>
 <div class="pl-body">
   <p>If the token is ever lost, the device with the lowest MAC address regenerates it.
      Leaving the station at address 0 makes the station that device, which is normally
@@ -238,7 +241,7 @@
      in a way that looks like noise.</p>
 </div>
 
-<h2>Bringing it up</h2>
+<h2 id="bringing-it-up">Bringing it up</h2>
 <ol class="pl-steps">
   <li><div><strong>Save the Link changes</strong> before doing anything else; the port
       does not pick them up otherwise.</div></li>

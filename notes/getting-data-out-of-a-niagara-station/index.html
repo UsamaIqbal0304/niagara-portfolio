@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>Answer four questions first</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#answer-four-questions-first">Answer four questions first</a></li><li><a href="#the-five-routes">The five routes</a></li><li><a href="#what-to-decide-before-the-first-message">What to decide before the first message</a></li><li><a href="#on-the-controller-specifically">On the controller specifically</a></li></ol>
+    </nav>
+<h2 id="answer-four-questions-first">Answer four questions first</h2>
 <div class="pl-body">
   <p>Most bad integrations are a good mechanism chosen for the wrong shape of problem.
      Before picking one, settle: <strong>who consumes it</strong> (a person, a dashboard,
@@ -170,7 +173,7 @@
      usually eliminate three of the five options immediately.</p>
 </div>
 
-<h2>The five routes</h2>
+<h2 id="the-five-routes">The five routes</h2>
 <table class="pl-spec">
   <thead><tr><th scope="col">Route</th><th scope="col">Suits</th><th scope="col">Costs you</th></tr></thead>
   <tbody>
@@ -208,7 +211,7 @@
      human's attention over HTTP; route data over MQTT or into a database.</p>
 </div>
 
-<h2>What to decide before the first message</h2>
+<h2 id="what-to-decide-before-the-first-message">What to decide before the first message</h2>
 <ol class="pl-steps">
   <li><div><strong>Naming and topic structure.</strong> Whatever you emit first is what
       the consumer builds against, and changing it later is a coordinated release across
@@ -226,7 +229,7 @@
       chosen.</div></li>
 </ol>
 
-<h2>On the controller specifically</h2>
+<h2 id="on-the-controller-specifically">On the controller specifically</h2>
 <div class="pl-body">
   <p>If the station doing the publishing is a controller rather than a Supervisor, the
      budget from <a href="/notes/what-runs-on-a-jace/">what runs on a JACE</a> applies to

@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>"Backup" means three different things</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#backup-means-three-different-things">"Backup" means three different things</a></li><li><a href="#what-is-scheduled-out-of-the-box">What is scheduled out of the box</a></li><li><a href="#the-gap">The gap</a></li><li><a href="#what-to-put-in-place">What to put in place</a></li></ol>
+    </nav>
+<h2 id="backup-means-three-different-things">"Backup" means three different things</h2>
 <div class="pl-body">
   <p>Before scheduling anything, be precise about which of these you mean, because they
      restore differently and are not interchangeable.</p>
@@ -184,7 +187,7 @@
   </tbody>
 </table>
 
-<h2>What is scheduled out of the box</h2>
+<h2 id="what-is-scheduled-out-of-the-box">What is scheduled out of the box</h2>
 <div class="pl-body">
   <p>A Supervisor's Niagara Network carries a provisioning extension, and that extension
      has a schedule component wired to a start-backup action. Set the schedule and every
@@ -203,7 +206,7 @@
      the work is batched and staggered instead.</p>
 </div>
 
-<h2>The gap</h2>
+<h2 id="the-gap">The gap</h2>
 <div class="pl-body">
   <p>All of that provisioning work is performed <em>by</em> the Supervisor <em>against</em>
      the stations in its Niagara Network. Its own station is not one of them.</p>
@@ -217,7 +220,7 @@
      for backup as a capability.</p>
 </div>
 
-<h2>What to put in place</h2>
+<h2 id="what-to-put-in-place">What to put in place</h2>
 <ol class="pl-steps">
   <li><div><strong>Schedule the subordinates properly</strong> — job prototypes rather
       than the convenience schedule, staggered, with the results actually

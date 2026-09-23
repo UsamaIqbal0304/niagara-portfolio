@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>A controller is not a small Supervisor</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#a-controller-is-not-a-small-supervisor">A controller is not a small Supervisor</a></li><li><a href="#native-code-is-the-hard-stop">Native code is the hard stop</a></li><li><a href="#the-budget-is-real-and-it-is-shared">The budget is real, and it is shared</a></li><li><a href="#who-renders-what">Who renders what</a></li><li><a href="#checking-before-you-ship">Checking before you ship</a></li></ol>
+    </nav>
+<h2 id="a-controller-is-not-a-small-supervisor">A controller is not a small Supervisor</h2>
 <div class="pl-body">
   <p>It is tempting to treat a JACE as a Supervisor with less of everything. It is not:
      it is a different processor architecture running a different operating system, with
@@ -169,7 +172,7 @@
      otherwise does not run slowly. It does not run.</p>
 </div>
 
-<h2>Native code is the hard stop</h2>
+<h2 id="native-code-is-the-hard-stop">Native code is the hard stop</h2>
 <div class="pl-body">
   <p>Controllers are ARM hosts. A development machine almost certainly is not. Any
      dependency that carries a compiled binary — a bundled shared library, a JNI layer,
@@ -188,7 +191,7 @@
      is out, not the platform.</p>
 </div>
 
-<h2>The budget is real, and it is shared</h2>
+<h2 id="the-budget-is-real-and-it-is-shared">The budget is real, and it is shared</h2>
 <div class="pl-body">
   <p>The second constraint is quieter and does more damage over time, because nothing
      fails outright. Every module installed occupies flash and heap whether or not it is
@@ -207,7 +210,7 @@
   </ul>
 </div>
 
-<h2>Who renders what</h2>
+<h2 id="who-renders-what">Who renders what</h2>
 <div class="pl-body">
   <p>One clarification that saves a lot of misplaced optimisation: the browser rendering
      a graphic is the <em>operator's</em>, not the controller's. Client-side rendering
@@ -219,7 +222,7 @@
      subscriptions behind them. Optimise those.</p>
 </div>
 
-<h2>Checking before you ship</h2>
+<h2 id="checking-before-you-ship">Checking before you ship</h2>
 <ol class="pl-steps">
   <li><div><strong>Inventory the jar.</strong> Anything in the archive that is not a
       class, a resource or metadata deserves an explanation.</div></li>

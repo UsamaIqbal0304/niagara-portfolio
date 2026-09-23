@@ -697,3 +697,21 @@ h4 { font-size:var(--pl-fs-md); line-height:var(--pl-lh-snug); font-weight:var(-
   .pl-demo__frame { height:min(var(--demo-h, 700px), 78vh); }
   .pl-demo__controls { width:100%; }
 }
+
+/* ---------------------------------------------------------------- note toc */
+
+/* A note answers one question, but it gets arrived at in the middle — from a
+   search result, or from somebody else's link to a section. The contents list
+   is the cheapest way to let that reader land on the part they came for. */
+.pl-toc {
+  max-width:var(--pl-max-prose); margin:0 0 var(--pl-s-11);
+  padding:var(--pl-s-8) var(--pl-s-9);
+  background:var(--pl-surface-sunk); border:1px solid var(--pl-line);
+  border-radius:var(--pl-r-md);
+}
+.pl-toc > p { margin:0 0 var(--pl-s-6); }
+.pl-toc ol { margin:0; padding-left:var(--pl-s-7); display:grid; gap:var(--pl-s-4); }
+.pl-toc li { font-size:var(--pl-fs-sm); color:var(--pl-text-muted); }
+.pl-toc li::marker { color:var(--pl-accent); }
+.pl-toc a { color:var(--pl-text); text-decoration:none; }
+.pl-toc a:hover { color:var(--pl-accent); text-decoration:underline; }

@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>Three objects, not one</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#three-objects-not-one">Three objects, not one</a></li><li><a href="#choosing-the-extension-that-matches-the-failure">Choosing the extension that matches the failure</a></li><li><a href="#what-the-alarm-class-actually-controls">What the alarm class actually controls</a></li><li><a href="#escalation-and-why-it-needs-somewhere-to-go">Escalation, and why it needs somewhere to go</a></li><li><a href="#recipients-and-one-that-does-not-exist-on-a-controller">Recipients, and one that does not exist on a controller</a></li><li><a href="#station-to-station-the-link-everybody-forgets">Station to station: the link everybody forgets</a></li><li><a href="#reassigning-classes-without-opening-every-point">Reassigning classes without opening every point</a></li><li><a href="#a-commissioning-check-that-takes-ten-minutes">A commissioning check that takes ten minutes</a></li></ol>
+    </nav>
+<h2 id="three-objects-not-one">Three objects, not one</h2>
 <div class="pl-body">
   <p>Niagara splits alarming into three things that are configured independently, and the
      split is the reason alarms go quiet.</p>
@@ -178,7 +181,7 @@
      still increment. It simply never becomes anybody's problem.</p>
 </div>
 
-<h2>Choosing the extension that matches the failure</h2>
+<h2 id="choosing-the-extension-that-matches-the-failure">Choosing the extension that matches the failure</h2>
 <div class="pl-body">
   <p>There are more extension types than most stations use, and the common reflex &mdash;
      an out-of-range extension on everything &mdash; misses whole categories of fault.</p>
@@ -220,7 +223,7 @@
      you configure it or add a status extension.</p>
 </div>
 
-<h2>What the alarm class actually controls</h2>
+<h2 id="what-the-alarm-class-actually-controls">What the alarm class actually controls</h2>
 <div class="pl-body">
   <p>The class is where acknowledgement, priority and escalation live. Priority runs 1 to
      255 with a default of <strong>255</strong>, which is the lowest &mdash; so a station
@@ -233,7 +236,7 @@
      observation cuts the diagnosis in half.</p>
 </div>
 
-<h2>Escalation, and why it needs somewhere to go</h2>
+<h2 id="escalation-and-why-it-needs-somewhere-to-go">Escalation, and why it needs somewhere to go</h2>
 <div class="pl-body">
   <p>Three escalation levels re-route an alarm that stays unacknowledged. Each has an
      enable flag, on by default, and a delay measured in hours and minutes with a
@@ -245,7 +248,7 @@
      worst combination because it looks configured.</p>
 </div>
 
-<h2>Recipients, and one that does not exist on a controller</h2>
+<h2 id="recipients-and-one-that-does-not-exist-on-a-controller">Recipients, and one that does not exist on a controller</h2>
 <div class="pl-body">
   <p>Recipients are linked from the alarm class's alarm topic to the recipient's Alarm
      action. Each can be restricted by time of day, by day of week, and to specific
@@ -271,7 +274,7 @@
      recipient for something the class should have separated.</p>
 </div>
 
-<h2>Station to station: the link everybody forgets</h2>
+<h2 id="station-to-station-the-link-everybody-forgets">Station to station: the link everybody forgets</h2>
 <div class="pl-body">
   <p>Getting alarms from a controller to a Supervisor needs configuration at both ends.
      In the sending station, an alarm class and a station recipient in the
@@ -290,7 +293,7 @@
      display bug rather than a missing link.</p>
 </div>
 
-<h2>Reassigning classes without opening every point</h2>
+<h2 id="reassigning-classes-without-opening-every-point">Reassigning classes without opening every point</h2>
 <div class="pl-body">
   <p>Alarm extensions are scattered across hundreds of points, so changing a class point
      by point is not viable on a real station. The <code>AlarmService</code> has an
@@ -302,7 +305,7 @@
      sound consistently instead of forming a separate vocabulary in the console.</p>
 </div>
 
-<h2>A commissioning check that takes ten minutes</h2>
+<h2 id="a-commissioning-check-that-takes-ten-minutes">A commissioning check that takes ten minutes</h2>
 <ol class="pl-steps">
   <li><div><strong>Force one alarm of each class</strong> and confirm it arrives at every
       recipient that class is meant to reach. Not one alarm &mdash; one per

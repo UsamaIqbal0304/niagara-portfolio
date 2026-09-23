@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>Why the problem exists at all</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#why-the-problem-exists-at-all">Why the problem exists at all</a></li><li><a href="#renaming-and-tagging-are-different-jobs">Renaming and tagging are different jobs</a></li><li><a href="#what-a-rename-can-break">What a rename can break</a></li><li><a href="#the-tooling-that-makes-it-repeatable">The tooling that makes it repeatable</a></li><li><a href="#do-it-once-keep-the-recipe">Do it once, keep the recipe</a></li></ol>
+    </nav>
+<h2 id="why-the-problem-exists-at-all">Why the problem exists at all</h2>
 <div class="pl-body">
   <p>Points are discovered from field devices, and their names are whatever the device
      vendor chose — abbreviations, instance numbers, a naming scheme that made sense
@@ -173,7 +176,7 @@
      expensive part, because it defeats every query written against them afterwards.</p>
 </div>
 
-<h2>Renaming and tagging are different jobs</h2>
+<h2 id="renaming-and-tagging-are-different-jobs">Renaming and tagging are different jobs</h2>
 <div class="pl-body">
   <p>Conflating them is the root mistake. A name is a label for a human reading a tree.
      A tag is machine-readable meaning attached to a point — this is a zone temperature,
@@ -189,7 +192,7 @@
      stops being a breaking change.</p>
 </div>
 
-<h2>What a rename can break</h2>
+<h2 id="what-a-rename-can-break">What a rename can break</h2>
 <div class="pl-body">
   <p>Renaming is not free, and the damage is usually discovered later by somebody else.
      Three things to check before a bulk pass:</p>
@@ -208,7 +211,7 @@
   </ul>
 </div>
 
-<h2>The tooling that makes it repeatable</h2>
+<h2 id="the-tooling-that-makes-it-repeatable">The tooling that makes it repeatable</h2>
 <table class="pl-spec">
   <thead><tr><th scope="col">Step</th><th scope="col">What does the work</th></tr></thead>
   <tbody>
@@ -229,7 +232,7 @@
   </tbody>
 </table>
 
-<h2>Do it once, keep the recipe</h2>
+<h2 id="do-it-once-keep-the-recipe">Do it once, keep the recipe</h2>
 <div class="pl-body">
   <p>The value is not in the single pass. It is that the selection query and the job
      definition survive, so the next building, the next phase and the next contractor's

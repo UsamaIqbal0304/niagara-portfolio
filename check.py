@@ -221,6 +221,16 @@ for rel, src in note_pages:
     leftover = re.search(r"</(p|li|h2|h3|div|table)>|<(div|p|h2|h3|ul|table)\b", md)
     check(not leftover, f"{slug}.md: unconverted HTML — {leftover.group(0) if leftover else ''}")
 
+    # Every section is addressable, and the contents list at the top points at
+    # ids that exist. A contents entry aimed at a missing id is a dead link
+    # that nothing else on the page would reveal.
+    ids = re.findall(r'<h2 id="([^"]+)"', body)
+    check(len(ids) == len(heads), f"{slug}: {len(heads) - len(ids)} section heading(s) with no id")
+    check(len(set(ids)) == len(ids), f"{slug}: duplicate section ids")
+    for target in re.findall(r'<nav class="pl-toc".*?</nav>', src, re.S):
+        for want in re.findall(r'href="#([^"]+)"', target):
+            check(want in ids, f"{slug}: contents links to #{want}, which is not a section")
+
     check("# " + h1 + "\n" in llms_full, f"llms-full.txt: does not contain '{h1}'")
     check(f"{ORIGIN}/{slug}.md" in llms, f"llms.txt: no markdown URL for {slug}")
 

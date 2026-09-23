@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>Three things called templates</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#three-things-called-templates">Three things called templates</a></li><li><a href="#exposed-properties-are-the-whole-point">Exposed properties are the whole point</a></li><li><a href="#bulk-deployment-from-a-spreadsheet">Bulk deployment from a spreadsheet</a></li><li><a href="#upgrade-downgrade-redeploy-and-detach">Upgrade, downgrade, redeploy &amp;mdash; and detach</a></li><li><a href="#where-the-effort-actually-goes">Where the effort actually goes</a></li></ol>
+    </nav>
+<h2 id="three-things-called-templates">Three things called templates</h2>
 <div class="pl-body">
   <p>Niagara uses the word for three different mechanisms with different constraints.
      Picking the wrong one is expensive later, because two of the three cannot be
@@ -205,7 +208,7 @@
      it.</p>
 </div>
 
-<h2>Exposed properties are the whole point</h2>
+<h2 id="exposed-properties-are-the-whole-point">Exposed properties are the whole point</h2>
 <div class="pl-body">
   <p>A template with no exposed properties is a photocopier. The Configuration tab of the
      template view lets you pick individual properties from inside the logic and expose
@@ -217,7 +220,7 @@
      people edit inside the deployed instance, which defeats the upgrade path.</p>
 </div>
 
-<h2>Bulk deployment from a spreadsheet</h2>
+<h2 id="bulk-deployment-from-a-spreadsheet">Bulk deployment from a spreadsheet</h2>
 <div class="pl-body">
   <p>Component templates can be deployed one at a time, or in bulk from an exported Excel
      file through the Template Manager. The export contains one worksheet per template,
@@ -253,7 +256,7 @@
      with two rows before running four hundred.</p>
 </div>
 
-<h2>Upgrade, downgrade, redeploy &mdash; and detach</h2>
+<h2 id="upgrade-downgrade-redeploy-and-detach">Upgrade, downgrade, redeploy &mdash; and detach</h2>
 <div class="pl-body">
   <p>The reason to accept the discipline of templates is here. Fix a fault in the
      template, and upgrade propagates the fix to every deployed instance through the same
@@ -269,7 +272,7 @@
      disaster when somebody does it to make one local edit easier.</p>
 </div>
 
-<h2>Where the effort actually goes</h2>
+<h2 id="where-the-effort-actually-goes">Where the effort actually goes</h2>
 <ol class="pl-steps">
   <li><div><strong>Decide the unit.</strong> One template per plant type, not per
       variant. Variants are exposed properties.</div></li>

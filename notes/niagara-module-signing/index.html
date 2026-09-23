@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>The three modes</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#the-three-modes">The three modes</a></li><li><a href="#trusted-is-a-property-of-the-host">Trusted is a property of the host</a></li><li><a href="#you-cannot-talk-a-station-out-of-it-at-the-command-line">You cannot talk a station out of it at the command line</a></li><li><a href="#program-objects-are-gated-separately">Program objects are gated separately</a></li><li><a href="#practical-consequences">Practical consequences</a></li></ol>
+    </nav>
+<h2 id="the-three-modes">The three modes</h2>
 <div class="pl-body">
   <p>A Niagara host decides how strict to be about module signatures with a single
      system property, <code>niagara.moduleVerificationMode</code>. It takes three
@@ -192,7 +195,7 @@
      "logs" — refused.</p>
 </div>
 
-<h2>Trusted is a property of the host</h2>
+<h2 id="trusted-is-a-property-of-the-host">Trusted is a property of the host</h2>
 <div class="pl-body">
   <p>The most common surprise is a module that installs on one host and is refused by
      the next, with the same jar and the same signature. Nothing about the module
@@ -203,7 +206,7 @@
      over several years the answer varies across the estate.</p>
 </div>
 
-<h2>You cannot talk a station out of it at the command line</h2>
+<h2 id="you-cannot-talk-a-station-out-of-it-at-the-command-line">You cannot talk a station out of it at the command line</h2>
 <div class="pl-body">
   <p>There is a matching property, a command-line property blacklist, whose job is to
      stop somebody setting the verification mode — among other security-relevant
@@ -214,7 +217,7 @@
      during commissioning.</p>
 </div>
 
-<h2>Program objects are gated separately</h2>
+<h2 id="program-objects-are-gated-separately">Program objects are gated separately</h2>
 <div class="pl-body">
   <p>Modules are not the only executable thing in a station. Program objects have their
      own signing requirement, with its own property, defaulting to permissive — unsigned
@@ -223,7 +226,7 @@
      one-line configuration change plus the work of signing what is already there.</p>
 </div>
 
-<h2>Practical consequences</h2>
+<h2 id="practical-consequences">Practical consequences</h2>
 <ol class="pl-steps">
   <li><div><strong>Sign in development, not at the end.</strong> A build that produces
       unsigned jars for months and signs once before delivery discovers every trust and

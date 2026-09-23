@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>Where the speed is actually set</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#where-the-speed-is-actually-set">Where the speed is actually set</a></li><li><a href="#which-point-gets-which-rate">Which point gets which rate</a></li><li><a href="#how-a-point-ends-up-in-a-bucket">How a point ends up in a bucket</a></li><li><a href="#the-single-policy-trap">The single-policy trap</a></li><li><a href="#the-write-side-of-the-same-policy">The write side of the same policy</a></li><li><a href="#measure-before-changing-anything">Measure before changing anything</a></li><li><a href="#the-order-to-work-in">The order to work in</a></li></ol>
+    </nav>
+<h2 id="where-the-speed-is-actually-set">Where the speed is actually set</h2>
 <div class="pl-body">
   <p>Each field-bus driver network carries a polling service — named <code>Poll
      Service</code> or <code>Poll Scheduler</code> depending on the driver — and it
@@ -195,7 +198,7 @@
      stale data the rest of the day.</p>
 </div>
 
-<h2>Which point gets which rate</h2>
+<h2 id="which-point-gets-which-rate">Which point gets which rate</h2>
 <div class="pl-body">
   <p>This differs by driver, and it is the part that catches people moving between
      them.</p>
@@ -212,7 +215,7 @@
   </ul>
 </div>
 
-<h2>How a point ends up in a bucket</h2>
+<h2 id="how-a-point-ends-up-in-a-bucket">How a point ends up in a bucket</h2>
 <div class="pl-body">
   <p>The rate on the drop-down is not the whole story, because the scheduler does not
      poll from a fixed list. Every ten seconds it rebuilds the list of objects assigned
@@ -238,7 +241,7 @@
      history.</p>
 </div>
 
-<h2>The single-policy trap</h2>
+<h2 id="the-single-policy-trap">The single-policy trap</h2>
 <div class="pl-body">
   <p>A driver's Tuning Policy Map ships with one default policy, and a station built
      without touching it has every point in the building on that one policy. Tridium's
@@ -252,7 +255,7 @@
      different note.</p>
 </div>
 
-<h2>The write side of the same policy</h2>
+<h2 id="the-write-side-of-the-same-policy">The write side of the same policy</h2>
 <div class="pl-body">
   <p>A tuning policy is not only about reads. The same component decides when a
      writable proxy point actually sends a value, and its defaults are the ones that
@@ -291,7 +294,7 @@
      look at before any poll rate.</p>
 </div>
 
-<h2>Measure before changing anything</h2>
+<h2 id="measure-before-changing-anything">Measure before changing anything</h2>
 <div class="pl-body">
   <p>The polling service publishes its own statistics, and they answer the question
      directly rather than by feel:</p>
@@ -318,7 +321,7 @@
      the station is busy, not which trunk is.</p>
 </div>
 
-<h2>The order to work in</h2>
+<h2 id="the-order-to-work-in">The order to work in</h2>
 <ol class="pl-steps">
   <li><div><strong>Reset the statistics and watch Busy Time.</strong> If it is low, the
       polling is not your problem and re-rating points will not help.</div></li>

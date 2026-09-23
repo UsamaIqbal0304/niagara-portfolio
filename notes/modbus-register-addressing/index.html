@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>Four groups, and the address that identifies them</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#four-groups-and-the-address-that-identifies-them">Four groups, and the address that identifies them</a></li><li><a href="#the-off-by-one">The off-by-one</a></li><li><a href="#the-data-type-is-a-second-separate-decision">The data type is a second, separate decision</a></li><li><a href="#bit-packed-registers">Bit-packed registers</a></li><li><a href="#there-is-no-discovery">There is no discovery</a></li><li><a href="#when-a-point-goes-to-fault">When a point goes to fault</a></li><li><a href="#serving-data-as-a-slave">Serving data as a slave</a></li><li><a href="#the-order-that-avoids-all-of-this">The order that avoids all of this</a></li></ol>
+    </nav>
+<h2 id="four-groups-and-the-address-that-identifies-them">Four groups, and the address that identifies them</h2>
 <div class="pl-body">
   <p>Everything a Modbus device exposes falls into one of four groups, and the leading
      digit of the address the vendor publishes is what tells them apart.</p>
@@ -186,7 +189,7 @@
      registers and nothing else.</p>
 </div>
 
-<h2>The off-by-one</h2>
+<h2 id="the-off-by-one">The off-by-one</h2>
 <div class="pl-body">
   <p>Decimal and hex addressing on the wire is <strong>zero-based</strong>: the first
      item in a group is item 0. So holding register 108 is addressed as 107 decimal, or
@@ -206,7 +209,7 @@
      coils the driver ignores leading zeros, so 00109 and 109 are the same address.</p>
 </div>
 
-<h2>The data type is a second, separate decision</h2>
+<h2 id="the-data-type-is-a-second-separate-decision">The data type is a second, separate decision</h2>
 <div class="pl-body">
   <p>Modbus does not describe its own payloads. The protocol moves 16-bit registers; what
      those registers mean is entirely the vendor's choice, and the only place it is
@@ -246,7 +249,7 @@
      and nothing reports that it was changed.</p>
 </div>
 
-<h2>Bit-packed registers</h2>
+<h2 id="bit-packed-registers">Bit-packed registers</h2>
 <div class="pl-body">
   <p>Vendors routinely pack several unrelated values into one 16-bit register. The driver
      handles this with bit-level proxy extensions &mdash; <code>NumericBits</code> and
@@ -260,7 +263,7 @@
      usually gets reported as "the meter is sending rubbish".</p>
 </div>
 
-<h2>There is no discovery</h2>
+<h2 id="there-is-no-discovery">There is no discovery</h2>
 <div class="pl-body">
   <p>Unlike most drivers, the Modbus point manager has no learn mode: no Discover button,
      no Discovered and Database panes. The protocol carries no self-description, so there
@@ -280,7 +283,7 @@
      one over-reaching point can take out a block of good ones.</p>
 </div>
 
-<h2>When a point goes to fault</h2>
+<h2 id="when-a-point-goes-to-fault">When a point goes to fault</h2>
 <div class="pl-body">
   <p>Open the point and read <code>ProxyExt &gt; Fault Cause</code>. It normally contains
      the Modbus exception verbatim, such as <em>Read fault: illegal data address</em>.
@@ -289,7 +292,7 @@
      is wrong &mdash; only the first two produce a fault.</p>
 </div>
 
-<h2>Serving data as a slave</h2>
+<h2 id="serving-data-as-a-slave">Serving data as a slave</h2>
 <div class="pl-body">
   <p>Running the station as a Modbus server is the mirror image, and adds one rule worth
      knowing before you start: <strong>every server point must fall inside a declared
@@ -308,7 +311,7 @@
      misbehave later.</p>
 </div>
 
-<h2>The order that avoids all of this</h2>
+<h2 id="the-order-that-avoids-all-of-this">The order that avoids all of this</h2>
 <ol class="pl-steps">
   <li><div><strong>Get the vendor's register map first</strong>, with data types and byte
       order. Without it you are guessing, and Modbus rewards guessing with plausible

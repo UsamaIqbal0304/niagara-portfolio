@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>Set the facets before the events</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#set-the-facets-before-the-events">Set the facets before the events</a></li><li><a href="#special-events-belong-to-one-schedule">Special events belong to one schedule</a></li><li><a href="#priority-is-the-order-of-the-list">Priority is the order of the list</a></li><li><a href="#one-calendar-many-schedules">One calendar, many schedules</a></li><li><a href="#week-1-is-not-the-first-calendar-week">Week 1 is not the first calendar week</a></li><li><a href="#master-and-slave-schedules">Master and slave schedules</a></li><li><a href="#crossing-into-bacnet">Crossing into BACnet</a></li><li><a href="#what-to-settle-before-the-schedules-are-built">What to settle before the schedules are built</a></li></ol>
+    </nav>
+<h2 id="set-the-facets-before-the-events">Set the facets before the events</h2>
 <div class="pl-body">
   <p>Weekly schedules come in boolean, numeric, enum and string flavours. For an enum
      schedule there is an ordering constraint that is easy to hit: define the range in
@@ -169,7 +172,7 @@
      events. Add events against an undefined range and you get to do them again.</p>
 </div>
 
-<h2>Special events belong to one schedule</h2>
+<h2 id="special-events-belong-to-one-schedule">Special events belong to one schedule</h2>
 <div class="pl-body">
   <p>Special events are exceptions to the normal week &mdash; holidays, one-off closures,
      a plant shutdown. They apply to weekly schedules only, and <strong>each weekly
@@ -181,7 +184,7 @@
      normally on Christmas Day in the three zones somebody missed.</p>
 </div>
 
-<h2>Priority is the order of the list</h2>
+<h2 id="priority-is-the-order-of-the-list">Priority is the order of the list</h2>
 <div class="pl-body">
   <p>Every special event outranks every regular weekly event. Among special events
      themselves, priority is simply position in the table: top of the list wins, bottom
@@ -201,7 +204,7 @@
      08:00&ndash;18:00 off leaves the weekly schedule running either side of it.</p>
 </div>
 
-<h2>One calendar, many schedules</h2>
+<h2 id="one-calendar-many-schedules">One calendar, many schedules</h2>
 <div class="pl-body">
   <p>A special event can be a reference type, pointing at a calendar schedule that owns
      the days of occurrence. Edit that one calendar and every weekly schedule referencing
@@ -212,7 +215,7 @@
      edit rather than forty.</p>
 </div>
 
-<h2>Week 1 is not the first calendar week</h2>
+<h2 id="week-1-is-not-the-first-calendar-week">Week 1 is not the first calendar week</h2>
 <div class="pl-body">
   <p>When defining a recurring special event by week and day, two similar-looking options
      mean different things.</p>
@@ -238,7 +241,7 @@
      kind of fault that gets reported months later as intermittent.</p>
 </div>
 
-<h2>Master and slave schedules</h2>
+<h2 id="master-and-slave-schedules">Master and slave schedules</h2>
 <div class="pl-body">
   <p>Scheduling uses the driver architecture to share configuration. You import a schedule
      component from another station &mdash; normally the Supervisor &mdash; and the
@@ -256,7 +259,7 @@
      occupancy times &mdash; is the situation master/slave exists to prevent.</p>
 </div>
 
-<h2>Crossing into BACnet</h2>
+<h2 id="crossing-into-bacnet">Crossing into BACnet</h2>
 <div class="pl-body">
   <p>The same architecture reaches BACnet devices, in both directions.</p>
   <ul>
@@ -273,7 +276,7 @@
      work.</p>
 </div>
 
-<h2>What to settle before the schedules are built</h2>
+<h2 id="what-to-settle-before-the-schedules-are-built">What to settle before the schedules are built</h2>
 <ol class="pl-steps">
   <li><div><strong>Who owns occupancy times</strong> &mdash; the Supervisor, each
       controller, or a BACnet device. One answer, written down.</div></li>

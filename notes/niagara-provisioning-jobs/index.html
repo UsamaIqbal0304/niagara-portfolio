@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>What it replaces</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#what-it-replaces">What it replaces</a></li><li><a href="#two-kinds-of-job">Two kinds of job</a></li><li><a href="#what-actually-happens-when-a-job-runs">What actually happens when a job runs</a></li><li><a href="#the-backup-action-almost-everybody-uses-first">The backup action almost everybody uses first</a></li><li><a href="#retention-because-jobs-keep-files">Retention, because jobs keep files</a></li><li><a href="#two-things-to-check-before-relying-on-it">Two things to check before relying on it</a></li><li><a href="#what-to-set-up-on-a-supervisor">What to set up on a Supervisor</a></li></ol>
+    </nav>
+<h2 id="what-it-replaces">What it replaces</h2>
 <div class="pl-body">
   <p>Provisioning is a licensed feature of a station running on a Supervisor. It
      automates tasks on the remote hosts in that station's NiagaraNetwork &mdash; and
@@ -177,7 +180,7 @@
   </ul>
 </div>
 
-<h2>Two kinds of job</h2>
+<h2 id="two-kinds-of-job">Two kinds of job</h2>
 <div class="pl-body">
   <p>The distinction matters because only one of them is suitable for anything recurring.</p>
   <ul>
@@ -193,7 +196,7 @@
      later.</p>
 </div>
 
-<h2>What actually happens when a job runs</h2>
+<h2 id="what-actually-happens-when-a-job-runs">What actually happens when a job runs</h2>
 <div class="pl-body">
   <p>Reading the execution order once saves a lot of confusion later, because the step
      count on the progress bar moves while you watch it.</p>
@@ -219,7 +222,7 @@
      <code>Max Provisioning Threads</code> on the batch job service.</p>
 </div>
 
-<h2>The backup action almost everybody uses first</h2>
+<h2 id="the-backup-action-almost-everybody-uses-first">The backup action almost everybody uses first</h2>
 <div class="pl-body">
   <p>The NiagaraNetwork has a Start Backup action that backs up every station. On a site
      with four controllers it is fine. Tridium's own documentation recommends against it
@@ -242,7 +245,7 @@
      cannot give you.</p>
 </div>
 
-<h2>Retention, because jobs keep files</h2>
+<h2 id="retention-because-jobs-keep-files">Retention, because jobs keep files</h2>
 <div class="pl-body">
   <p>Provisioning persists everything by default: who submitted the job, when it started
      and ended, the detail of each step and its log output. For backup jobs the saved
@@ -274,7 +277,7 @@
      file, so "tidying up the job list" is not a cosmetic operation.</p>
 </div>
 
-<h2>Two things to check before relying on it</h2>
+<h2 id="two-things-to-check-before-relying-on-it">Two things to check before relying on it</h2>
 <div class="pl-body">
   <p>Jobs can raise an alarm on failure, on success, or both. Configure failure alarms at
      minimum, or an unattended nightly job is only as reliable as somebody's habit of
@@ -286,7 +289,7 @@
      old half.</p>
 </div>
 
-<h2>What to set up on a Supervisor</h2>
+<h2 id="what-to-set-up-on-a-supervisor">What to set up on a Supervisor</h2>
 <ol class="pl-steps">
   <li><div><strong>The network extension</strong>, so every station gets its provisioning
       extensions without anyone remembering to add them.</div></li>

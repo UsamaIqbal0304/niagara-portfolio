@@ -4685,6 +4685,34 @@ def build_llms_full():
     write_text("llms-full.txt", "\n".join(parts).rstrip() + "\n")
 
 
+def section_index(body):
+    """The body with an id on every section heading, and the list of those
+    sections. A note gets cited in the middle rather than read from the top,
+    and without ids the only address anyone can share is the whole page."""
+    seen, sections = {}, []
+
+    def one(m):
+        text = re.sub(r"<[^>]+>", "", m.group(1))
+        base = re.sub(r"[^a-z0-9]+", "-", html.unescape(text).lower()).strip("-")
+        seen[base] = seen.get(base, 0) + 1
+        ident = base if seen[base] == 1 else f"{base}-{seen[base]}"
+        sections.append((ident, text))
+        return f'<h2 id="{ident}">{m.group(1)}</h2>'
+
+    return re.sub(r"<h2>(.*?)</h2>", one, body, flags=re.S), sections
+
+
+def note_toc(sections):
+    """Only worth the space once a note has enough sections to scroll past."""
+    if len(sections) < 4:
+        return ""
+    items = "".join(f'<li><a href="#{i}">{e(t)}</a></li>' for i, t in sections)
+    return f'''<nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol>{items}</ol>
+    </nav>'''
+
+
 def sibling_notes(n, count=3):
     """The three notes to show under a note. Picking the first three in the list
     put the same three under all twenty, which is a dead end for a reader who
@@ -4711,6 +4739,8 @@ def note_page(n):
         <p>{e(s["desc"].split(".")[0])}.</p></div>''')
     more = "".join(note_card(o) for o in sibling_notes(n))
     written = date.fromisoformat(n["date"]).strftime("%B %Y")
+    anchored, sections = section_index(n["body"])
+    toc = note_toc(sections)
 
     body = f'''
 <section class="pl-band pl-hero pl-hero--page">
@@ -4725,7 +4755,7 @@ def note_page(n):
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">{n["body"]}</div>
+  <div class="pl-wrap">{toc}{anchored}</div>
 </section>
 
 <section class="pl-section pl-section--sunk">

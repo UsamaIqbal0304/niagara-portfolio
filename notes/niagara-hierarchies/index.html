@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>The problem with a hand-built tree</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#the-problem-with-a-hand-built-tree">The problem with a hand-built tree</a></li><li><a href="#level-definitions-two-families">Level definitions: two families</a></li><li><a href="#neql-briefly">NEQL, briefly</a></li><li><a href="#scope">Scope</a></li><li><a href="#who-sees-which-tree">Who sees which tree</a></li><li><a href="#the-cache-and-the-trap-inside-it">The cache, and the trap inside it</a></li><li><a href="#doing-it-in-the-right-order">Doing it in the right order</a></li></ol>
+    </nav>
+<h2 id="the-problem-with-a-hand-built-tree">The problem with a hand-built tree</h2>
 <div class="pl-body">
   <p>Every station needs a navigation structure that matches how people think about the
      building &mdash; site, then building, then floor, then plant &mdash; rather than
@@ -175,7 +178,7 @@
      levels, and the station generates the tree by querying itself.</p>
 </div>
 
-<h2>Level definitions: two families</h2>
+<h2 id="level-definitions-two-families">Level definitions: two families</h2>
 <div class="pl-body">
   <p>A hierarchy is a tree of level definitions, one per node level. They come in two
      kinds, and mixing them up is the usual first mistake.</p>
@@ -208,7 +211,7 @@
      appears under them until a query or relation level is added at the bottom.</p>
 </div>
 
-<h2>NEQL, briefly</h2>
+<h2 id="neql-briefly">NEQL, briefly</h2>
 <div class="pl-body">
   <p>The queries are written in NEQL, the same language the Search bar uses, so anything
      you can find by searching you can turn into a tree level. A few forms cover most
@@ -247,7 +250,7 @@
      estate rather than a station.</p>
 </div>
 
-<h2>Scope</h2>
+<h2 id="scope">Scope</h2>
 <div class="pl-body">
   <p>Each hierarchy has a scope container. The default is the whole station, and the
      scope ORD narrows it to a branch &mdash; pointing it at a model folder for one
@@ -256,7 +259,7 @@
      station.</p>
 </div>
 
-<h2>Who sees which tree</h2>
+<h2 id="who-sees-which-tree">Who sees which tree</h2>
 <div class="pl-body">
   <p>Visibility is granted role by role: the Role Manager has a <strong>Viewable
      Hierarchies</strong> field, and a role may be given more than one. Because a station
@@ -271,7 +274,7 @@
      behaviour but surprises people who expect one setting to do both jobs.</p>
 </div>
 
-<h2>The cache, and the trap inside it</h2>
+<h2 id="the-cache-and-the-trap-inside-it">The cache, and the trap inside it</h2>
 <div class="pl-body">
   <p>From Niagara 4.4 a hierarchy can be cached on the station side, which makes
      expanding a large tree in Workbench or a browser dramatically faster. The cost is
@@ -294,7 +297,7 @@
      or spend ten minutes convinced your edit did nothing.</p>
 </div>
 
-<h2>Doing it in the right order</h2>
+<h2 id="doing-it-in-the-right-order">Doing it in the right order</h2>
 <ol class="pl-steps">
   <li><div><strong>Draw the tree on paper first.</strong> The level definitions follow
       from the structure; deriving the structure from the level definitions goes

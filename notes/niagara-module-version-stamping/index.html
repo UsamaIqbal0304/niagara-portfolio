@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>The failure this prevents</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#the-failure-this-prevents">The failure this prevents</a></li><li><a href="#what-the-declared-version-actually-means">What the declared version actually means</a></li><li><a href="#why-compiling-on-a-newer-sdk-is-usually-safe">Why compiling on a newer SDK is usually safe</a></li><li><a href="#where-it-does-bite">Where it does bite</a></li><li><a href="#how-to-make-this-routine">How to make this routine</a></li></ol>
+    </nav>
+<h2 id="the-failure-this-prevents">The failure this prevents</h2>
 <div class="pl-body">
   <p>You build a module on a development machine, sign it, push it to a controller, and
      the Software Manager refuses it with a dependency error naming a Niagara version
@@ -172,7 +175,7 @@
      not.</p>
 </div>
 
-<h2>What the declared version actually means</h2>
+<h2 id="what-the-declared-version-actually-means">What the declared version actually means</h2>
 <div class="pl-body">
   <p>A module declares what it needs in <code>module.xml</code>, as a set of dependencies
      each carrying a vendor version. That version is a <strong>minimum</strong>. It says
@@ -190,7 +193,7 @@
      build should let you make them separately.</p>
 </div>
 
-<h2>Why compiling on a newer SDK is usually safe</h2>
+<h2 id="why-compiling-on-a-newer-sdk-is-usually-safe">Why compiling on a newer SDK is usually safe</h2>
 <div class="pl-body">
   <p>The instinct is that building on a newer framework must produce something the older
      one cannot load. Within a single Niagara generation that is rarely true, for two
@@ -207,7 +210,7 @@
      found the real incompatibility instead of guessing at one.</p>
 </div>
 
-<h2>Where it does bite</h2>
+<h2 id="where-it-does-bite">Where it does bite</h2>
 <div class="pl-body">
   <p>Two places, in practice.</p>
 </div>
@@ -228,7 +231,7 @@
   </tbody>
 </table>
 
-<h2>How to make this routine</h2>
+<h2 id="how-to-make-this-routine">How to make this routine</h2>
 <div class="pl-body">
   <p>Make the target version an argument to the build rather than something inherited
      from whatever is installed. A build that defaults to the developer's own

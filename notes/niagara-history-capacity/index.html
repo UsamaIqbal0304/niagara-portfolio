@@ -160,15 +160,18 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>A new history extension collects nothing</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#a-new-history-extension-collects-nothing">A new history extension collects nothing</a></li><li><a href="#the-name-collides-by-default">The name collides by default</a></li><li><a href="#capacity-and-the-setting-that-silently-stops-collecting">Capacity, and the setting that silently stops collecting</a></li><li><a href="#changing-the-interval-creates-a-new-history">Changing the interval creates a new history</a></li><li><a href="#sizing-it-against-the-archive">Sizing it against the archive</a></li><li><a href="#what-to-check-on-a-station-you-did-not-build">What to check on a station you did not build</a></li></ol>
+    </nav>
+<h2 id="a-new-history-extension-collects-nothing">A new history extension collects nothing</h2>
 <div class="pl-body">
   <p>Add a history extension to a point and it arrives <strong>disabled</strong>. Setting
      <code>Enabled</code> to true is the whole of what is strictly required to start
      collecting — which is exactly why the other properties get skipped.</p>
 </div>
 
-<h2>The name collides by default</h2>
+<h2 id="the-name-collides-by-default">The name collides by default</h2>
 <div class="pl-body">
   <p><code>History Name</code> defaults to <code>%parent.name%</code>. Every
      <code>SpaceTemp</code> point under every air handler therefore wants to be the same
@@ -181,7 +184,7 @@
      batch rather than on all of them afterwards.</p>
 </div>
 
-<h2>Capacity, and the setting that silently stops collecting</h2>
+<h2 id="capacity-and-the-setting-that-silently-stops-collecting">Capacity, and the setting that silently stops collecting</h2>
 <table class="pl-spec">
   <thead><tr><th scope="col">Property</th><th scope="col">Default</th><th scope="col">What it means for you</th></tr></thead>
   <tbody>
@@ -201,7 +204,7 @@
      that Full Policy does nothing at all when Capacity is Unlimited.</p>
 </div>
 
-<h2>Changing the interval creates a new history</h2>
+<h2 id="changing-the-interval-creates-a-new-history">Changing the interval creates a new history</h2>
 <div class="pl-body">
   <p>Histories with different intervals are not compatible, so changing
      <code>Interval</code> splits a new history off from the original rather than editing
@@ -209,7 +212,7 @@
      you two datasets and a join, not a better trend.</p>
 </div>
 
-<h2>Sizing it against the archive</h2>
+<h2 id="sizing-it-against-the-archive">Sizing it against the archive</h2>
 <div class="pl-body">
   <p>Where records are archived to a relational database and queried back through the
      Archive History Provider, the local capacity is a cache decision rather than a
@@ -222,7 +225,7 @@
      without hand-picking histories.</p>
 </div>
 
-<h2>What to check on a station you did not build</h2>
+<h2 id="what-to-check-on-a-station-you-did-not-build">What to check on a station you did not build</h2>
 <ol class="pl-steps">
   <li><div><strong>Any history whose Full Policy is Stop.</strong> Then look at when it
       last recorded.</div></li>

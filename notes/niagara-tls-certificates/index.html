@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>Where the first certificate comes from</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#where-the-first-certificate-comes-from">Where the first certificate comes from</a></li><li><a href="#three-things-about-the-default-certificate-that-surprise-people">Three things about the default certificate that surprise people</a></li><li><a href="#the-platform-settings-worth-checking-on-every-commission">The platform settings worth checking on every commission</a></li><li><a href="#what-expiry-actually-breaks-and-what-it-does-not">What expiry actually breaks, and what it does not</a></li><li><a href="#a-reasonable-order-of-work">A reasonable order of work</a></li></ol>
+    </nav>
+<h2 id="where-the-first-certificate-comes-from">Where the first certificate comes from</h2>
 <div class="pl-body">
   <p>The first time a Workbench installation, a platform or a station starts after
      commissioning, the system generates a default self-signed server certificate with
@@ -180,7 +183,7 @@
      recommended for robust long-term use.</p>
 </div>
 
-<h2>Three things about the default certificate that surprise people</h2>
+<h2 id="three-things-about-the-default-certificate-that-surprise-people">Three things about the default certificate that surprise people</h2>
 <div class="pl-body">
   <ul>
     <li><strong>It cannot be deleted.</strong> From Niagara 4.13 the default certificate
@@ -199,7 +202,7 @@
   </ul>
 </div>
 
-<h2>The platform settings worth checking on every commission</h2>
+<h2 id="the-platform-settings-worth-checking-on-every-commission">The platform settings worth checking on every commission</h2>
 <div class="pl-body">
   <p>Right-click Platform, open <code>Views &gt; Platform Administration</code>, then
      <strong>Change TLS Settings</strong>:</p>
@@ -219,7 +222,7 @@
   </tbody>
 </table>
 
-<h2>What expiry actually breaks, and what it does not</h2>
+<h2 id="what-expiry-actually-breaks-and-what-it-does-not">What expiry actually breaks, and what it does not</h2>
 <div class="pl-body">
   <p>This is the part that makes certificate expiry dangerous rather than merely
      annoying: it does not fail all at once.</p>
@@ -246,7 +249,7 @@
      external one.</p>
 </div>
 
-<h2>A reasonable order of work</h2>
+<h2 id="a-reasonable-order-of-work">A reasonable order of work</h2>
 <ol class="pl-steps">
   <li><div><strong>Commission on the default certificate.</strong> That is what it is
       for. Do not spend the first day of a job on PKI.</div></li>

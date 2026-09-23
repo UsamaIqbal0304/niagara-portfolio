@@ -160,8 +160,11 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
-<h2>Find the blockers before you plan the dates</h2>
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#find-the-blockers-before-you-plan-the-dates">Find the blockers before you plan the dates</a></li><li><a href="#the-direction-is-not-symmetrical">The direction is not symmetrical</a></li><li><a href="#licences-before-anything-else">Licences, before anything else</a></li><li><a href="#running-the-migration-tool">Running the migration tool</a></li><li><a href="#users-and-permissions-change-shape">Users and permissions change shape</a></li><li><a href="#two-details-that-bite-later">Two details that bite later</a></li><li><a href="#after-the-last-controller">After the last controller</a></li></ol>
+    </nav>
+<h2 id="find-the-blockers-before-you-plan-the-dates">Find the blockers before you plan the dates</h2>
 <div class="pl-body">
   <p>Most of the risk in a migration is discovered in the survey, not in the conversion.
      Four questions decide whether a date is realistic.</p>
@@ -187,7 +190,7 @@
      finding it early.</p>
 </div>
 
-<h2>The direction is not symmetrical</h2>
+<h2 id="the-direction-is-not-symmetrical">The direction is not symmetrical</h2>
 <div class="pl-body">
   <p>If a controller runs something unsupported in N4 and genuinely cannot change, you
      can leave it on AX-3.8 and still integrate it with a Niagara 4 Supervisor. The
@@ -198,7 +201,7 @@
      indefinitely rather than holding up everything else.</p>
 </div>
 
-<h2>Licences, before anything else</h2>
+<h2 id="licences-before-anything-else">Licences, before anything else</h2>
 <div class="pl-body">
   <p>AX licences do not work in Niagara 4. Request N4 licences for every platform being
      migrated and <strong>confirm they are ready before you start</strong>, because a
@@ -210,7 +213,7 @@
      the estate stays on AX.</p>
 </div>
 
-<h2>Running the migration tool</h2>
+<h2 id="running-the-migration-tool">Running the migration tool</h2>
 <div class="pl-body">
   <p>The tool takes an AX-3.8 station backup distribution file and writes out an
      N4-compatible station folder, plus a log, into the Workbench user home. The source
@@ -237,7 +240,7 @@
      Sorting this out beforehand turns a mid-run surprise into a non-event.</p>
 </div>
 
-<h2>Users and permissions change shape</h2>
+<h2 id="users-and-permissions-change-shape">Users and permissions change shape</h2>
 <div class="pl-body">
   <p>Two structural changes happen to security during migration, and both are worth
      explaining to whoever owns the system before they see them.</p>
@@ -263,7 +266,7 @@
      property sheet.</p>
 </div>
 
-<h2>Two details that bite later</h2>
+<h2 id="two-details-that-bite-later">Two details that bite later</h2>
 <div class="pl-body">
   <p><strong>Environment files.</strong> Anything customised under the framework's lib
      directory &mdash; a modified units file, custom colour coding &mdash; is not
@@ -277,7 +280,7 @@
      slot in the AX station avoids it.</p>
 </div>
 
-<h2>After the last controller</h2>
+<h2 id="after-the-last-controller">After the last controller</h2>
 <ol class="pl-steps">
   <li><div><strong>Verify platform daemon communications</strong> between the Supervisor
       and every controller read ok. This is the check that catches a conversion that

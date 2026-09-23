@@ -160,7 +160,10 @@
 </section>
 
 <section class="pl-section">
-  <div class="pl-wrap">
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#what-a-tag-is-made-of">What a tag is made of</a></li><li><a href="#three-kinds-and-only-two-of-them-scale">Three kinds, and only two of them scale</a></li><li><a href="#what-a-dictionary-actually-contains">What a dictionary actually contains</a></li><li><a href="#doing-it-to-a-whole-station">Doing it to a whole station</a></li><li><a href="#what-it-buys">What it buys</a></li></ol>
+    </nav>
 <div class="pl-note pl-note--warn">
   <p><strong>Check the licence first.</strong> The <code>tags</code> licence feature is
      required to use the <code>TagDictionaryService</code> and tag dictionaries on a
@@ -168,7 +171,7 @@
      conversation nobody enjoys having in week three.</p>
 </div>
 
-<h2>What a tag is made of</h2>
+<h2 id="what-a-tag-is-made-of">What a tag is made of</h2>
 <div class="pl-body">
   <p>A tag has an id, and the id is two parts separated by a colon:
      <code>namespace:name</code>. The namespace names the dictionary the tag came from
@@ -181,7 +184,7 @@
      property.</p>
 </div>
 
-<h2>Three kinds, and only two of them scale</h2>
+<h2 id="three-kinds-and-only-two-of-them-scale">Three kinds, and only two of them scale</h2>
 <table class="pl-spec">
   <thead><tr><th scope="col">Kind</th><th scope="col">Where it comes from</th><th scope="col">Use it when</th></tr></thead>
   <tbody>
@@ -197,7 +200,7 @@
   </tbody>
 </table>
 
-<h2>What a dictionary actually contains</h2>
+<h2 id="what-a-dictionary-actually-contains">What a dictionary actually contains</h2>
 <div class="pl-body">
   <p>A tag dictionary is more than a word list. It carries a unique namespace, tag
      definitions with their default values and validation rules, optional tag group
@@ -212,7 +215,7 @@
      station. Pick deliberately; retagging afterwards is the expensive direction.</p>
 </div>
 
-<h2>Doing it to a whole station</h2>
+<h2 id="doing-it-to-a-whole-station">Doing it to a whole station</h2>
 <div class="pl-body">
   <p>Tagging point by point is how tagging projects die. The Batch Editor under
      <code>Program Service</code> is the tool: <strong>Find Objects</strong> opens the
@@ -224,7 +227,7 @@
      compared with a tag added to four thousand existing points.</p>
 </div>
 
-<h2>What it buys</h2>
+<h2 id="what-it-buys">What it buys</h2>
 <div class="pl-body">
   <p>One thing, and it is worth the effort by itself: another piece of software can
      discover what is in the station without knowing the naming convention the installer
