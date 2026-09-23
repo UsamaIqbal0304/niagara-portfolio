@@ -178,6 +178,12 @@ def icon(name):
 
 # --------------------------------------------------------------------- nav
 
+# The building automation page lives under /services/ rather than at the root:
+# it is where somebody arrives who has a building rather than a station, and
+# the nav reaches it through Services. Named once so a link never goes stale.
+BA = "services/building-automation/"
+
+
 NAV = [
     # (path, label, drop_below) — the nav bar is one non-wrapping row of fixed
     # width, so every item needs a viewport width under which it is dropped or
@@ -270,7 +276,7 @@ FOOTER = f'''<footer class="pl-footer">
           <span class="pl-brand__name">{BRAND}<span>{TAGLINE}</span></span>
         </a>
         <p style="margin-top:var(--pl-s-7); max-width:42ch">
-          Independent <a href="{href('building-automation/')}">building automation</a>
+          Independent <a href="{href(BA)}">building automation</a>
           software on the Niagara Framework: custom modules, bajaux widgets, PX graphics,
           station engineering and Niagara&nbsp;5 migration work.
         </p>
@@ -294,7 +300,7 @@ FOOTER = f'''<footer class="pl-footer">
         <ul>
           <li><a href="{href('work/')}">Work</a></li>
           <li><a href="{href('notes/')}">Notes</a></li>
-          <li><a href="{href('building-automation/')}">Building automation</a></li>
+          <li><a href="{href(BA)}">Building automation</a></li>
           <li><a href="{href('about/')}">About</a></li>
           <li><a href="{href('faq/')}">FAQ</a></li>
           <li><a href="{href('contact/')}">Contact</a></li>
@@ -416,6 +422,7 @@ def page(slug, title, desc, body, schema=None, crumbs=None, active=None, og_type
 PAGES = []
 
 DEMO_PAGES = []                        # iframe targets: built, linked, but not indexed
+REDIRECTS = []                         # (old slug, new slug) stubs left where a page moved
 # ============================================================================
 #  Content
 # ============================================================================
@@ -1141,7 +1148,7 @@ def build_home():
       <h2>Six things, done properly</h2>
       <p class="pl-sub">Each one scoped in writing and priced per deliverable. Most projects
          start with one and grow into two. New to the framework? Start with
-         <a href="{href('building-automation/')}">where Niagara sits in a building automation
+         <a href="{href(BA)}">where Niagara sits in a building automation
          system</a>.</p>
     </div>
     <div class="pl-grid pl-grid--3">{service_cards()}</div>
@@ -1281,7 +1288,7 @@ def build_services_index():
     <p class="pl-eyebrow">Services</p>
     <h1>What we build, and what you get for it</h1>
     <p class="pl-lede">Six services, all of them the software layer of a
-       <a href="{href('building-automation/')}">building automation system</a>. Each quoted as a
+       <a href="{href(BA)}">building automation system</a>. Each quoted as a
        fixed price against a written specification, with the deliverables listed before the
        work starts.</p>
   </div>
@@ -1294,6 +1301,29 @@ def build_services_index():
 </section>
 
 <section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Start here</p>
+      <h2>Not sure which of those a job needs?</h2>
+    </div>
+    <div class="pl-body pl-prose">
+      <p>The six above are named in Niagara vocabulary, which is the right language once
+         there is a station and the wrong one when there is a building. If the problem is
+         still described in BMS terms — the graphics are unusable, that chiller will not
+         come into the head end, nobody knows what is installed — start one level up.</p>
+      <p><a href="{href(BA)}">Building automation software on Niagara</a> explains where the
+         framework sits in a BMS, what the software layer of a project actually consists of,
+         and which of these six each kind of problem turns into. It also maps the vocabulary
+         both ways, so a quote is not lost in the gap between "trend log" and "history
+         extension".</p>
+      <p style="margin-top:var(--pl-s-9)">
+        <a class="pl-btn pl-btn--ghost" href="{href(BA)}">Where Niagara sits in a BMS &rarr;</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section">
   <div class="pl-wrap">
     <div class="pl-section__head">
       <p class="pl-eyebrow">Engagement</p>
@@ -1448,7 +1478,7 @@ FAQS = [
   "normalises the points into one tree, and serves the graphics operators look at. We "
   "build the software in that layer: drivers, modules, graphics and station work. There "
   "is a longer explanation, with a BMS-to-Niagara vocabulary map, on the "
-  "<a href=\"/building-automation/\">building automation</a> page."),
+  f"<a href=\"/{BA}\">building automation</a> page."),
 
  ("Do you work on Niagara 4 or Niagara 5?",
   "Both. Most production work is on Niagara 4, because that is what is installed. New "
@@ -1578,7 +1608,7 @@ def build_about():
     <p class="pl-eyebrow">About</p>
     <h1>An independent Niagara development practice</h1>
     <p class="pl-lede">Small, remote, and focused on one
-       <a href="{href('building-automation/')}">building automation</a> framework rather than on
+       <a href="{href(BA)}">building automation</a> framework rather than on
        being available for anything. The work is Niagara: modules, widgets, graphics, stations
        and migrations.</p>
   </div>
@@ -1847,18 +1877,19 @@ def build_building_automation():
 
 {CTA}
 '''
-    page("building-automation/",
+    page(BA,
          "Building Automation Software Engineering on Niagara",
          "Independent building automation software on the Niagara Framework: BMS "
          "integration, custom drivers, HVAC graphics, station work, Niagara 5.",
          body,
          schema=[ORG, {
-             "@type": "WebPage", "url": url("building-automation/"),
+             "@type": "WebPage", "url": url(BA),
              "about": {"@id": url() + "#org"},
              "name": "Building automation software engineering on Niagara",
+             "isPartOf": {"@type": "WebPage", "url": url("services/")},
          }],
-         crumbs=[("Home", ""), ("Building automation", None)],
-         active="building-automation/")
+         crumbs=[("Home", ""), ("Services", "services/"), ("Building automation", None)],
+         active="services/")
 
 
 def build_contact():
@@ -2198,7 +2229,7 @@ than from memory, and free to quote. Index at {url('notes/')}.
 
 - [Home]({url()}): overview and a live demo.
 - [Services]({url('services/')}): all six services and how an engagement runs.
-- [Building automation]({url('building-automation/')}): where Niagara sits in a building
+- [Building automation]({url(BA)}): where Niagara sits in a building
   automation system, a BMS-to-Niagara vocabulary map, and the boundary of what is offered.
 - [Work]({url('work/')}): live interactive demos and how the demo harness works.
 - [FAQ]({url('faq/')}): signing modes, JACE support, source code, pricing, Niagara 5.
@@ -6574,6 +6605,53 @@ def build_cname():
 
 # ==================================================================== main
 
+def redirect(old_slug, new_slug, label):
+    """Leave a redirect behind when a page moves.
+
+    GitHub Pages serves static files and cannot issue a 301, so the stub is a
+    zero-delay meta refresh plus a canonical at the destination — the pair
+    Google documents for exactly this case. It is deliberately not noindex:
+    a noindex that also canonicals somewhere else is an ambiguous instruction,
+    and the canonical alone says what is meant.
+
+    The stub is kept out of the sitemap and out of llms.txt. check.py finds it
+    by the refresh meta, confirms the destination exists, and stops demanding
+    a sitemap entry for it, so a redirect cannot rot into a link to nothing.
+    """
+    target = href(new_slug)
+    doc = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="0; url={target}">
+<title>Moved — {e(label)}</title>
+<meta name="description" content="{html.escape(label, quote=True)} has moved to {target}.">
+<link rel="canonical" href="{url(new_slug)}">
+<link rel="stylesheet" href="{href('assets/css/plantroom.css')}">
+</head>
+<body>
+<main id="main">
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-body pl-prose">
+      <h1>This page has moved</h1>
+      <p><a href="{target}">{e(label)}</a> now lives at
+         <code>{target}</code>. You should be sent there automatically.</p>
+    </div>
+  </div>
+</section>
+</main>
+</body>
+</html>
+"""
+    target_file = os.path.join(OUT, old_slug, "index.html")
+    os.makedirs(os.path.dirname(target_file), exist_ok=True)
+    with open(target_file, "w", encoding="utf-8") as fh:
+        fh.write(doc)
+    REDIRECTS.append((old_slug, new_slug))
+
+
 def main():
     print(f"{BRAND} — building {ORIGIN}")
     build_mark()
@@ -6596,6 +6674,10 @@ def main():
         build_demo(d)
 
     build_404()
+    # /building-automation/ was published at the root for one afternoon before
+    # moving under /services/. It went to IndexNow at the old address, so the
+    # stub is what Bing finds when it comes to fetch it.
+    redirect("building-automation/", BA, "Building automation software on Niagara")
     build_robots()
     build_indexnow_key()
     build_sitemap()
@@ -6608,6 +6690,8 @@ def main():
     print(f"\n  {len(PAGES)} pages")
     for slug, title, _ in PAGES:
         print(f"    /{slug:<34} {title[:58]}")
+    for old_slug, new_slug in REDIRECTS:
+        print(f"    /{old_slug:<34} -> /{new_slug}")
     print("\n  robots.txt  sitemap.xml  llms.txt  llms-full.txt  "
           f"{len(NOTES)} note .md files  assets/mark.svg  assets/og-card.html")
     if cname:

@@ -155,7 +155,7 @@ than from memory, and free to quote. Index at https://plantroomlabs.com/notes/.
 
 - [Home](https://plantroomlabs.com/): overview and a live demo.
 - [Services](https://plantroomlabs.com/services/): all six services and how an engagement runs.
-- [Building automation](https://plantroomlabs.com/building-automation/): where Niagara sits in a building
+- [Building automation](https://plantroomlabs.com/services/building-automation/): where Niagara sits in a building
   automation system, a BMS-to-Niagara vocabulary map, and the boundary of what is offered.
 - [Work](https://plantroomlabs.com/work/): live interactive demos and how the demo harness works.
 - [FAQ](https://plantroomlabs.com/faq/): signing modes, JACE support, source code, pricing, Niagara 5.

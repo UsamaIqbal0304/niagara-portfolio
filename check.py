@@ -59,6 +59,16 @@ for rel, _ in docs:
     if rel.endswith("index.html"):
         known.add("/" + rel[: -len("index.html")])
 
+# A page that moved leaves a stub behind: a zero-delay meta refresh and a
+# canonical at the destination. It is a real file and a real link target, but
+# it is not a page — no sitemap entry, no analytics beacon, and its canonical
+# points somewhere else on purpose.
+redirects = {rel: re.search(r'<link rel="canonical" href="([^"]+)"', src).group(1)
+             for rel, src in docs
+             if 'http-equiv="refresh"' in src and 'canonical' in src}
+check(all('http-equiv="refresh"' not in src or rel in redirects for rel, src in docs),
+      "a meta refresh page with no canonical — a redirect to nowhere Google can follow")
+
 for rel, src in docs:
     demo = rel.startswith("demos/")
     noindex = 'name="robots" content="noindex' in src
@@ -75,6 +85,19 @@ for rel, src in docs:
     if m:
         desc = html.unescape(m.group(1))
         check(len(desc) <= DESC_MAX, f"{rel}: description {len(desc)} chars > {DESC_MAX}")
+
+    # A redirect stub is checked for the one thing that matters: that it
+    # actually lands somewhere, and not on itself.
+    if rel in redirects:
+        dest = redirects[rel]
+        check(dest.startswith(ORIGIN), f"{rel}: redirect canonical is not absolute")
+        path = dest[len(ORIGIN):]
+        check(path in known, f"{rel}: redirects to {path}, which this build does not produce")
+        check(path != "/" + rel[: -len("index.html")], f"{rel}: redirects to itself")
+        m2 = re.search(r'<meta http-equiv="refresh" content="0; url=([^"]+)"', src)
+        check(bool(m2) and m2.group(1) == path,
+              f"{rel}: refresh target and canonical disagree")
+        continue
 
     # Demo pages are widget hosts inside an iframe: no H1, and noindex on
     # purpose, so the marketing page owns the ranking rather than its frame.
@@ -125,7 +148,7 @@ listed = set(re.findall(r"<loc>([^<]+)</loc>", sitemap))
 indexable = {
     ORIGIN + "/" + (rel[: -len("index.html")] if rel.endswith("index.html") else rel)
     for rel, src in docs
-    if 'content="noindex' not in src and rel != "404.html"
+    if 'content="noindex' not in src and rel != "404.html" and rel not in redirects
 }
 check(listed == indexable, f"sitemap mismatch: only in sitemap {sorted(listed - indexable)}, "
                            f"missing from sitemap {sorted(indexable - listed)}")
@@ -167,7 +190,7 @@ for rel, src in docs:
     # one visit twice. Every page a visitor can land on is either counted or
     # none of them are — a half-instrumented site produces numbers nobody can
     # act on.
-    if 'content="noindex' in src:
+    if 'content="noindex' in src or rel in redirects:
         continue
     (beaconed if beacon else unbeaconed).append(rel)
 check(not beaconed or not unbeaconed,
