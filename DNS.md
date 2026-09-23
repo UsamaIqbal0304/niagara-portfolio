@@ -56,7 +56,7 @@ both, the TXT is the normal route.
 
 | Type | Name | Value | TTL |
 |---|---|---|---|
-| TXT | *(leave empty — means `@`)* | `google-site-verification=iFhnvrjJm4ege5QJLDBRCzRueYKiDzqLv-55NdPhE2O` | lowest offered |
+| TXT | *(leave empty — means `@`)* | `google-site-verification=iFhnvrjJm4ege5QJLDBRCzRueYKiDzqLv-55NdPhE20` | lowest offered |
 
 Copy the value with the copy button in the Workspace screen rather than
 retyping it. It contains `I`, `l`, `O` and `0`, and one wrong character fails
