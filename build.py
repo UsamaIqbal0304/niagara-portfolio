@@ -2539,7 +2539,8 @@ NOTES += [
       An untested backup is an assumption with a filename.</div></li>
 </ol>
 """,
-  related=["services/station-engineering/", "services/workbench-tooling/"],
+  related=["services/station-engineering/", "services/workbench-tooling/",
+           "notes/niagara-provisioning-jobs/", "notes/ax-to-n4-migration/"],
  ),
 
  dict(
@@ -2810,7 +2811,8 @@ NOTES += [
       nothing changed on screen.</div></li>
 </ol>
 """,
-  related=["services/px-graphics/", "services/bajaux-widgets/"],
+  related=["services/px-graphics/", "services/bajaux-widgets/",
+           "notes/niagara-templates/", "notes/niagara-tag-dictionaries/"],
  ),
 
  dict(
@@ -3117,7 +3119,7 @@ NOTES += [
      whether somebody wrote <code>SpaceTemp</code> or <code>ZnT</code> in 2019.</p>
 </div>
 """,
-  related=["services/station-engineering/", "services/workbench-tooling/"],
+  related=["services/station-engineering/", "services/workbench-tooling/", "notes/px-relative-ords/"],
  ),
 
  dict(
@@ -3874,7 +3876,8 @@ NOTES += [
       rebuilds it after a permissions change.</div></li>
 </ol>
 """,
-  related=["services/station-engineering/", "services/px-graphics/"],
+  related=["services/station-engineering/", "services/px-graphics/",
+           "notes/niagara-tag-dictionaries/", "notes/niagara-roles-and-permissions/"],
  ),
 
  dict(
@@ -4013,7 +4016,8 @@ NOTES += [
       there.</div></li>
 </ol>
 """,
-  related=["services/workbench-tooling/", "services/station-engineering/"],
+  related=["services/workbench-tooling/", "services/station-engineering/",
+           "notes/niagara-provisioning-jobs/", "notes/bulk-point-renaming-and-tagging/", "notes/px-relative-ords/"],
  ),
 
  dict(
@@ -4342,7 +4346,8 @@ NOTES += [
       number should be small and deliberate.</div></li>
 </ol>
 """,
-  related=["services/station-engineering/", "services/workbench-tooling/"],
+  related=["services/station-engineering/", "services/workbench-tooling/",
+           "notes/niagara-tls-certificates/", "notes/ax-to-n4-migration/"],
  ),
 
  dict(
@@ -4680,6 +4685,19 @@ def build_llms_full():
     write_text("llms-full.txt", "\n".join(parts).rstrip() + "\n")
 
 
+def sibling_notes(n, count=3):
+    """The three notes to show under a note. Picking the first three in the list
+    put the same three under all twenty, which is a dead end for a reader who
+    arrived on a narrow question and a wasted internal link for a crawler.
+    Any note slugs named in `related` come first, then whatever shares the most
+    tags, then list order as the tie-break."""
+    named = [o for o in NOTES if o["slug"] in n["related"] and o["slug"] != n["slug"]]
+    mine = set(n["tags"])
+    rest = [o for o in NOTES if o["slug"] != n["slug"] and o not in named]
+    rest.sort(key=lambda o: -len(mine & set(o["tags"])))
+    return (named + rest)[:count]
+
+
 def note_page(n):
     """One note. The same page furniture as a service page, so a visitor who
     arrives on a note from a search result lands somewhere that looks like the
@@ -4691,8 +4709,7 @@ def note_page(n):
             links.append(f'''<div class="pl-card pl-card--link">{icon(s["icon"])}
         <h3><a href="{href(s["slug"])}">{e(s["nav"])}</a></h3>
         <p>{e(s["desc"].split(".")[0])}.</p></div>''')
-    others = [o for o in NOTES if o["slug"] != n["slug"]][:3]
-    more = "".join(note_card(o) for o in others)
+    more = "".join(note_card(o) for o in sibling_notes(n))
     written = date.fromisoformat(n["date"]).strftime("%B %Y")
 
     body = f'''
