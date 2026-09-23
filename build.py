@@ -4498,6 +4498,189 @@ NOTES += [
 """,
   related=["services/niagara-5-migration/", "services/niagara-modules/"],
  ),
+
+ dict(
+  slug="notes/niagara-writable-point-priority/",
+  date="2026-09-23",
+  nav="Writable points",
+  title="Why a Writable Point Ignores the Value You Set",
+  desc=("Sixteen priority inputs, two of them reserved for right-click actions, a "
+        "fallback underneath, and a BACnet scheme wired to none of it."),
+  h1="Why a writable point ignores the value you set",
+  lede=("A writable point does not have a value. It has <strong>sixteen inputs, two "
+        "actions and a fallback</strong>, and what appears on <code>Out</code> is "
+        "whichever of those won. Almost every &ldquo;it will not hold&rdquo; call is "
+        "a fight between two of them."),
+  tags=["Station engineering", "BACnet", "Commissioning"],
+  body="""
+<h2>The sixteen inputs and who owns them</h2>
+<div class="pl-body">
+  <p>Every <code>BooleanWritable</code>, <code>NumericWritable</code>,
+     <code>EnumWritable</code> and <code>StringWritable</code> carries inputs
+     <code>In1</code> to <code>In16</code>, level&nbsp;1 highest and level&nbsp;16
+     lowest, plus a <code>Fallback</code> property below all of them. The level names
+     are borrowed from BACnet convention, and knowing them is the difference between
+     picking a level and guessing one:</p>
+</div>
+
+<table class="pl-spec">
+  <thead><tr><th scope="col">Level</th><th scope="col">Convention</th><th scope="col">Notes</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">1</th><td>Emergency, manual life safety</td><td>Not linkable. Issued as an action.</td></tr>
+    <tr><th scope="row">2</th><td>Automatic life safety</td><td></td></tr>
+    <tr><th scope="row">3, 4</th><td>User defined</td><td></td></tr>
+    <tr><th scope="row">5</th><td>Critical equipment control</td><td></td></tr>
+    <tr><th scope="row">6</th><td>Minimum on/off</td><td>Reserved on a BooleanWritable for its built-in timers.</td></tr>
+    <tr><th scope="row">7</th><td>User defined</td><td></td></tr>
+    <tr><th scope="row">8</th><td>Override, manual operator</td><td>Not linkable. Issued as an action.</td></tr>
+    <tr><th scope="row">9</th><td>Demand limiting</td><td></td></tr>
+    <tr><th scope="row">10</th><td>User defined</td><td></td></tr>
+    <tr><th scope="row">11</th><td>Temperature override</td><td></td></tr>
+    <tr><th scope="row">12, 13</th><td>Stop and start optimisation</td><td></td></tr>
+    <tr><th scope="row">14</th><td>Duty cycling</td><td></td></tr>
+    <tr><th scope="row">15</th><td>Outside air optimisation</td><td></td></tr>
+    <tr><th scope="row">16</th><td>Schedule</td><td>Where a schedule normally lands, and the reason it loses to everything.</td></tr>
+  </tbody>
+</table>
+
+<h2>How the scan resolves</h2>
+<div class="pl-body">
+  <p>The priority scan runs on any input change, not on a timer. It looks for a
+     non-auto action at level&nbsp;1, then takes the value of the highest valid input
+     from level&nbsp;2 downwards, treating a non-auto action at level&nbsp;8 as valid
+     when it reaches it. If nothing qualifies, <code>Out</code> takes
+     <code>Fallback</code>.</p>
+  <p>The word doing the work there is <strong>valid</strong>. An input is valid only
+     if none of these status bits are set:</p>
+  <ul>
+    <li><code>down</code> — the device behind it is not answering.</li>
+    <li><code>fault</code> — the value arrived, but the source says it is wrong.</li>
+    <li><code>disabled</code> — somebody disabled the point or its parent.</li>
+    <li><code>null</code> — nothing has ever been written here.</li>
+    <li><code>stale</code> — no successful read inside the tuning policy's stale time.</li>
+  </ul>
+  <p>That list is the whole diagnosis for most cases. A value sitting on
+     <code>In10</code> that never reaches <code>Out</code> is not a priority problem;
+     it is a status problem at <code>In10</code>, or something valid above it.</p>
+</div>
+
+<div class="pl-note">
+  <p><strong>Read the status, not the value.</strong> A point showing the wrong number
+     with <code>{ok}</code> is being beaten by a higher level. The same point showing
+     the wrong number in override colour is being held by an action, and no amount of
+     re-linking will move it.</p>
+</div>
+
+<h2>The linking rules</h2>
+<div class="pl-body">
+  <ul>
+    <li><strong>One link per level.</strong> A second link to the same input is refused.</li>
+    <li><strong>Levels 1 and 8 cannot be linked at all</strong>, because they belong to
+       the emergency and override actions.</li>
+    <li><strong>Level 6 cannot be linked on a BooleanWritable</strong>, because the
+       minimum on/off timers own it.</li>
+  </ul>
+  <p>Both of those last two are a change from the AX-era scheme, where a writable
+     object took a single <code>priorityArray</code> input that several outputs could
+     be linked into, including at duplicate levels and at levels also used by commands.
+     Logic carried across from an AX station will not link the way it used to, and the
+     usual workaround is a free user-defined level — 3, 4, 7 or 10 — rather than trying
+     to reproduce the old arrangement.</p>
+</div>
+
+<h2>Fallback is a value an operator can change</h2>
+<div class="pl-body">
+  <p>Fallback is not a safety constant. Every writable point ships with a
+     <code>Set</code> action that writes directly to it, and that action is available
+     to an operator-level user by default. A setpoint that drifts overnight with nobody
+     admitting to it is usually this.</p>
+  <p>Two things follow. If the point should fall back to nothing rather than to a
+     number, set <code>Fallback</code> to null — which the property sheet accepts and
+     the Set action does not — and then set the <code>Hidden</code> config flag on the
+     Set slot from the slot sheet, or the next user puts a number back.</p>
+  <p>The other direction is the useful one. Proxy points are always read-only points,
+     but they inherit the actions of the source point, so a NumericWritable exported
+     over a NiagaraNetwork gives an operator a working setpoint through a
+     <code>SetPoint</code> widget on a graphic without a second writable point being
+     created anywhere. The kitControl constants behave the same way, except that they
+     have no priority inputs at all and Set simply writes their output.</p>
+</div>
+
+<h2>The two overrides behave differently</h2>
+<div class="pl-body">
+  <p>They look like a pair in the right-click menu and they are not.</p>
+  <ul>
+    <li>A <strong>manual override at level 8</strong> prompts for a duration. Permanent
+       is first in the list, so it is what gets clicked; the timed options and a custom
+       hours/minutes/seconds entry are underneath it. When a timed override expires the
+       scan returns to automatic control on its own. A maximum duration can be imposed
+       through the point's facets.</li>
+    <li>An <strong>emergency override at level 1</strong> has no duration at all. It
+       holds until somebody right-clicks the point and chooses <code>Auto</code>. There
+       is no expiry to wait for, and nothing in the station will clear it.</li>
+  </ul>
+  <p>Both show override status, violet by default. On handover, the emergency level is
+     worth restricting: by default every action except the emergency ones is available
+     to an operator-level user, and that split is set with config flags on the action
+     slots — editable across many points at once in the batch editor.</p>
+</div>
+
+<h2>BACnet priority is a different scheme</h2>
+<div class="pl-body">
+  <p>This is the one that costs a day. Niagara's sixteen levels are <em>patterned on</em>
+     BACnet's, but there is no linkage between them. The station's priority scheme is
+     station-centric, and writing to <code>In8</code> of a BACnet proxy point is not the
+     same act as writing at BACnet priority&nbsp;8 in the device.</p>
+  <p>When a write does not arrive, the proxy extension says so and people do not look.
+     <code>Write Status</code> reports <code>read only</code>, <code>writable</code> or
+     the failure text, and the classic failure is making a NumericWritable for the
+     <code>presentValue</code> of an Analog_Input, which comes back as
+     <code>Property: Write Access Denied</code>. A genuine BACnet error arrives in the
+     device's own words, as error class and error code separated by a colon.</p>
+  <p>To see what the device thinks its priority array holds, add a boolean facet named
+     <code>priorityArray</code> to the <em>point's</em> facets — not the device facets
+     on the proxy extension. The status then carries <code>bac=X</code>, with X the
+     level in the device that is currently winning. The same mechanism polls
+     <code>statusFlags</code>, which merge into the point's status, plus
+     <code>eventState</code> and <code>reliability</code>, which report as
+     <code>state=</code> and <code>reliability=</code>. Without them the driver polls
+     one property and an object in alarm looks perfectly healthy.</p>
+  <p>Note also <code>Property Array Index</code>. It is <code>-1</code> for any property
+     that is not an array, which includes <code>presentValue</code>. Set it to a number
+     only when you genuinely mean one element — proxying level 7 of a binary output's
+     priority array, for instance.</p>
+</div>
+
+<h2>Exposing a writable the other way</h2>
+<div class="pl-body">
+  <p>When the station is the server rather than the client, the failure moves to
+     permissions. The BACnet driver serves every exported object read-only through a
+     station user called <code>BACnet</code>, which it creates itself at startup with
+     <strong>no permissions at all</strong>. An external system writing to an exported
+     NumericWritable, or invoking an action on an exported BooleanWritable, needs that
+     user given write permission on the category the points live in — and a non-blank
+     password, since it now holds write rights. The same permissions govern writes to
+     exported files and histories.</p>
+</div>
+
+<h2>The order to work in</h2>
+<ol class="pl-steps">
+  <li><div><strong>Open the property sheet, not the graphic.</strong> All sixteen
+      inputs, their statuses and the fallback are on one page, and the answer is
+      normally visible without changing anything.</div></li>
+  <li><div><strong>Find the winner.</strong> Highest valid input, or an action at 1 or
+      8, or fallback. If it is an action, nothing else matters until it is auto'ed.</div></li>
+  <li><div><strong>Check the loser's status.</strong> If your value is not winning and
+      nothing above it is valid, it is one of the five bits — most often
+      <code>null</code> on a link that was never made.</div></li>
+  <li><div><strong>Only then look at BACnet.</strong> Write Status names the failure,
+      and a <code>priorityArray</code> facet shows whose value the device is actually
+      holding.</div></li>
+</ol>
+""",
+  related=["services/station-engineering/", "services/px-graphics/",
+           "notes/bacnet-mstp-on-a-jace/", "notes/niagara-poll-rates-and-tuning-policies/"],
+ ),
 ]
 
 NOTE_LOOKUP = {n["slug"]: n for n in NOTES}
@@ -4817,7 +5000,8 @@ NOTE_GROUPS = [
       "notes/niagara-poll-rates-and-tuning-policies/"]),
     ("Station engineering", "station-engineering",
      "The work between a working driver and a station somebody else can maintain.",
-     ["notes/bulk-point-renaming-and-tagging/",
+     ["notes/niagara-writable-point-priority/",
+      "notes/bulk-point-renaming-and-tagging/",
       "notes/niagara-tag-dictionaries/",
       "notes/niagara-hierarchies/",
       "notes/niagara-templates/",

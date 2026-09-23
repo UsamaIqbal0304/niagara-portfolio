@@ -127,6 +127,7 @@ than from memory, and free to quote. Index at https://plantroomlabs.com/notes/.
 - [Doing one thing to fifty stations at once](https://plantroomlabs.com/notes/niagara-provisioning-jobs/): Provisioning runs platform tasks across a whole NiagaraNetwork from one Supervisor connection — and the obvious backup action is the wrong one. Markdown: https://plantroomlabs.com/notes/niagara-provisioning-jobs.md
 - [Roles, categories and the grid between them](https://plantroomlabs.com/notes/niagara-roles-and-permissions/): Niagara permissions are a grid of category against level — which is why a user can log in successfully and still be told they have no access. Markdown: https://plantroomlabs.com/notes/niagara-roles-and-permissions.md
 - [What actually blocks an AX to N4 migration](https://plantroomlabs.com/notes/ax-to-n4-migration/): A station cannot migrate until every module it uses has been refactored for Niagara 4 — and licences, users and permissions all change shape on the way. Markdown: https://plantroomlabs.com/notes/ax-to-n4-migration.md
+- [Why a writable point ignores the value you set](https://plantroomlabs.com/notes/niagara-writable-point-priority/): Sixteen priority inputs, two of them reserved for right-click actions, a fallback underneath, and a BACnet scheme wired to none of it. Markdown: https://plantroomlabs.com/notes/niagara-writable-point-priority.md
 
 ## Honest limits
 
