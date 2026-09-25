@@ -24,7 +24,7 @@ Read that as a prerequisite, not a warning. The inventory has to happen before t
 
 ## A module with an N5 build is not automatically safe either
 
-Niagara 5 moves the runtime from Java 8 to Java 21, and removes `SecurityManager` entirely. One consequence of that removal is that a valid signature stops being a recommendation and becomes mandatory, with no grace period. An unsigned module, a self-signed one outside your trust store, or one whose signing certificate has lapsed, will not load — independent of whether the code itself has been ported.
+Niagara 5 moves the runtime off Java 8 — Tridium's current FAQ says to Java 25, earlier partner material said 21 — and removes `SecurityManager` entirely. One consequence of that removal is that a valid signature stops being a recommendation and becomes mandatory, with no grace period. An unsigned module, a self-signed one outside your trust store, or one whose signing certificate has lapsed, will not load — independent of whether the code itself has been ported.
 
 So two separate questions need separate answers for every third-party module in a station: does an N5 build exist at all, and if it does, is it validly signed for the host it is going to load on. A module can clear the first test and still fail the second.
 

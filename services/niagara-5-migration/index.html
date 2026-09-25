@@ -229,8 +229,8 @@
     <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/services/">Services</a></li><li>Niagara 5 migration</li></ol></nav>
     <p class="pl-eyebrow">Service</p>
     <h1>Niagara 5 readiness and migration</h1>
-    <p class="pl-lede">Niagara 5 changes three things that break modules: <strong>Java 21</strong>, <strong>mandatory signatures with no grace period</strong>, and <strong>hardware</strong> — it does not run on a JACE-8000 at all. The first useful step is finding out which of your modules actually survive. Nothing stops working in 2026; the reason to start now is that the inventory is the input to next year's capital plan, and controller replacement has a lead time rather than a switch.</p>
-    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Java 8 → 21</li><li class="pl-chip pl-chip--on-dark">Mandatory signing</li><li class="pl-chip pl-chip--on-dark">JACE-8000 → 9000</li><li class="pl-chip pl-chip--on-dark">Module inventory</li><li class="pl-chip pl-chip--on-dark">Porting</li></ul>
+    <p class="pl-lede">Niagara 5 changes three things that break modules: <strong>a new Java runtime</strong>, <strong>mandatory signatures with no grace period</strong>, and <strong>hardware</strong> — it does not run on a JACE-8000 at all. The first useful step is finding out which of your modules actually survive. Nothing stops working in 2026; the reason to start now is that the inventory is the input to next year's capital plan, and controller replacement has a lead time rather than a switch.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Java 8 → 25</li><li class="pl-chip pl-chip--on-dark">Mandatory signing</li><li class="pl-chip pl-chip--on-dark">JACE-8000 → 9000</li><li class="pl-chip pl-chip--on-dark">Module inventory</li><li class="pl-chip pl-chip--on-dark">Porting</li></ul>
     <div class="pl-btn-row">
       <a class="pl-btn pl-btn--on-dark" href="/contact/">Scope this work</a>
       <a class="pl-btn pl-btn--quiet-dark" href="/work/">See the work</a>
@@ -240,12 +240,68 @@
 
 <section class="pl-section">
   <div class="pl-wrap">
-<h2>What actually changes</h2>
+<h2>The scan is free</h2>
+<p class="pl-sub">Before anything gets quoted there is a step that costs nothing and
+   answers the only question that matters first: is there a problem here at all. For most
+   estates the answer turns out to be no, and finding that out should not cost anybody a
+   purchase order.</p>
+<div class="pl-grid pl-grid--3" style="margin-top:var(--pl-s-9)">
+  <div class="pl-card"><h3>Send any one of three things</h3>
+    <p>A <b>listing of the station's <code>modules/</code> folder</b> — a directory
+       listing, a text file, even a screenshot; it does not need to be tidy. Or <b>the
+       jars themselves</b>, which gives a deeper answer because the bytecode can be read
+       rather than inferred from filenames. Or <b>a station backup</b>, and the module set
+       is read out of it. One station or fifty.</p></div>
+  <div class="pl-card"><h3>What comes back</h3>
+    <p>A table, one row per module: findings by severity, the class-file versions inside
+       the jar, the signing state, and a plain one-line verdict. Written to be read by
+       whoever has to make the decision, not only by whoever wrote the module.</p></div>
+  <div class="pl-card"><h3>What it costs</h3>
+    <p>Nothing, and it obliges nothing. No quote is attached to it, and there is no
+       follow-up unless you ask for one. If the honest answer is that your modules are
+       fine, that is the answer you get — and it is the most common one.</p></div>
+</div>
+<table class="pl-spec" style="margin-top:var(--pl-s-11)">
+ <thead><tr><th scope="col">Column in the table</th><th scope="col">What it tells you</th></tr></thead>
+ <tbody>
+  <tr><th scope="row">Findings by severity</th>
+      <td>Split three ways: calls that <em>throw</em> on the new runtime, calls that still
+          run but whose meaning changed silently, and things that work but are on notice.
+          The middle group is the one worth reading twice — a module that installs, starts,
+          and quietly does the wrong thing is a harder problem than one that refuses to
+          load.</td></tr>
+  <tr><th scope="row">Class-file version</th>
+      <td>The oldest bytecode in the jar, including inside the libraries it bundles. Very
+          old bytecode still loads on a modern JVM; what it cannot do is be recompiled by
+          any current toolchain. So this column flags a dependency nobody can fix, rather
+          than a module that will not start.</td></tr>
+  <tr><th scope="row">Signing state</th>
+      <td>Signed or not, by what, and whether that certificate is trusted by the hosts the
+          module has to load on. Signing becomes mandatory, so this is a separate question
+          from whether the code survives — a module can pass on code and fail here.</td></tr>
+  <tr><th scope="row">Verdict</th>
+      <td>One line, in plain English. Likely fine as it stands; needs its bundled libraries
+          bumped and a rebuild; needs source changes; needs the original vendor; or needs
+          replacing because the vendor is not coming back.</td></tr>
+ </tbody>
+</table>
+<div class="pl-note pl-note--warn" style="margin-top:var(--pl-s-11)">
+  <p><b>What the scan is, said precisely.</b> It reads a module's bytecode and reports what
+     a real Java&nbsp;25 JDK does with it. That makes it <b>static analysis against
+     Java&nbsp;25, not a test on a Niagara&nbsp;5 build</b> — no Niagara&nbsp;5 build
+     exists to test against yet, and a readiness claim that does not draw that distinction
+     is claiming more than it can show. A module that scans clean can still need work
+     against a new SDK. This is the cheapest way to find the modules that are definitely a
+     problem; it is not a certificate of readiness, and it is not sold as one.</p>
+</div>
+
+<h2 style="margin-top:var(--pl-s-13)">What actually changes</h2>
 <table class="pl-spec" style="margin-top:var(--pl-s-9)">
  <thead><tr><th scope="col">Change</th><th scope="col">Consequence for an existing estate</th></tr></thead>
  <tbody>
-  <tr><th scope="row">Java 8 &rarr; Java 21</th>
-      <td>Modules must be recompiled. Anything depending on <code>SecurityManager</code>, on
+  <tr><th scope="row">Java 8 &rarr; Java 25</th>
+      <td>Tridium's current FAQ names Java 25; earlier partner material said 21. Either
+          way, modules must be recompiled. Anything depending on <code>SecurityManager</code>, on
           removed internal APIs, or on a library that itself stopped at Java 8, needs source
           changes rather than a rebuild.</td></tr>
   <tr><th scope="row">Signing is mandatory</th>
@@ -280,7 +336,7 @@
        signature state, stamped version, and a verdict per module: rebuild, port, replace,
        or abandoned and needs a plan. The document that makes the migration scopeable.</p></div>
   <div class="pl-card"><h3>Porting</h3>
-    <p>Taking a module you own — or one whose source you hold — to Java 21, re-signing it,
+    <p>Taking a module you own — or one whose source you hold — to the new runtime, re-signing it,
        auditing its dependencies, and running a regression pass, with a readiness statement
        you can hand to a client.</p></div>
   <div class="pl-card"><h3>Replacement</h3>
@@ -323,7 +379,7 @@
     </div>
     <table class="pl-spec">
       <thead><tr><th scope="col">Deliverable</th><th scope="col">Detail</th></tr></thead>
-      <tbody><tr><th scope="row">A module inventory</th><td>Every third-party module across the estate, machine-generated rather than remembered.</td></tr><tr><th scope="row">A verdict per module</th><td>Rebuild, port, replace or at-risk — with the reasoning, so it can be challenged.</td></tr><tr><th scope="row">A sequencing plan</th><td>What has to happen before a controller is swapped, and what can safely wait.</td></tr><tr><th scope="row">Ported modules</th><td>Where porting is in scope: Java 21, re-signed, regression-tested, with a readiness statement.</td></tr></tbody>
+      <tbody><tr><th scope="row">A module scan</th><td>Free, and the first step. A per-module table: findings by severity, class-file version, signing state, and a plain verdict. The one deliverable on this page with no price attached.</td></tr><tr><th scope="row">A module inventory</th><td>Every third-party module across the estate, machine-generated rather than remembered.</td></tr><tr><th scope="row">A verdict per module</th><td>Rebuild, port, replace or at-risk — with the reasoning, so it can be challenged.</td></tr><tr><th scope="row">A sequencing plan</th><td>What has to happen before a controller is swapped, and what can safely wait.</td></tr><tr><th scope="row">Ported modules</th><td>Where porting is in scope: recompiled for the new runtime, bundled libraries bumped, re-signed, regression-tested, with a readiness statement that says what was analysed and what was tested.</td></tr></tbody>
     </table>
   </div>
 </section>
@@ -369,6 +425,14 @@
       <p>The JACE 8000 to 9000 licence transfer, step by step: what it requires, what it does not include, and which parts cannot be undone.</p>
       <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Migration</li><li class="pl-chip">Licensing</li></ul>
     </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-permissions-on-java-25/">What Java 25 does to Niagara's module permission model</a></h3>
+      <p>Niagara's module permission model is built on Java's Security Manager. On a Java 25 JVM it cannot be installed, so the checks stop happening.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Station security</li><li class="pl-chip">Migration</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-an-n5-module-scan-actually-finds/">What a static Niagara 5 module scan actually finds</a></h3>
+      <p>Reading a module's bytecode against Java 25 gives a per-module answer. What it finds, what it cannot tell you, and the false alarms it avoids.</p>
+      <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Module development</li><li class="pl-chip">Estate management</li></ul>
+    </div><div class="pl-card pl-card--link">
       <h3><a href="/notes/ax-to-n4-migration/">What actually blocks an AX to N4 migration</a></h3>
       <p>A station cannot migrate until every module it uses has been refactored for Niagara 4 — and licences, users and permissions all change shape on the way.</p>
       <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Estate management</li><li class="pl-chip">Module development</li></ul>
@@ -380,8 +444,8 @@
 <section class="pl-band pl-section pl-anchor" id="contact">
   <div class="pl-wrap pl-cta">
     <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
-    <h2>Send a module list, or say you do not have one.</h2>
-    <p class="pl-lede">Not having one is the normal case and is the reason the audit exists. A station backup or a screenshot of the modules folder is enough to start; what comes back is a fixed price for the full inventory.</p>
+    <h2>Send a module list. The scan comes back free.</h2>
+    <p class="pl-lede">A directory listing of the modules folder is enough — the jars or a station backup work just as well. What comes back is a table, one row per module, with a plain verdict: no charge, and nothing attached to it. Not having a list is the normal case and is most of the reason the audit exists, so saying so is a perfectly good way to start.</p>
     <div class="pl-btn-row">
       <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
       <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com?subject=Niagara%20enquiry&body=Niagara%20version%3A%20%0ATarget%20hardware%20(JACE%20%2F%20Supervisor%20%2F%20PC)%3A%20%0AVerification%20mode%20(medium%20%2F%20high%20%2F%20not%20sure)%3A%20%0A%0AWhat%20it%20has%20to%20do%3A%20%0A">info@plantroomlabs.com</a>

@@ -115,6 +115,24 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://plantroomlabs.com/notes/niagara-module-permissions-on-java-25/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://plantroomlabs.com/notes/what-an-n5-module-scan-actually-finds/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://plantroomlabs.com/notes/lorawan-and-mqtt-into-a-niagara-station/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://plantroomlabs.com/notes/what-runs-on-a-jace/</loc>
     <lastmod>2026-09-26</lastmod>
     <changefreq>monthly</changefreq>

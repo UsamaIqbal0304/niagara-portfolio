@@ -227,6 +227,22 @@
     },
     {
      "@type": "Question",
+     "name": "Is my module Niagara 5 ready?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Probably, and there is a free way to find out, but nobody can honestly say certainly yet. What can be measured today is whether a module's bytecode survives the move off Java 8: the jars are readable, a Java 25 JDK is runnable, and every removed API leaves a fingerprint in the class that calls it. Run that across a well-built module and the usual result is no blockers at all — most findings sit in bundled third-party libraries rather than in the module's own code, so the work is a recompile, a library bump and a re-sign rather than a rewrite. What that cannot tell you is anything about Niagara 5 itself. There is no Niagara 5 build to test against, so any readiness statement — ours or a vendor's — is static analysis against Java 25, not a test on a Niagara 5 build, and a module that scans clean can still need work against the new SDK. Send a module list and the scan comes back free, with that distinction written on it rather than glossed over."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can you bring LoRaWAN or MQTT sensor data into Niagara?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. Check the stock abstractMqttDriver and jsonToolkit first — a plain MQTT client and structured-payload parsing have been in the box since 4.8, and a lot of projects need nothing past that. Custom work starts where those stop: a LoRaWAN network server feeding into Niagara, a payload decoder for a shape jsonToolkit cannot unpack on its own, topic and schema design, and store-and-forward so a dropped link does not lose readings. Send a payload sample from the network server or a screenshot of the current topic tree and it is a day's reading to say what stock covers and what does not."
+     }
+    },
+    {
+     "@type": "Question",
      "name": "Is Niagara 4 about to stop working?",
      "acceptedAnswer": {
       "@type": "Answer",
@@ -262,7 +278,7 @@
      "name": "We have a catalogue of modules and a Niagara 5 deadline. Can you take some of it?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "That is the work this practice was set up to do. A catalogue port is priced per module rather than as one lump, so it can be staged: the two that are most at risk first, the rest once the pattern is proven on those. Each module comes back recompiled under Java 21, re-signed to your certificate, with a dependency audit, a regression pass against your own test station, and a readiness statement you can publish to your customers."
+      "text": "That is the work this practice was set up to do. A catalogue port is priced per module rather than as one lump, so it can be staged: the two that are most at risk first, the rest once the pattern is proven on those. Each module comes back recompiled for the Niagara 5 runtime, re-signed to your certificate, with a dependency audit, a regression pass against your own test station, and a readiness statement you can publish to your customers."
      }
     },
     {
@@ -393,6 +409,12 @@
       <summary>What does a Niagara 5 readiness audit actually produce?</summary>
       <div class="pl-faq__body"><p>A machine-generated inventory of every third-party module across the estate — vendor, version, signature state and stamped Niagara version — with a verdict per module of rebuild, port, replace or at-risk, the reasoning behind each verdict, and a sequencing plan covering what must happen before any controller is swapped.</p></div>
     </details><details>
+      <summary>Is my module Niagara 5 ready?</summary>
+      <div class="pl-faq__body"><p>Probably, and there is a free way to find out, but nobody can honestly say <em>certainly</em> yet. What can be measured today is whether a module's bytecode survives the move off Java 8: the jars are readable, a Java 25 JDK is runnable, and every removed API leaves a fingerprint in the class that calls it. Run that across a well-built module and the usual result is no blockers at all — most findings sit in bundled third-party libraries rather than in the module's own code, so the work is a recompile, a library bump and a re-sign rather than a rewrite. What that cannot tell you is anything about Niagara 5 itself. There is no Niagara 5 build to test against, so any readiness statement — ours or a vendor's — is <strong>static analysis against Java 25, not a test on a Niagara 5 build</strong>, and a module that scans clean can still need work against the new SDK. Send a module list and the scan comes back free, with that distinction written on it rather than glossed over.</p></div>
+    </details><details>
+      <summary>Can you bring LoRaWAN or MQTT sensor data into Niagara?</summary>
+      <div class="pl-faq__body"><p>Yes. Check the stock abstractMqttDriver and jsonToolkit first — a plain MQTT client and structured-payload parsing have been in the box since 4.8, and a lot of projects need nothing past that. Custom work starts where those stop: a LoRaWAN network server feeding into Niagara, a payload decoder for a shape jsonToolkit cannot unpack on its own, topic and schema design, and store-and-forward so a dropped link does not lose readings. Send a payload sample from the network server or a screenshot of the current topic tree and it is a day's reading to say what stock covers and what does not.</p></div>
+    </details><details>
       <summary>Is Niagara 4 about to stop working?</summary>
       <div class="pl-faq__body"><p>No. Niagara 4 is supported to 2028. Niagara 5 is expected to reach general availability around the end of 2026. Dates published around licence transfer are commercial deadlines for a discount rather than a point at which anything stops running. Plan for the migration; do not let anyone panic you into it. Confirm current dates with your distributor.</p></div>
     </details><details>
@@ -406,7 +428,7 @@
       <div class="pl-faq__body"><p>Yes, and for module vendors and distributors that is the normal shape. The deliverable carries your module name, your vendor string and your certificate; the specification and the installation note are written to be handed to your customer with your logo on them; and there is no requirement to disclose who wrote it. A mutual NDA before the first technical conversation is fine and is signed, not negotiated.</p></div>
     </details><details>
       <summary>We have a catalogue of modules and a Niagara 5 deadline. Can you take some of it?</summary>
-      <div class="pl-faq__body"><p>That is the work this practice was set up to do. A catalogue port is priced per module rather than as one lump, so it can be staged: the two that are most at risk first, the rest once the pattern is proven on those. Each module comes back recompiled under Java 21, re-signed to your certificate, with a dependency audit, a regression pass against your own test station, and a readiness statement you can publish to your customers.</p></div>
+      <div class="pl-faq__body"><p>That is the work this practice was set up to do. A catalogue port is priced per module rather than as one lump, so it can be staged: the two that are most at risk first, the rest once the pattern is proven on those. Each module comes back recompiled for the Niagara 5 runtime, re-signed to your certificate, with a dependency audit, a regression pass against your own test station, and a readiness statement you can publish to your customers.</p></div>
     </details><details>
       <summary>Do you work on Niagara AX?</summary>
       <div class="pl-faq__body"><p>Only to get you off it. AX is end of life, so the honest answer is that new modules and new graphics should not be written against it. What is worth doing on an AX site is the inventory: what is actually running on the station, which of it has a Niagara 4 equivalent, which of it was bespoke and has no source, and what the building automation estate has to look like on the other side. That inventory is the same piece of work as a Niagara 5 readiness audit, one framework generation earlier.</p></div>

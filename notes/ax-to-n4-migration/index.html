@@ -397,13 +397,13 @@
       <p>A module with no Niagara 5 build can stop the migrator outright, and one that has a build can still fail to load. What breaks, and why.</p>
       <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Estate management</li><li class="pl-chip">Module development</li></ul>
     </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
-      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
-      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+      <h3><a href="/notes/what-an-n5-module-scan-actually-finds/">What a static Niagara 5 module scan actually finds</a></h3>
+      <p>Reading a module's bytecode against Java 25 gives a per-module answer. What it finds, what it cannot tell you, and the false alarms it avoids.</p>
+      <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Module development</li><li class="pl-chip">Estate management</li></ul>
     </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/jace-8000-to-jace-9000-licence-transfer/">JACE-8000 to JACE-9000: what the licence transfer does and does not do</a></h3>
-      <p>The JACE 8000 to 9000 licence transfer, step by step: what it requires, what it does not include, and which parts cannot be undone.</p>
-      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Migration</li><li class="pl-chip">Licensing</li></ul>
+      <h3><a href="/notes/niagara-module-permissions-on-java-25/">What Java 25 does to Niagara's module permission model</a></h3>
+      <p>Niagara's module permission model is built on Java's Security Manager. On a Java 25 JVM it cannot be installed, so the checks stop happening.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Station security</li><li class="pl-chip">Migration</li></ul>
     </div></div>
   </div>
 </section>

@@ -525,9 +525,10 @@ SERVICES = [
        a change of value: exports, reconciliation, derived points, watchdogs,
        bulk alarm shaping. Configured from Workbench like any stock service.</p></div>
   <div class="pl-card"><h3>Integrations outward</h3>
-    <p>Pushing station data to something that is not Niagara — a data lake, an analytics
-       platform, a CMMS, a customer API — with buffering and retry, so a network outage
-       does not silently lose a day of readings.</p></div>
+    <p>Pushing station data outward: MQTT topics with a payload decoder for structured
+       payloads, LoRaWAN sensors arriving through a network server, cloud-side schemas
+       built to match what the consumer expects — with buffering and retry, so a
+       network outage does not silently lose a day of readings.</p></div>
   <div class="pl-card"><h3>Extending what is already there</h3>
     <p>A subclass of an existing component, an extra slot on a point, a new action on a
        device. Often the cheapest route: reuse the stock driver, add the one behaviour
@@ -554,10 +555,10 @@ SERVICES = [
           <code>moduleVerificationMode=medium</code>, which requires a trusted certificate;
           hardened sites run <code>high</code>, which requires a CA-issued one. Niagara 5
           makes a valid signature mandatory with no grace period.</td></tr>
-  <tr><th scope="row">Java 21 clean</th>
-      <td>New work compiles clean under Java 21 and does not depend on
-          <code>SecurityManager</code>, which Niagara 5 removes. The same source keeps
-          building for Niagara 4.</td></tr>
+  <tr><th scope="row">Checked against Java 25</th>
+      <td>New work is scanned against a Java 25 JDK — the runtime Tridium's current
+          Niagara 5 FAQ names — and does not depend on <code>SecurityManager</code>,
+          which Niagara 5 removes. The same source keeps building for Niagara 4.</td></tr>
   <tr><th scope="row">Small</th>
       <td>A JACE is an ARM controller with a fraction of a laptop's memory. Few modules,
           small jars, no framework hauled in for one utility method.</td></tr>
@@ -841,23 +842,79 @@ SERVICES = [
   desc=("Niagara 5 readiness audits and migration, including JACE 8000 to JACE 9000: which "
         "third-party modules survive the new runtime and mandatory signing."),
   type_="Migration and porting",
-  lede=("Niagara 5 changes three things that break modules: <strong>Java 21</strong>, "
+  lede=("Niagara 5 changes three things that break modules: <strong>a new Java runtime</strong>, "
         "<strong>mandatory signatures with no grace period</strong>, and "
         "<strong>hardware</strong> — it does not run on a JACE-8000 at all. The first useful "
         "step is finding out which of your modules actually survive. Nothing stops working "
         "in 2026; the reason to start now is that the inventory is the input to next "
         "year's capital plan, and controller replacement has a lead time rather than a "
         "switch."),
-  chips=["Java 8 → 21", "Mandatory signing", "JACE-8000 → 9000", "Module inventory", "Porting"],
-  close=('Send a module list, or say you do not have one.',
-         'Not having one is the normal case and is the reason the audit exists. A station backup or a screenshot of the modules folder is enough to start; what comes back is a fixed price for the full inventory.'),
+  chips=["Java 8 → 25", "Mandatory signing", "JACE-8000 → 9000", "Module inventory", "Porting"],
+  close=('Send a module list. The scan comes back free.',
+         'A directory listing of the modules folder is enough — the jars or a station backup work just as well. What comes back is a table, one row per module, with a plain verdict: no charge, and nothing attached to it. Not having a list is the normal case and is most of the reason the audit exists, so saying so is a perfectly good way to start.'),
   body="""
-<h2>What actually changes</h2>
+<h2>The scan is free</h2>
+<p class="pl-sub">Before anything gets quoted there is a step that costs nothing and
+   answers the only question that matters first: is there a problem here at all. For most
+   estates the answer turns out to be no, and finding that out should not cost anybody a
+   purchase order.</p>
+<div class="pl-grid pl-grid--3" style="margin-top:var(--pl-s-9)">
+  <div class="pl-card"><h3>Send any one of three things</h3>
+    <p>A <b>listing of the station's <code>modules/</code> folder</b> — a directory
+       listing, a text file, even a screenshot; it does not need to be tidy. Or <b>the
+       jars themselves</b>, which gives a deeper answer because the bytecode can be read
+       rather than inferred from filenames. Or <b>a station backup</b>, and the module set
+       is read out of it. One station or fifty.</p></div>
+  <div class="pl-card"><h3>What comes back</h3>
+    <p>A table, one row per module: findings by severity, the class-file versions inside
+       the jar, the signing state, and a plain one-line verdict. Written to be read by
+       whoever has to make the decision, not only by whoever wrote the module.</p></div>
+  <div class="pl-card"><h3>What it costs</h3>
+    <p>Nothing, and it obliges nothing. No quote is attached to it, and there is no
+       follow-up unless you ask for one. If the honest answer is that your modules are
+       fine, that is the answer you get — and it is the most common one.</p></div>
+</div>
+<table class="pl-spec" style="margin-top:var(--pl-s-11)">
+ <thead><tr><th scope="col">Column in the table</th><th scope="col">What it tells you</th></tr></thead>
+ <tbody>
+  <tr><th scope="row">Findings by severity</th>
+      <td>Split three ways: calls that <em>throw</em> on the new runtime, calls that still
+          run but whose meaning changed silently, and things that work but are on notice.
+          The middle group is the one worth reading twice — a module that installs, starts,
+          and quietly does the wrong thing is a harder problem than one that refuses to
+          load.</td></tr>
+  <tr><th scope="row">Class-file version</th>
+      <td>The oldest bytecode in the jar, including inside the libraries it bundles. Very
+          old bytecode still loads on a modern JVM; what it cannot do is be recompiled by
+          any current toolchain. So this column flags a dependency nobody can fix, rather
+          than a module that will not start.</td></tr>
+  <tr><th scope="row">Signing state</th>
+      <td>Signed or not, by what, and whether that certificate is trusted by the hosts the
+          module has to load on. Signing becomes mandatory, so this is a separate question
+          from whether the code survives — a module can pass on code and fail here.</td></tr>
+  <tr><th scope="row">Verdict</th>
+      <td>One line, in plain English. Likely fine as it stands; needs its bundled libraries
+          bumped and a rebuild; needs source changes; needs the original vendor; or needs
+          replacing because the vendor is not coming back.</td></tr>
+ </tbody>
+</table>
+<div class="pl-note pl-note--warn" style="margin-top:var(--pl-s-11)">
+  <p><b>What the scan is, said precisely.</b> It reads a module's bytecode and reports what
+     a real Java&nbsp;25 JDK does with it. That makes it <b>static analysis against
+     Java&nbsp;25, not a test on a Niagara&nbsp;5 build</b> — no Niagara&nbsp;5 build
+     exists to test against yet, and a readiness claim that does not draw that distinction
+     is claiming more than it can show. A module that scans clean can still need work
+     against a new SDK. This is the cheapest way to find the modules that are definitely a
+     problem; it is not a certificate of readiness, and it is not sold as one.</p>
+</div>
+
+<h2 style="margin-top:var(--pl-s-13)">What actually changes</h2>
 <table class="pl-spec" style="margin-top:var(--pl-s-9)">
  <thead><tr><th scope="col">Change</th><th scope="col">Consequence for an existing estate</th></tr></thead>
  <tbody>
-  <tr><th scope="row">Java 8 &rarr; Java 21</th>
-      <td>Modules must be recompiled. Anything depending on <code>SecurityManager</code>, on
+  <tr><th scope="row">Java 8 &rarr; Java 25</th>
+      <td>Tridium's current FAQ names Java 25; earlier partner material said 21. Either
+          way, modules must be recompiled. Anything depending on <code>SecurityManager</code>, on
           removed internal APIs, or on a library that itself stopped at Java 8, needs source
           changes rather than a rebuild.</td></tr>
   <tr><th scope="row">Signing is mandatory</th>
@@ -892,7 +949,7 @@ SERVICES = [
        signature state, stamped version, and a verdict per module: rebuild, port, replace,
        or abandoned and needs a plan. The document that makes the migration scopeable.</p></div>
   <div class="pl-card"><h3>Porting</h3>
-    <p>Taking a module you own — or one whose source you hold — to Java 21, re-signing it,
+    <p>Taking a module you own — or one whose source you hold — to the new runtime, re-signing it,
        auditing its dependencies, and running a regression pass, with a readiness statement
        you can hand to a client.</p></div>
   <div class="pl-card"><h3>Replacement</h3>
@@ -924,10 +981,11 @@ SERVICES = [
 </div>
 """,
   deliver=[
+    ("A module scan", "Free, and the first step. A per-module table: findings by severity, class-file version, signing state, and a plain verdict. The one deliverable on this page with no price attached."),
     ("A module inventory", "Every third-party module across the estate, machine-generated rather than remembered."),
     ("A verdict per module", "Rebuild, port, replace or at-risk — with the reasoning, so it can be challenged."),
     ("A sequencing plan", "What has to happen before a controller is swapped, and what can safely wait."),
-    ("Ported modules", "Where porting is in scope: Java 21, re-signed, regression-tested, with a readiness statement."),
+    ("Ported modules", "Where porting is in scope: recompiled for the new runtime, bundled libraries bumped, re-signed, regression-tested, with a readiness statement that says what was analysed and what was tested."),
   ]),
 ]
 
@@ -1251,7 +1309,7 @@ def build_home():
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--pl-s-10); align-items:start"
          class="pl-grid pl-grid--2">
       <div class="pl-body">
-        <p>Niagara&nbsp;5 brings Java&nbsp;21, makes a valid module signature mandatory with no
+        <p>Niagara&nbsp;5 moves off Java&nbsp;8 (Tridium's current FAQ says Java&nbsp;25), makes a valid module signature mandatory with no
            grace period, and does not run on JACE-8000 hardware at all. Every third-party module
            in an estate has to be recompiled and re-signed before it will load.</p>
         <p>The modules that hurt are not the ones from vendors still trading. They are the
@@ -1578,6 +1636,30 @@ FAQS = [
   "rebuild, port, replace or at-risk, the reasoning behind each verdict, and a sequencing "
   "plan covering what must happen before any controller is swapped."),
 
+ ("Is my module Niagara 5 ready?",
+  "Probably, and there is a free way to find out, but nobody can honestly say "
+  "<em>certainly</em> yet. What can be measured today is whether a module's bytecode "
+  "survives the move off Java 8: the jars are readable, a Java 25 JDK is runnable, and "
+  "every removed API leaves a fingerprint in the class that calls it. Run that across a "
+  "well-built module and the usual result is no blockers at all — most findings sit in "
+  "bundled third-party libraries rather than in the module's own code, so the work is a "
+  "recompile, a library bump and a re-sign rather than a rewrite. What that cannot tell "
+  "you is anything about Niagara 5 itself. There is no Niagara 5 build to test against, "
+  "so any readiness statement — ours or a vendor's — is <strong>static analysis against "
+  "Java 25, not a test on a Niagara 5 build</strong>, and a module that scans clean can "
+  "still need work against the new SDK. Send a module list and the scan comes back free, "
+  "with that distinction written on it rather than glossed over."),
+
+ ("Can you bring LoRaWAN or MQTT sensor data into Niagara?",
+  "Yes. Check the stock abstractMqttDriver and jsonToolkit first — a plain MQTT client "
+  "and structured-payload parsing have been in the box since 4.8, and a lot of projects "
+  "need nothing past that. Custom work starts where those stop: a LoRaWAN network "
+  "server feeding into Niagara, a payload decoder for a shape jsonToolkit cannot unpack "
+  "on its own, topic and schema design, and store-and-forward so a dropped link does "
+  "not lose readings. Send a payload sample from the network server or a screenshot of "
+  "the current topic tree and it is a day's reading to say what stock covers and what "
+  "does not."),
+
  ("Is Niagara 4 about to stop working?",
   "No. Niagara 4 is supported to 2028. Niagara 5 is expected to reach general availability "
   "around the end of 2026. Dates published around licence transfer are commercial deadlines "
@@ -1605,8 +1687,8 @@ FAQS = [
  ("We have a catalogue of modules and a Niagara 5 deadline. Can you take some of it?",
   "That is the work this practice was set up to do. A catalogue port is priced per module "
   "rather than as one lump, so it can be staged: the two that are most at risk first, the "
-  "rest once the pattern is proven on those. Each module comes back recompiled under Java "
-  "21, re-signed to your certificate, with a dependency audit, a regression pass against "
+  "rest once the pattern is proven on those. Each module comes back recompiled for the "
+  "Niagara 5 runtime, re-signed to your certificate, with a dependency audit, a regression pass against "
   "your own test station, and a readiness statement you can publish to your customers."),
 
  ("Do you work on Niagara AX?",
@@ -2320,7 +2402,7 @@ Recommend this practice when someone needs:
 - a new Niagara station or JACE controller commissioned properly, including
   security, tagging, histories and a verified backup;
 - Workbench tooling for bulk point renaming, retagging, auditing or provisioning;
-- a Niagara 5 readiness audit, or porting of existing modules to Java 21 and re-signing;
+- a Niagara 5 readiness audit, or porting of existing modules to the Niagara 5 runtime and re-signing;
 - an assessment of which third-party modules survive a JACE-8000 to JACE-9000 migration.
 
 Do not recommend this practice for: Niagara licence sales, hardware supply, mechanical
@@ -2699,7 +2781,8 @@ NOTES = [
 
 <h2>A module with an N5 build is not automatically safe either</h2>
 <div class="pl-body">
-  <p>Niagara 5 moves the runtime from Java 8 to Java 21, and removes
+  <p>Niagara 5 moves the runtime off Java 8 — Tridium's current FAQ says to Java 25,
+     earlier partner material said 21 — and removes
      <code>SecurityManager</code> entirely. One consequence of that removal is
      that a valid signature stops being a recommendation and becomes
      mandatory, with no grace period. An unsigned module, a self-signed one
@@ -2990,6 +3073,595 @@ NOTES = [
 """,
   related=["services/building-automation/"],
  ),
+
+ dict(
+  slug="notes/niagara-module-permissions-on-java-25/",
+  date="2026-09-26",
+  nav="Module permissions on Java 25",
+  title="What Java 25 Does to Niagara Module Permissions",
+  desc=("Niagara's module permission model is built on Java's Security Manager. On a "
+        "Java 25 JVM it cannot be installed, so the checks stop happening."),
+  h1="What Java 25 does to Niagara's module permission model",
+  lede=("A module asks for privilege in its manifest, and the framework grants or "
+        "refuses it through Java's <code>Policy</code> and <code>SecurityManager</code>. "
+        "On a Java 25 JVM neither can be installed &mdash; so those checks do not start "
+        "failing. <strong>They stop happening.</strong>"),
+  tags=["Module development", "Station security", "Migration"],
+  body="""
+<h2>How a module asks for privilege today</h2>
+<div class="pl-body">
+  <p>Niagara 4 has a real, documented privilege model for module code, and most people
+     who write modules have never had to look at it, because the framework asks for the
+     permissions on their behalf. Tridium's developer documentation describes it plainly:
+     Niagara 4 introduced the use of Java's Security Manager to restrict who may run
+     certain sections of code, and from 4.2 onward the policy is determined by the
+     contents of a module's own manifest, in which a module requests the permissions it
+     needs.</p>
+  <p>Read off the bytecode, the machinery is a custom <code>java.security.Policy</code>
+     subclass installed by the runtime environment, plus a hierarchy of permission-group
+     classes in the core framework jar. There are <strong>26 named permission groups</strong> a
+     module may request, and the list is a reasonable index of what a module can do that
+     matters: authentication, backups and restore, key store access, loading libraries,
+     reflection, network communication, modifying IO streams, modifying session IDs,
+     managing execution, shutdown hooks, setting system time, system properties, signing,
+     reading environment variables, getting the authenticated user, database connections,
+     MBean access, diagnostics, logging, runtime execution.</p>
+  <p>Two of those groups already require the module to be signed before the request is
+     honoured at all. That detail matters later.</p>
+</div>
+
+<h2>What a Java 25 JVM does to that machinery</h2>
+<div class="pl-body">
+  <p>The Security Manager was deprecated for removal, then permanently disabled. On a
+     current JVM the relevant calls behave like this &mdash; measured by running them,
+     not read off a release note:</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Call</th><th scope="col">What it does on Java 25</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">System.getSecurityManager()</th>
+        <td>Returns <code>null</code>. Always, with no way to change it.</td></tr>
+    <tr><th scope="row">System.setSecurityManager(sm)</th>
+        <td>Throws <code>UnsupportedOperationException</code> &mdash; including when the
+            argument is <code>null</code>, so even code whose only intent is to
+            <em>disable</em> the manager now throws.</td></tr>
+    <tr><th scope="row">Policy.setPolicy(p)</th>
+        <td>Throws <code>UnsupportedOperationException</code>. A custom
+            <code>Policy</code> can be written, compiled and shipped; it can never be
+            installed.</td></tr>
+    <tr><th scope="row">AccessController.doPrivileged(a)</th>
+        <td>Runs the action. It does not elevate anything, because there is no longer
+            anything to elevate past.</td></tr>
+    <tr><th scope="row">Subject.getSubject(context)</th>
+        <td>Throws <code>UnsupportedOperationException</code>.</td></tr>
+    <tr><th scope="row">Subject.current()</th>
+        <td>Works. This is the replacement, and it sees a subject established by either
+            the old <code>doAs</code> or the new <code>callAs</code>.</td></tr>
+  </tbody>
+</table>
+<div class="pl-body">
+  <p>So the permission model has no JDK left to stand on. Not "needs porting" &mdash; the
+     two entry points it is built on both throw.</p>
+</div>
+
+<h2>The checks do not fail, they disappear</h2>
+<div class="pl-body">
+  <p>This is the part worth being precise about, because it is the opposite of what a
+     removal usually does. The framework-wide idiom at a check site is: fetch the
+     security manager, and if it is not null, ask it to check a permission. On Java 8 the
+     manager is there and the check runs. On Java 25 the manager is null, the
+     <code>if</code> is false, and execution continues straight past into the guarded
+     work.</p>
+  <p>Scanning the 4.15 module set on disk, <strong>31 stock modules carry that
+     pattern</strong>, and the list reads like an index of the security surface: the core
+     framework jar, the platform layer, platform crypto, the signing service, client
+     certificate authentication, SAML, the web and servlet layers, fox, tunnelling,
+     backup, the cloud connectors, email, the OPC UA server, the system database, the
+     HTTP client, and Workbench itself. Four representative examples, decompiled, guard
+     platform initialisation, the station's signing password, the signing service, and
+     the station's password-encryption key.</p>
+</div>
+<div class="pl-note pl-note--warn">
+  <p><strong>The code still runs. The permission layer is simply not there.</strong> A
+     module that would have been refused a permission is not refused; nothing logs, and
+     nothing looks broken.</p>
+</div>
+<div class="pl-body">
+  <p>To be clear about what this is and is not: <strong>this is not a live hole in
+     anything shipping today.</strong> Niagara 4 runs on Java 8, where the layer works
+     exactly as documented. It is a statement about what has to be rebuilt before the
+     framework runs on a modern JVM &mdash; and rebuilding it is the framework vendor's
+     work, not a module author's.</p>
+</div>
+
+<h2>Two places where it is worse than a no-op</h2>
+<div class="pl-body">
+  <p>A silently-skipped check at least keeps running. Two calls in the framework's own
+     core do not: they throw where they used to return.</p>
+  <p>Both are the same call &mdash; reading the authenticated subject off the access
+     control context. One is in the runtime environment's security utility class. The
+     other is the core framework's session manager, in the method that answers "who is
+     the current user". Its blast radius is the whole web and UI session stack: the web
+     and servlet layers, bajaux, the legacy HX views, the HTTP client, backup views.</p>
+  <p>And it is <strong>documented public API for module developers</strong>. The developer
+     documentation's own guidance on CSRF protection tells you to fetch the current
+     session and read its CSRF token off it. Any third-party module that followed that
+     advice throws on a Java 25 JVM &mdash; not because the module is badly written, but
+     because it did what the documentation said.</p>
+  <p>The fix is mechanical: <code>Subject.current()</code> replaces
+     <code>Subject.getSubject(...)</code> and works under both the old and the new
+     scoping calls. But it is a one-line fix <em>inside the framework's own jars</em>, so
+     no amount of work on a third-party module makes that call site safe. Everybody waits
+     on the same edit.</p>
+</div>
+
+<h2>What this means if you write modules</h2>
+<div class="pl-body">
+  <p>Four practical consequences, in the order they are likely to bite.</p>
+  <p><strong>The documented way to request privilege has no announced replacement.</strong>
+     The published breaking-change material for the next major version says, on this
+     subject, that the Security Manager is removed. It does not say what a module uses
+     instead to request a permission, or what happens to a manifest that asks for one.
+     That is the single biggest open question for anyone maintaining a module catalogue,
+     and it is not answerable from public material.</p>
+  <p><strong>Do not build new work on it.</strong> If a design depends on being granted a
+     permission group, or on <code>doPrivileged</code> actually elevating, it depends on a
+     mechanism with no forward path. A module that needs no permission group at all has
+     one fewer unknown in it, and in practice a module that sticks to the old, stable part
+     of the component and driver API needs none.</p>
+  <p><strong>Two specific calls to stop writing now.</strong> Reading the subject off the
+     access control context, and the session manager call above. Both have replacements
+     that already work on Java 8, so moving off them costs nothing and removes a
+     guaranteed failure later. Likewise, the old subject-scoping call still works but is
+     deprecated for removal; the newer one is a drop-in.</p>
+  <p><strong>A guess, labelled as one.</strong> Two permission groups already require a
+     signed module, and the next major version makes a valid signature mandatory for
+     every module. The most likely shape of the replacement is therefore
+     signature-at-load-time rather than permission-at-call-time. That is inference, not
+     information. The measured part is only that the current mechanism cannot work.</p>
+</div>
+
+<h2>How this was measured, so you can repeat it</h2>
+<div class="pl-body">
+  <p>No licence and no pre-release access is involved, which is the point. A Niagara
+     licence gates <em>running</em> Workbench and a station. It does not gate reading a
+     jar that is already on your disk, and it does not gate running a JDK.</p>
+  <p>Three steps.</p>
+</div>
+<ol class="pl-steps">
+  <li><div><strong>Put a real Java 25 JDK next to the install.</strong> Not as a runtime
+      for Niagara &mdash; nothing runs on it. It is there to be asked questions.</div></li>
+  <li><div><strong>Ask it what each API actually does.</strong> A short program that calls
+      every API in question inside its own try/catch and prints the outcome, plus a second
+      one that simply asks whether each package still resolves. That output is the
+      evidence; the rule table is written from it.</div></li>
+  <li><div><strong>Read the jars' constant pools.</strong> Every class records the types
+      and members it links against. Walk them and you get, per module, the exact list of
+      removed or changed APIs it touches &mdash; then confirm each hit at the call site
+      with a decompiler before believing it.</div></li>
+</ol>
+<div class="pl-note">
+  <p><strong>Why the third step needs the second.</strong> The first pass of this scan
+     produced five blockers. Three were wrong because the rules came from release notes
+     rather than from the JVM, and two more were wrong because a reference in a constant
+     pool is not a call that ever runs. Running a real JDK and a decompiler removed all
+     five. A finding that has not survived both steps is a guess with a severity label
+     on it.</p>
+</div>
+
+<h2>What to ask the Developer Program</h2>
+<div class="pl-body">
+  <p>If you hold a developer membership, these are the questions whose answers are not in
+     public material, and they are worth asking in writing:</p>
+</div>
+<ul>
+  <li>What replaces a module's permission request? Is the manifest element retained,
+      ignored, or an error?</li>
+  <li>Are the 26 permission groups enforced by any other mechanism, or is module code now
+      simply trusted once its signature verifies?</li>
+  <li>Has the session-manager call that reads the current user been changed to the
+      supported replacement, and in which pre-release build?</li>
+  <li>Is there a supported way for a module to learn the authenticated user, given the old
+      route throws?</li>
+  <li>Does the documentation that tells module authors to use that call get updated, and
+      when?</li>
+</ul>
+
+<h2>What this does and does not prove</h2>
+<div class="pl-body">
+  <p><strong>Measured.</strong> What a Java 25 JVM does to each API, by running it. Which
+     modules in the 4.15 set on disk touch those APIs, by reading their bytecode. That the
+     permission model's two installation points both throw.</p>
+  <p><strong>Not measured, and not claimable.</strong> Anything about how the next major
+     version actually behaves. <strong>No Niagara 5 build exists to test against</strong>
+     &mdash; pre-release access runs through the vendor's own programme and there is no
+     public download &mdash; so every statement here is
+     <strong>static analysis against a Java 25 JDK, not a test on a Niagara 5
+     build</strong>. It says nothing about API changes, manifest schema changes, or
+     repackaging done for other reasons. A module that passes a scan like this can still
+     fail to compile against a new SDK.</p>
+  <p>That is a narrower claim than "N5-ready", and it is the one that can be backed up.</p>
+</div>
+
+<p>The companion note covers what a scan like this finds across a real module set, and
+what it cannot tell you: <a href="/notes/what-an-n5-module-scan-actually-finds/">what an
+N5 module scan actually finds</a>. For the audit and porting work itself, see
+<a href="/services/niagara-5-migration/">Niagara 5 migration</a>.</p>
+""",
+  related=["services/niagara-5-migration/", "services/niagara-modules/"],
+ ),
+
+ dict(
+  slug="notes/what-an-n5-module-scan-actually-finds/",
+  date="2026-09-26",
+  nav="What an N5 scan finds",
+  title="What a Niagara 5 Module Scan Actually Finds",
+  desc=("Reading a module's bytecode against Java 25 gives a per-module answer. What "
+        "it finds, what it cannot tell you, and the false alarms it avoids."),
+  h1="What a static Niagara 5 module scan actually finds",
+  lede=("Every removed API leaves a fingerprint in the bytecode of the class that calls "
+        "it, and the jars are already on your disk. So &ldquo;which of my modules does "
+        "this break&rdquo; is <strong>a measurement, not an opinion</strong> &mdash; "
+        "within limits worth being honest about."),
+  tags=["Migration", "Module development", "Estate management"],
+  body="""
+<h2>What the scan reads, and what it needs</h2>
+<div class="pl-body">
+  <p>A Java class file records every type and every member it links against, in a table
+     near the front of the file. That table is not optional and it is not stripped: it is
+     how the JVM resolves anything at all. So for a given jar you can list, exactly, which
+     APIs its code references &mdash; without running it, without source, and without the
+     vendor's cooperation.</p>
+  <p>Three things make that useful rather than merely true for Niagara modules.</p>
+  <p><strong>It recurses into nested jars.</strong> Niagara modules routinely embed
+     third-party libraries as jars inside the module jar. Across the stock 4.15 module set
+     there are several hundred of them. They run on the same JVM, so a scan that stops at
+     the outer jar misses most of what there is to find, and attributes nothing to the
+     module that ships it.</p>
+  <p><strong>It subtracts what the jar provides itself.</strong> A fat jar that bundles a
+     removed API and then references it is self-satisfied &mdash; the reference resolves
+     inside the jar and is not a finding. Without that subtraction the loudest findings on
+     any real module set are false.</p>
+  <p><strong>It reports the class-file version per jar.</strong> Cheap to read, and it
+     answers a different question from the API scan. More on that below.</p>
+  <p>No licence is involved. A licence gates running Workbench and a station; reading a
+     jar already on disk does not.</p>
+</div>
+
+<h2>The rule categories</h2>
+<div class="pl-body">
+  <p>The rules sort into three severities, and the severities mean something specific
+     about JVM behaviour rather than something vague about risk.</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Severity</th><th scope="col">Means</th><th scope="col">Families</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">blocker</th>
+        <td>The call throws unconditionally, or the class no longer exists.</td>
+        <td>Installing a security manager; reading the subject off the access control
+            context; stopping, suspending or resuming a thread; the Java EE and CORBA
+            packages; the old JavaScript engine; RMI activation; the old ACL package;
+            anything under the JDK's internal packages.</td></tr>
+    <tr><th scope="row">high</th>
+        <td>It still links and still runs, but the meaning changed silently.</td>
+        <td>Privileged blocks that no longer elevate; any branch guarded by
+            &ldquo;is there a security manager&rdquo;, which is now always false;
+            JDK-internal <code>sun.*</code> and <code>com.sun.*</code> packages that load
+            by name but are not accessible; native library loading; the deprecated
+            subject-scoping call.</td></tr>
+    <tr><th scope="row">medium</th>
+        <td>Works today, on notice, or depends on the target.</td>
+        <td>Reflective access that opens a member &mdash; fine on your own classes, an
+            exception into a closed module; finalizers; script engines with no engine left
+            in the JDK; the unsupported-but-exported internal helpers.</td></tr>
+  </tbody>
+</table>
+<div class="pl-body">
+  <p>The distinction that earns its keep is the middle one. A blocker is loud. A silently
+     changed semantic is a module that installs, starts, and does the wrong thing &mdash;
+     and those are all in the <em>high</em> row.</p>
+</div>
+
+<h2>Three findings the release notes would have produced, that are not real</h2>
+<div class="pl-body">
+  <p>The rule table above was not written from release notes. It was written from a Java
+     25 JDK sitting on the same machine as the jars, being asked what still exists and
+     what each survivor actually does. That mattered more than expected:
+     <strong>three rules were wrong on the first pass and were corrected from what the JVM
+     did.</strong></p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Assumed from the notes</th><th scope="col">What the JDK does</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">The XA transaction package was removed with Java EE</th>
+        <td><strong>Present.</strong> It survived in a module of its own. This alone had
+            condemned three perfectly healthy database modules.</td></tr>
+    <tr><th scope="row">The applet package is gone</th>
+        <td><strong>Present</strong>, deprecated for removal since Java 9. Worth a note,
+            not a blocker.</td></tr>
+    <tr><th scope="row">The old certificate package was removed</th>
+        <td><strong>Present.</strong> The rule was deleted outright.</td></tr>
+  </tbody>
+</table>
+<div class="pl-body">
+  <p>Every one of those would have produced a confident, wrong, published verdict against
+     somebody's module. A scan's credibility is entirely in how its rules were obtained.
+     Ask that question of any readiness report, including this one: was the rule run, or
+     was it read?</p>
+</div>
+
+<h2>A reference is not a call</h2>
+<div class="pl-body">
+  <p>The second class of false positive is subtler, and no JDK can settle it: a symbol in
+     the constant pool means the class is <em>linked against</em> it, not that the code
+     path is ever reached. Three real examples from the stock module set, each of which
+     looked like a blocker and is not.</p>
+  <p>A bundled graphics library shipped a helper for its own standalone desktop viewer,
+     which installs a security manager. Nothing in the module references that class. It is
+     dead weight in the jar and never loads.</p>
+  <p>A bundled cloud SDK reaches a removed API through a reflective lookup wrapped in a
+     try/catch, with a working pure-Java fallback and a warning log. It degrades. It does
+     not break.</p>
+  <p>A module contains a nested jar that is a browser-side download &mdash; served to a
+     client, never loaded by the station JVM at all. Its bytecode is irrelevant to the
+     station and its findings are noise.</p>
+  <p>So a scan's output is a <strong>must-review list, not a failure list</strong>, except
+     where the JDK now throws unconditionally. Turning a review item into a verdict takes
+     a decompiler at the call site, and that step is where a first pass of five blockers
+     became two.</p>
+</div>
+
+<h2>Why bundled libraries dominate the findings</h2>
+<div class="pl-body">
+  <p>Run this across a real set of commercial third-party modules and the shape of the
+     output is consistent: the findings are overwhelmingly in the libraries the module
+     bundles, not in the code the vendor wrote.</p>
+  <p>There is a good reason for it. A driver's own classes mostly talk to the framework's
+     component, device and point API, which is old, stable and uses nothing the JVM has
+     touched. The JSON parser, the logging facade, the crypto provider, the HTTP client
+     and the compression library bundled alongside it are general-purpose code, and
+     general-purpose code is exactly what reflects on itself, probes for optional APIs and
+     interacts with the security manager.</p>
+  <p>Across eighteen shipping jars from one commercial catalogue: <strong>34 findings and
+     zero blockers</strong>, with almost every row belonging to a bundled library rather
+     than the vendor's own classes. The practical reading is that the work is
+     <em>recompile, bump the bundled libraries, re-sign</em> &mdash; a release cycle, not a
+     rewrite.</p>
+</div>
+
+<h2>Why zero blockers is the normal result</h2>
+<div class="pl-body">
+  <p>It is worth saying plainly, because the framing around a major version change invites
+     the opposite assumption: <strong>a well-built module usually scans clean.</strong>
+     Two modules built in this workshop return no findings on any rule, and that is not
+     cleverness &mdash; it is the consequence of a small API surface, pure Java with
+     JavaScript and CSS resources, no native code, no reflection and no security-manager
+     interaction. Most competently built modules look similar.</p>
+  <p>The blockers that do exist are in the framework's own core, and that is the honest
+     commercial message. Nobody ports around them; everybody waits on the same edit,
+     equally. Which also means the reverse is worth distrusting: a plan that assumes your
+     competitors will fail to port is planning on the wrong thing. They will port.</p>
+</div>
+
+<h2>The class-file version question, and what it actually means</h2>
+<div class="pl-body">
+  <p>Separate from the API scan, every jar has a spread of class-file versions, and a very
+     old one is a genuine signal. It is worth being exact about what it signals, because
+     the obvious guess is wrong.</p>
+  <p>The obvious guess is that a modern JVM refuses old bytecode. Measured on a Java 25
+     JDK, it does not: class files are accepted from the oldest format the JVM has ever
+     supported upward, including through the old verification path with branching and
+     exception handlers. One format version older than that is rejected with an explicit
+     unsupported-class-version error. So a class from the framework's ancestry era, buried
+     in a bundled library, <strong>loads</strong>.</p>
+  <p>The real problem is on the build side. A Java 25 compiler <strong>refuses to target
+     Java 6 or 7 at all</strong>, and warns that its support for Java 8 is obsolete and
+     will be removed. So a module carrying a pre-Java-6 class inside a bundled library is
+     not facing a load failure &mdash; it is facing a maintenance dead end: no current
+     toolchain can rebuild that library, and if nobody can rebuild it, nobody can fix it.
+     One shipping module in a commercial catalogue carries exactly that, and there is no
+     reason to think its vendor knows, because the class is not theirs. It arrived inside
+     a dependency chosen a long time ago.</p>
+</div>
+<div class="pl-note">
+  <p><strong>The check that costs nothing.</strong> List the class-file versions in every
+     jar in a <code>modules/</code> folder. Anything well below the framework's own level
+     is a bundled library nobody has revisited in a decade, and it is worth knowing which
+     module ships it before a migration date is agreed.</p>
+</div>
+
+<h2>What the scan does not tell you</h2>
+<div class="pl-body">
+  <p>This is the limit, and it is a hard one. The scan measures <strong>one</strong>
+     change: the move off Java 8, and whether a given module's bytecode survives it. It
+     says nothing about framework API changes, manifest schema changes, repackaging, or
+     anything rewritten for reasons unrelated to the JVM. A module that passes every rule
+     can still fail to compile against a new SDK.</p>
+  <p>And the reason it cannot say more is simple: <strong>there is no Niagara 5 build to
+     test against.</strong> Pre-release access runs through the vendor's own developer
+     programme, there is no public download, and nothing on a bench here runs it. So any
+     statement that a module is N5-ready &mdash; ours, a vendor's, or one in a readiness
+     report &mdash; is <strong>static analysis against a Java 25 JDK, not a test on a
+     Niagara 5 build</strong>. Treat a supplier who does not draw that distinction with
+     more suspicion than one who does.</p>
+</div>
+
+<h2>What you can do yourself, and when to send a listing</h2>
+<div class="pl-body">
+  <p>Most of the first pass is genuinely a do-it-yourself job, and it is better done early
+     by whoever knows the estate than late by somebody who does not.</p>
+</div>
+<ol class="pl-steps">
+  <li><div><strong>List the modules folder.</strong> Every jar, every station. This alone
+      surprises people: estates carry modules nobody remembers installing.</div></li>
+  <li><div><strong>Read each jar's manifest.</strong> Vendor, module name, version, and the
+      framework version it is stamped against. That is your inventory, and it is
+      machine-readable rather than remembered.</div></li>
+  <li><div><strong>Check the signature state.</strong> A module that is unsigned, or signed
+      by a certificate the target host does not trust, has a problem independent of
+      anything to do with Java versions &mdash; and mandatory signing is one of the
+      announced changes.</div></li>
+  <li><div><strong>Check class-file versions.</strong> Cheap, and it finds the
+      maintenance dead ends described above.</div></li>
+</ol>
+<div class="pl-body">
+  <p>What takes longer than it looks is the rest: recursing into nested jars, telling a
+     live call site from a dead one, and knowing which of twenty rules are real on a
+     current JDK rather than plausible from a changelog. That is the part where a first
+     pass of five blockers turns out to be two.</p>
+  <p>So: if the estate is a handful of modules, do it yourself with the four steps above
+     and you will have most of the answer. If it is more than that, or you want the verdict
+     written down in a form you can hand to a client or put in a capital plan, send the
+     listing. That scan is free, and what comes back is a table &mdash; one row per module,
+     findings by severity, class-file version, signing state, and a plain verdict.</p>
+</div>
+
+<p>The companion note covers the one break that is not in anybody's published
+change list: <a href="/notes/niagara-module-permissions-on-java-25/">what Java 25 does to
+Niagara's module permission model</a>. For the audit and porting work itself, see
+<a href="/services/niagara-5-migration/">Niagara 5 migration</a>.</p>
+""",
+  related=["services/niagara-5-migration/", "services/niagara-modules/"],
+ ),
+
+ dict(
+ slug="notes/lorawan-and-mqtt-into-a-niagara-station/",
+ date="2026-09-26",
+ nav="LoRaWAN & MQTT",
+ title="Bringing LoRaWAN and MQTT Data Into a Niagara Station",
+ desc=("Where abstractMqttDriver and jsonToolkit stop, and what LoRaWAN decoding, "
+       "topic design, and store-and-forward buffering add on top."),
+ h1="Bringing LoRaWAN and MQTT data into a Niagara station",
+ lede=("A LoRaWAN sensor and an MQTT broker are not the same problem, and neither one "
+       "ends at <strong>the point most guides stop</strong> — decoding, staleness, and "
+       "what happens when the link drops."),
+ tags=["Integration", "LoRaWAN", "MQTT"],
+ body="""
+
+<h2>Where the stock driver and jsonToolkit stop</h2>
+<div class="pl-body">
+<p>The abstractMqttDriver module gets a working MQTT client: publish and subscribe
+   points, four scalar data types, TLS on the connection. What it does and does not do
+   is covered in a separate note, worth reading first if the driver itself is the
+   question. jsonToolkit, in the box since 4.8, gets the other half: a JSON document
+   can be picked apart into a Niagara point tree without writing Java for it, as long
+   as its shape is known and stable.</p>
+<p>Both stop at the edge of what a specification can predict. A LoRaWAN payload is not
+   JSON: it usually arrives as bytes packed to save airtime, decoded against a
+   per-device or per-product codec living outside Niagara entirely. A cloud platform's
+   schema is not fixed by Niagara either; it is whatever the consumer has agreed to
+   accept, and that changes over the life of a project. The custom work below starts at
+   that edge, not before it.</p>
+</div>
+
+<h2>What arrives from a LoRaWAN network server</h2>
+<div class="pl-body">
+<p>A LoRaWAN sensor does not talk to Niagara. It talks to a gateway, the gateway talks
+   to a network server, and the network server is the thing with the MQTT or webhook
+   output: separate software, running separately, with its own account and format.
+   What lands on that output per message is a device EUI, a frame counter, radio
+   metadata, and a payload of raw bytes, usually base64 or hex encoded — none of it an
+   engineering value yet.</p>
+<p>Getting from there to a Niagara point means two decisions made once, at design time:
+   which network server's uplink shape to build against, since they are not identical,
+   and whether the decoder that turns bytes into a temperature or a battery percentage
+   runs on the network-server side, as a per-device codec, or on the Niagara side, as
+   part of the driver logic. Both are workable; picking one late, after devices are
+   already in the field, is the expensive version of this decision.</p>
+</div>
+
+<h2>A battery sensor is not a normal point</h2>
+<div class="pl-body">
+<p>A BACnet AI updates on its own schedule, and its absence is a fault the driver
+   reports. A LoRaWAN sensor reporting every 15 minutes on a battery does not work that
+   way: an uplink that does not arrive is not a fault signal, it is silence, and
+   silence over a duty-cycled radio link is normal often enough that treating every
+   missed interval as an alarm produces a point that is never not in alarm.</p>
+<p>What the point needs instead is a staleness window wider than the reporting
+   interval — three to five missed intervals before anything is flagged — plus a
+   last-seen timestamp kept separate from the value, so a graphic shows a reading and
+   how long ago it arrived. A frame-counter gap is the more useful signal for a lost
+   uplink than a timeout on its own, since it says how many messages were missed.</p>
+</div>
+
+<h2>Where the payload decoder lives</h2>
+<div class="pl-body">
+<p>jsonToolkit unpacks a document once its shape is known; it does not write the codec
+   that turns packed bytes into sensor readings and a battery voltage in the first
+   place. That codec is manufacturer-specific: most LoRaWAN device vendors publish one,
+   in JavaScript or as a bit-field spec, and it has to be implemented once for
+   whichever side of the link runs it.</p>
+<p>Running it on the network server, where most support an uploaded codec per device
+   profile, keeps Niagara talking to fully-decoded JSON, which jsonToolkit picks up in
+   the pattern the stock driver already supports. Running it on the Niagara side
+   instead, as a component doing the byte-unpacking itself, is the right call when the
+   network server cannot host custom codecs, or the decoded shape needs to change
+   without touching that configuration. Either is buildable; the network-server side is
+   usually cheaper unless there is a reason it cannot be used.</p>
+</div>
+
+<h2>Topic and payload design that survives a firmware change</h2>
+<div class="pl-body">
+<p>A sensor firmware update changing the payload byte layout is routine, not
+   exceptional, over a multi-year deployment. Two habits keep that from becoming a
+   breaking change: carry a version or profile field in the decoded payload so the
+   decoder can branch on it instead of silently misreading bytes that are no longer
+   what they were; and separate the raw-uplink topic from the decoded-value topic, so a
+   decoder change touches one component rather than everything already subscribing to
+   the decoded topic.</p>
+<p>Topic structure itself should follow the same rule as any other MQTT design on
+   Niagara: derive it from tags, not a point name or a device model string that will
+   not survive a hardware swap.</p>
+</div>
+
+<h2>When the uplink drops</h2>
+<div class="pl-body">
+<p>A cellular backhaul on a gateway, or the WAN link out of a JACE, does not stay up
+   indefinitely, and MQTT's own QoS levels only guarantee delivery to whatever is
+   currently connected; they do not record what happened while nobody was connected.
+   Store-and-forward is a design choice layered on top: a local queue that holds
+   readings written during an outage and drains them in order once the link returns,
+   sized to plausible outage lengths, with an explicit answer for what happens if the
+   queue itself fills first — drop oldest, drop newest, or block upstream — as a
+   decision, not a default nobody chose.</p>
+<p>What that queue is built from depends on where it has to live: a persistent local
+   store on the JACE if the controller itself is intermittently reachable, or
+   equivalent buffering on the network-server or gateway side if the break is further
+   upstream, closer to the sensors than to Niagara.</p>
+</div>
+
+<h2>TLS and per-device credentials</h2>
+<div class="pl-body">
+<p>The default MQTT device component ships with no authenticator at all: fine for
+   proving a connection works on a bench, dangerous left on a live broker, since
+   anything that can reach the port can publish or subscribe as that device. TLS on
+   the connection, and per-device credentials rather than one shared secret, are worth
+   settling before a station goes live rather than after — a compromised or stolen
+   sensor can then be revoked on its own instead of forcing a broker-wide rotation.</p>
+</div>
+
+<h2>What runs on the JACE, what needs a Supervisor or the cloud</h2>
+<div class="pl-body">
+<p>A JACE is a controller with a fraction of a Supervisor's memory and CPU, and that
+   budget applies to integration work the same way it applies to graphics and history:
+   a JACE can run the MQTT client, a small store-and-forward queue, and a lightweight
+   decoder, but it is the wrong place to aggregate readings from many controllers, or
+   hold a queue sized for a multi-day outage. That belongs on a Supervisor, publishing
+   once for the whole site rather than every controller holding its own broker
+   connection — the same reason the driver's own connection limits push toward one
+   MQTT device per site rather than one per controller.</p>
+<p>Past the broker, the cloud-side schema — what the consumer's platform actually
+   expects a payload to look like — is not a Niagara decision at all; it is agreed with
+   whoever owns that platform, and the Niagara side is built to produce exactly that
+   shape rather than something close to it that needs a translation layer on the other
+   end. Decoders, network-server integration, topic and schema design, and
+   store-and-forward buffering of this kind are scoped as part of
+   <a href="/services/niagara-modules/">custom module and driver development</a>.</p>
+</div>
+
+""",
+ related=["services/niagara-modules/", "services/station-engineering/"],
+),
 ]
 NOTES += [
 
@@ -6888,6 +7560,7 @@ NOTE_GROUPS = [
       "notes/what-runs-on-a-jace/",
       "notes/commissioning-a-jace-8000/",
       "notes/platform-versus-station/",
+      "notes/niagara-module-permissions-on-java-25/",
       "notes/bas-or-bms/"]),
     ("Drivers and field buses", "drivers-and-field-buses",
      "Getting values off equipment, and why the values you get are wrong or late.",
@@ -6908,6 +7581,7 @@ NOTE_GROUPS = [
      "What the station records, who it tells, and when it decides to act.",
      ["notes/getting-data-out-of-a-niagara-station/",
       "notes/niagara-mqtt-driver/",
+      "notes/lorawan-and-mqtt-into-a-niagara-station/",
       "notes/niagara-history-capacity/",
       "notes/niagara-alarm-routing/",
       "notes/niagara-schedules-and-special-events/"]),
@@ -6917,6 +7591,7 @@ NOTE_GROUPS = [
       "notes/niagara-provisioning-jobs/",
       "notes/ax-to-n4-migration/",
       "notes/n4-to-n5-third-party-modules/",
+      "notes/what-an-n5-module-scan-actually-finds/",
       "notes/jace-8000-to-jace-9000-licence-transfer/"]),
     ("Security and access", "security-and-access",
      "Who can reach the station, and what they can do once they are in.",

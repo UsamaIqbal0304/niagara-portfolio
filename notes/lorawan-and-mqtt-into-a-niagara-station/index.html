@@ -3,23 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>What the Niagara MQTT Driver Will and Will Not Do</title>
-<meta name="description" content="It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker.">
-<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-mqtt-driver/">
+<title>Bringing LoRaWAN and MQTT Data Into a Niagara Station</title>
+<meta name="description" content="Where abstractMqttDriver and jsonToolkit stop, and what LoRaWAN decoding, topic design, and store-and-forward buffering add on top.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/lorawan-and-mqtt-into-a-niagara-station/">
 <meta name="author" content="Plantroom Labs">
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Plantroom Labs">
-<meta property="og:title" content="What the Niagara MQTT Driver Will and Will Not Do">
-<meta property="og:description" content="It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker.">
-<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-mqtt-driver/">
+<meta property="og:title" content="Bringing LoRaWAN and MQTT Data Into a Niagara Station">
+<meta property="og:description" content="Where abstractMqttDriver and jsonToolkit stop, and what LoRaWAN decoding, topic design, and store-and-forward buffering add on top.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/lorawan-and-mqtt-into-a-niagara-station/">
 <meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="What the Niagara MQTT Driver Will and Will Not Do">
-<meta name="twitter:description" content="It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker.">
+<meta name="twitter:title" content="Bringing LoRaWAN and MQTT Data Into a Niagara Station">
+<meta name="twitter:description" content="Where abstractMqttDriver and jsonToolkit stop, and what LoRaWAN decoding, topic design, and store-and-forward buffering add on top.">
 <meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
 
 <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
@@ -28,7 +28,7 @@
 <link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
-<link rel="alternate" type="text/markdown" href="/notes/niagara-mqtt-driver.md" title="This page as markdown">
+<link rel="alternate" type="text/markdown" href="/notes/lorawan-and-mqtt-into-a-niagara-station.md" title="This page as markdown">
 
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
@@ -152,22 +152,22 @@
   },
   {
    "@type": "TechArticle",
-   "@id": "https://plantroomlabs.com/notes/niagara-mqtt-driver/#article",
-   "headline": "What the Niagara MQTT driver will and will not do",
-   "description": "It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker.",
-   "url": "https://plantroomlabs.com/notes/niagara-mqtt-driver/",
+   "@id": "https://plantroomlabs.com/notes/lorawan-and-mqtt-into-a-niagara-station/#article",
+   "headline": "Bringing LoRaWAN and MQTT data into a Niagara station",
+   "description": "Where abstractMqttDriver and jsonToolkit stop, and what LoRaWAN decoding, topic design, and store-and-forward buffering add on top.",
+   "url": "https://plantroomlabs.com/notes/lorawan-and-mqtt-into-a-niagara-station/",
    "inLanguage": "en-GB",
-   "keywords": "Integration, MQTT, Drivers",
+   "keywords": "Integration, LoRaWAN, MQTT",
    "isAccessibleForFree": true,
-   "datePublished": "2026-09-23",
-   "dateModified": "2026-09-23",
+   "datePublished": "2026-09-26",
+   "dateModified": "2026-09-26",
    "author": {
     "@id": "https://plantroomlabs.com/#org"
    },
    "publisher": {
     "@id": "https://plantroomlabs.com/#org"
    },
-   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-mqtt-driver/"
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/lorawan-and-mqtt-into-a-niagara-station/"
   },
   {
    "@type": "BreadcrumbList",
@@ -187,7 +187,7 @@
     {
      "@type": "ListItem",
      "position": 3,
-     "name": "MQTT"
+     "name": "LoRaWAN & MQTT"
     }
    ]
   }
@@ -223,11 +223,11 @@
 
 <section class="pl-band pl-hero pl-hero--page">
   <div class="pl-wrap">
-    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>MQTT</li></ol></nav>
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>LoRaWAN &amp; MQTT</li></ol></nav>
     <p class="pl-eyebrow">Note</p>
-    <h1>What the Niagara MQTT driver will and will not do</h1>
-    <p class="pl-lede">MQTT is the protocol people reach for when a vendor has a cloud and no driver. Niagara ships one, and it does <strong>less and more</strong> than the name suggests — the surprises are all in the first afternoon.</p>
-    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Integration</li><li class="pl-chip pl-chip--on-dark">MQTT</li><li class="pl-chip pl-chip--on-dark">Drivers</li></ul>
+    <h1>Bringing LoRaWAN and MQTT data into a Niagara station</h1>
+    <p class="pl-lede">A LoRaWAN sensor and an MQTT broker are not the same problem, and neither one ends at <strong>the point most guides stop</strong> — decoding, staleness, and what happens when the link drops.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Integration</li><li class="pl-chip pl-chip--on-dark">LoRaWAN</li><li class="pl-chip pl-chip--on-dark">MQTT</li></ul>
     <p class="pl-hero__meta">Written September 2026</p>
   </div>
 </section>
@@ -235,135 +235,130 @@
 <section class="pl-section">
   <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
       <p class="pl-eyebrow">On this page</p>
-      <ol><li><a href="#licensed-and-capped-below-the-licence">Licensed, and capped below the licence</a></li><li><a href="#what-it-can-carry">What it can carry</a></li><li><a href="#discover-does-not-contact-the-broker">Discover does not contact the broker</a></li><li><a href="#publish-and-subscribe-are-different-components">Publish and subscribe are different components</a></li><li><a href="#the-device-settings-that-decide-whether-it-survives-the-night">The device settings that decide whether it survives the night</a></li><li><a href="#the-order-to-work-in">The order to work in</a></li></ol>
+      <ol><li><a href="#where-the-stock-driver-and-jsontoolkit-stop">Where the stock driver and jsonToolkit stop</a></li><li><a href="#what-arrives-from-a-lorawan-network-server">What arrives from a LoRaWAN network server</a></li><li><a href="#a-battery-sensor-is-not-a-normal-point">A battery sensor is not a normal point</a></li><li><a href="#where-the-payload-decoder-lives">Where the payload decoder lives</a></li><li><a href="#topic-and-payload-design-that-survives-a-firmware-change">Topic and payload design that survives a firmware change</a></li><li><a href="#when-the-uplink-drops">When the uplink drops</a></li><li><a href="#tls-and-per-device-credentials">TLS and per-device credentials</a></li><li><a href="#what-runs-on-the-jace-what-needs-a-supervisor-or-the-cloud">What runs on the JACE, what needs a Supervisor or the cloud</a></li></ol>
     </nav>
-<h2 id="licensed-and-capped-below-the-licence">Licensed, and capped below the licence</h2>
+
+<h2 id="where-the-stock-driver-and-jsontoolkit-stop">Where the stock driver and jsonToolkit stop</h2>
 <div class="pl-body">
-  <p>The <code>abstractMqttDriver</code> module is a licensed feature. Open License
-     Manager and look for the feature by name: if it is absent, the palette will still
-     open and the network will still install, and nothing will work. That is worth
-     confirming before a design depends on it.</p>
-  <p>There is a second ceiling underneath the licence. Since 4.10u10 and 4.14u1 the
-     driver applies a default device connection limit of <strong>25 on a JACE and 50 on
-     a Supervisor</strong>, regardless of what the GlobalCapacity licence allows. The
-     limit exists to protect driver performance, and only the Supervisor's is
-     configurable — to a maximum of 500. A design that assumed one MQTT device per
-     tenant meter is the design that discovers this.</p>
+<p>The abstractMqttDriver module gets a working MQTT client: publish and subscribe
+   points, four scalar data types, TLS on the connection. What it does and does not do
+   is covered in a separate note, worth reading first if the driver itself is the
+   question. jsonToolkit, in the box since 4.8, gets the other half: a JSON document
+   can be picked apart into a Niagara point tree without writing Java for it, as long
+   as its shape is known and stable.</p>
+<p>Both stop at the edge of what a specification can predict. A LoRaWAN payload is not
+   JSON: it usually arrives as bytes packed to save airtime, decoded against a
+   per-device or per-product codec living outside Niagara entirely. A cloud platform's
+   schema is not fixed by Niagara either; it is whatever the consumer has agreed to
+   accept, and that changes over the life of a project. The custom work below starts at
+   that edge, not before it.</p>
 </div>
 
-<div class="pl-note pl-note--warn">
-  <p><strong>Niagara configures the client, never the broker.</strong> There is no
-     broker in the station and none is going to appear. Somebody has to own a broker
-     before any of this is testable, and on most projects working out who is the
-     longest part of the job.</p>
-</div>
-
-<h2 id="what-it-can-carry">What it can carry</h2>
+<h2 id="what-arrives-from-a-lorawan-network-server">What arrives from a LoRaWAN network server</h2>
 <div class="pl-body">
-  <p>Four data types, and no others: Boolean, numeric, string and enum. Anything
-     structured — a JSON document with six fields in it, which is what most vendor
-     cloud topics actually publish — has to be taken apart somewhere. The driver will
-     not do it, so either the publisher changes shape or a module does the parsing, and
-     that decision belongs at design time rather than on site.</p>
-  <p>The device component comes in four kinds. <code>DefaultMqttDevice</code> is the
-     generic client for any broker and is the one to use; <code>AwsMqttDevice</code> and
-     <code>GcpMqttDevice</code> are shaped for AWS IoT and Google Cloud, with their own
-     certificate and RSA-key authenticators, and Azure IoT Hub is reached through a SAS
-     token authenticator on the default device. From 4.14 the default device and
-     authenticator also support client certificate authentication.</p>
-  <p><code>AbstractMqttDevice</code> is the fourth, and it is the one to be careful
-     about: it differs from the others only in that it has <strong>no authenticator at
-     all</strong>, and therefore no communication security. It is a testing component
-     that survives into production because it connects first time.</p>
+<p>A LoRaWAN sensor does not talk to Niagara. It talks to a gateway, the gateway talks
+   to a network server, and the network server is the thing with the MQTT or webhook
+   output: separate software, running separately, with its own account and format.
+   What lands on that output per message is a device EUI, a frame counter, radio
+   metadata, and a payload of raw bytes, usually base64 or hex encoded — none of it an
+   engineering value yet.</p>
+<p>Getting from there to a Niagara point means two decisions made once, at design time:
+   which network server's uplink shape to build against, since they are not identical,
+   and whether the decoder that turns bytes into a temperature or a battery percentage
+   runs on the network-server side, as a per-device codec, or on the Niagara side, as
+   part of the driver logic. Both are workable; picking one late, after devices are
+   already in the field, is the expensive version of this decision.</p>
 </div>
 
-<h2 id="discover-does-not-contact-the-broker">Discover does not contact the broker</h2>
+<h2 id="a-battery-sensor-is-not-a-normal-point">A battery sensor is not a normal point</h2>
 <div class="pl-body">
-  <p>This is the one that wastes an afternoon. The Mqtt Client Driver Point Manager has
-     a Discover button, and pressing it opens the <strong>BQL Query Builder</strong>.
-     It runs a query against points in your own station and lists what it finds, so that
-     you can publish them. It does not enumerate topics, it does not ask the broker
-     anything, and no amount of fixing the connection will make it behave like BACnet
-     discovery.</p>
-  <p>Anything arriving <em>from</em> the broker is added by hand, from the
-     <code>abstractMqttDriver</code> palette or the point manager's New button, with the
-     topic typed in. That is not a defect — it follows from MQTT itself, where a broker
-     has no obligation to tell a client what exists — but it does mean a hundred-point
-     integration is a hundred rows of typing, which is what a spreadsheet and the batch
-     editor are for.</p>
+<p>A BACnet AI updates on its own schedule, and its absence is a fault the driver
+   reports. A LoRaWAN sensor reporting every 15 minutes on a battery does not work that
+   way: an uplink that does not arrive is not a fault signal, it is silence, and
+   silence over a duty-cycled radio link is normal often enough that treating every
+   missed interval as an alarm produces a point that is never not in alarm.</p>
+<p>What the point needs instead is a staleness window wider than the reporting
+   interval — three to five missed intervals before anything is flagged — plus a
+   last-seen timestamp kept separate from the value, so a graphic shows a reading and
+   how long ago it arrived. A frame-counter gap is the more useful signal for a lost
+   uplink than a timeout on its own, since it says how many messages were missed.</p>
 </div>
 
-<h2 id="publish-and-subscribe-are-different-components">Publish and subscribe are different components</h2>
+<h2 id="where-the-payload-decoder-lives">Where the payload decoder lives</h2>
 <div class="pl-body">
-  <p>Each data type has a publish extension and a subscribe extension, and they are not
-     interchangeable. Publishing is a wire-sheet act: drop a publish point under the
-     device's <code>Points</code> folder and link the source point's output into it.</p>
+<p>jsonToolkit unpacks a document once its shape is known; it does not write the codec
+   that turns packed bytes into sensor readings and a battery voltage in the first
+   place. That codec is manufacturer-specific: most LoRaWAN device vendors publish one,
+   in JavaScript or as a bit-field spec, and it has to be implemented once for
+   whichever side of the link runs it.</p>
+<p>Running it on the network server, where most support an uploaded codec per device
+   profile, keeps Niagara talking to fully-decoded JSON, which jsonToolkit picks up in
+   the pattern the stock driver already supports. Running it on the Niagara side
+   instead, as a component doing the byte-unpacking itself, is the right call when the
+   network server cannot host custom codecs, or the decoded shape needs to change
+   without touching that configuration. Either is buildable; the network-server side is
+   usually cheaper unless there is a reason it cannot be used.</p>
 </div>
 
-<table class="pl-spec">
-  <thead><tr><th scope="col">Property</th><th scope="col">Publish</th><th scope="col">Subscribe</th></tr></thead>
-  <tbody>
-    <tr><th scope="row">Topic</th><td>Yes</td><td>Yes</td></tr>
-    <tr><th scope="row">QoS</th><td>Yes</td><td>Yes</td></tr>
-    <tr><th scope="row">Retained</th><td>Yes, default true</td><td>&mdash;</td></tr>
-    <tr><th scope="row">Publish Message on Change</th><td>Yes, default true</td><td>&mdash;</td></tr>
-  </tbody>
-</table>
-
+<h2 id="topic-and-payload-design-that-survives-a-firmware-change">Topic and payload design that survives a firmware change</h2>
 <div class="pl-body">
-  <p>A topic is levels separated by forward slashes, and it is typed, not chosen —
-     a typo is a point that never updates and never faults. QoS is per message:
-     <code>0</code> fire and forget, <code>1</code> at least once with confirmation,
-     <code>2</code> exactly once through a four-step handshake. A publisher and a
-     subscriber may use different levels on the same topic.</p>
-  <p><code>Retained</code> defaults to true on publish, which means the broker keeps
-     the last message and hands it to anyone who subscribes later. For plant status
-     that is what you want. For a command topic it is not — a retained command is
-     redelivered to every client that connects, including after a restart.</p>
+<p>A sensor firmware update changing the payload byte layout is routine, not
+   exceptional, over a multi-year deployment. Two habits keep that from becoming a
+   breaking change: carry a version or profile field in the decoded payload so the
+   decoder can branch on it instead of silently misreading bytes that are no longer
+   what they were; and separate the raw-uplink topic from the decoded-value topic, so a
+   decoder change touches one component rather than everything already subscribing to
+   the decoded topic.</p>
+<p>Topic structure itself should follow the same rule as any other MQTT design on
+   Niagara: derive it from tags, not a point name or a device model string that will
+   not survive a hardware swap.</p>
 </div>
 
-<h2 id="the-device-settings-that-decide-whether-it-survives-the-night">The device settings that decide whether it survives the night</h2>
+<h2 id="when-the-uplink-drops">When the uplink drops</h2>
 <div class="pl-body">
-  <ul>
-    <li><strong>Clean Session</strong>, default false, so the session is persistent and
-       the broker delivers queued messages when the client returns. Setting it true
-       throws away everything on every disconnect.</li>
-    <li><strong>Keep Alive</strong> is the longest the client may stay silent. It sends
-       a PINGREQ inside that window and the broker must disconnect it if nothing
-       arrives. It exists specifically to deal with half-open connections — the failure
-       where both ends believe they are connected and nothing is moving.</li>
-    <li><strong>Connection Timeout</strong> caps how long the client waits on a request
-       to the broker.</li>
-    <li><strong>Enable LWT</strong> is <strong>false by default</strong>, so out of the
-       box nothing tells the broker this station has dropped. Turn it on and the last
-       will and testament is published on the client's behalf; Retained for LWT
-       defaults to true, so a late subscriber still learns the station is gone.</li>
-    <li><strong>Send Enum As</strong> chooses between the tag and the ordinal. TAG is
-       the default and is what a human reading the topic wants; an ordinal is what a
-       downstream system expecting a number wants. Changing it later changes every
-       payload.</li>
-  </ul>
+<p>A cellular backhaul on a gateway, or the WAN link out of a JACE, does not stay up
+   indefinitely, and MQTT's own QoS levels only guarantee delivery to whatever is
+   currently connected; they do not record what happened while nobody was connected.
+   Store-and-forward is a design choice layered on top: a local queue that holds
+   readings written during an outage and drains them in order once the link returns,
+   sized to plausible outage lengths, with an explicit answer for what happens if the
+   queue itself fills first — drop oldest, drop newest, or block upstream — as a
+   decision, not a default nobody chose.</p>
+<p>What that queue is built from depends on where it has to live: a persistent local
+   store on the JACE if the controller itself is intermittently reachable, or
+   equivalent buffering on the network-server or gateway side if the break is further
+   upstream, closer to the sensors than to Niagara.</p>
 </div>
 
-<div class="pl-note">
-  <p><strong>Connect does nothing until the address is filled in.</strong> The Connect
-     and Disconnect actions need the broker IP address, the port and a Client ID
-     present on the device first. An action that appears to do nothing is usually a
-     blank field, not a broker problem.</p>
+<h2 id="tls-and-per-device-credentials">TLS and per-device credentials</h2>
+<div class="pl-body">
+<p>The default MQTT device component ships with no authenticator at all: fine for
+   proving a connection works on a bench, dangerous left on a live broker, since
+   anything that can reach the port can publish or subscribe as that device. TLS on
+   the connection, and per-device credentials rather than one shared secret, are worth
+   settling before a station goes live rather than after — a compromised or stolen
+   sensor can then be revoked on its own instead of forcing a broker-wide rotation.</p>
 </div>
 
-<h2 id="the-order-to-work-in">The order to work in</h2>
-<ol class="pl-steps">
-  <li><div><strong>Confirm the licence feature, then the connection count.</strong>
-      Both are cheaper to find now than after the point schedule is agreed.</div></li>
-  <li><div><strong>Settle the payload shape with whoever owns the broker.</strong> Four
-      scalar types is the whole vocabulary; if the topics carry JSON objects, decide
-      then who unpacks them.</div></li>
-  <li><div><strong>Bring one point up in each direction.</strong> One publish, one
-      subscribe, on a real broker. Everything after that is repetition.</div></li>
-  <li><div><strong>Set Keep Alive and LWT before handover</strong>, not after the first
-      silent disconnection.</div></li>
-</ol>
+<h2 id="what-runs-on-the-jace-what-needs-a-supervisor-or-the-cloud">What runs on the JACE, what needs a Supervisor or the cloud</h2>
+<div class="pl-body">
+<p>A JACE is a controller with a fraction of a Supervisor's memory and CPU, and that
+   budget applies to integration work the same way it applies to graphics and history:
+   a JACE can run the MQTT client, a small store-and-forward queue, and a lightweight
+   decoder, but it is the wrong place to aggregate readings from many controllers, or
+   hold a queue sized for a multi-day outage. That belongs on a Supervisor, publishing
+   once for the whole site rather than every controller holding its own broker
+   connection — the same reason the driver's own connection limits push toward one
+   MQTT device per site rather than one per controller.</p>
+<p>Past the broker, the cloud-side schema — what the consumer's platform actually
+   expects a payload to look like — is not a Niagara decision at all; it is agreed with
+   whoever owns that platform, and the Niagara side is built to produce exactly that
+   shape rather than something close to it that needs a translation layer on the other
+   end. Decoders, network-server integration, topic and schema design, and
+   store-and-forward buffering of this kind are scoped as part of
+   <a href="/services/niagara-modules/">custom module and driver development</a>.</p>
+</div>
+
 </div>
 </section>
 
@@ -392,13 +387,13 @@
       <p>REST, MQTT, a relational history database, file export or an HTTP client. Which suits which consumer, and what each one costs you to run.</p>
       <ul class="pl-chips"><li class="pl-chip">Integration</li><li class="pl-chip">Histories</li><li class="pl-chip">MQTT</li></ul>
     </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-tls-certificates/">The certificate on a new JACE</a></h3>
-      <p>Every station starts with a self-signed certificate it generated itself. What that is good for, what it is not, and what breaks on the day it expires.</p>
-      <ul class="pl-chips"><li class="pl-chip">TLS</li><li class="pl-chip">Certificates</li><li class="pl-chip">Commissioning</li></ul>
+      <h3><a href="/notes/niagara-mqtt-driver/">What the Niagara MQTT driver will and will not do</a></h3>
+      <p>It is licensed, it is capped below your licence, it is a client only, and its Discover button never contacts the broker.</p>
+      <ul class="pl-chips"><li class="pl-chip">Integration</li><li class="pl-chip">MQTT</li><li class="pl-chip">Drivers</li></ul>
     </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/lorawan-and-mqtt-into-a-niagara-station/">Bringing LoRaWAN and MQTT data into a Niagara station</a></h3>
-      <p>Where abstractMqttDriver and jsonToolkit stop, and what LoRaWAN decoding, topic design, and store-and-forward buffering add on top.</p>
-      <ul class="pl-chips"><li class="pl-chip">Integration</li><li class="pl-chip">LoRaWAN</li><li class="pl-chip">MQTT</li></ul>
+      <h3><a href="/notes/modbus-register-addressing/">Why a Modbus point reads the wrong register</a></h3>
+      <p>Modbus decimal addressing is zero-based, vendor documentation is not, and the Address Format property decides which of the two you are typing.</p>
+      <ul class="pl-chips"><li class="pl-chip">Modbus</li><li class="pl-chip">Integration</li><li class="pl-chip">Station engineering</li></ul>
     </div></div>
   </div>
 </section>

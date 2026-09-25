@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a Niagara 5 Module Scan Actually Finds</title>
+<meta name="description" content="Reading a module&#x27;s bytecode against Java 25 gives a per-module answer. What it finds, what it cannot tell you, and the false alarms it avoids.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/what-an-n5-module-scan-actually-finds/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="What a Niagara 5 Module Scan Actually Finds">
+<meta property="og:description" content="Reading a module&#x27;s bytecode against Java 25 gives a per-module answer. What it finds, what it cannot tell you, and the false alarms it avoids.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/what-an-n5-module-scan-actually-finds/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What a Niagara 5 Module Scan Actually Finds">
+<meta name="twitter:description" content="Reading a module&#x27;s bytecode against Java 25 gives a per-module answer. What it finds, what it cannot tell you, and the false alarms it avoids.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/what-an-n5-module-scan-actually-finds.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "building automation systems",
+    "BMS integration",
+    "DDC controls",
+    "HVAC controls software",
+    "HVAC plant graphics",
+    "supervisory control",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "founder": {
+    "@type": "Person",
+    "name": "Usama Iqbal",
+    "jobTitle": "Niagara developer"
+   },
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   },
+   "makesOffer": [
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/niagara-modules/#service",
+      "@type": "Service",
+      "name": "Custom Niagara modules and drivers",
+      "serviceType": "Custom software development"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/bajaux-widgets/#service",
+      "@type": "Service",
+      "name": "bajaux web widgets and dashboards",
+      "serviceType": "User interface development"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/px-graphics/#service",
+      "@type": "Service",
+      "name": "PX graphics and standard sheets",
+      "serviceType": "Graphics engineering"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/station-engineering/#service",
+      "@type": "Service",
+      "name": "Station engineering and new controller setup",
+      "serviceType": "Systems engineering"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/workbench-tooling/#service",
+      "@type": "Service",
+      "name": "Workbench tooling and bulk engineering",
+      "serviceType": "Engineering automation"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/niagara-5-migration/#service",
+      "@type": "Service",
+      "name": "Niagara 5 readiness and migration",
+      "serviceType": "Migration and porting"
+     }
+    }
+   ]
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/what-an-n5-module-scan-actually-finds/#article",
+   "headline": "What a static Niagara 5 module scan actually finds",
+   "description": "Reading a module's bytecode against Java 25 gives a per-module answer. What it finds, what it cannot tell you, and the false alarms it avoids.",
+   "url": "https://plantroomlabs.com/notes/what-an-n5-module-scan-actually-finds/",
+   "inLanguage": "en-GB",
+   "keywords": "Migration, Module development, Estate management",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-26",
+   "dateModified": "2026-09-26",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/what-an-n5-module-scan-actually-finds/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "What an N5 scan finds"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+    <details class="pl-menu" data-menu>
+      <summary aria-label="Menu"><span class="pl-menu__bars" aria-hidden="true"></span>Menu</summary>
+      <ul class="pl-menu__panel">
+        <li><a href="/services/">Services</a></li><li><a href="/work/">Work</a></li><li><a href="/services/niagara-5-migration/">Niagara 5</a></li><li><a href="/notes/" aria-current="page">Notes</a></li><li><a href="/faq/">FAQ</a></li><li><a href="/about/">About</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </details>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>What an N5 scan finds</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>What a static Niagara 5 module scan actually finds</h1>
+    <p class="pl-lede">Every removed API leaves a fingerprint in the bytecode of the class that calls it, and the jars are already on your disk. So &ldquo;which of my modules does this break&rdquo; is <strong>a measurement, not an opinion</strong> &mdash; within limits worth being honest about.</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Migration</li><li class="pl-chip pl-chip--on-dark">Module development</li><li class="pl-chip pl-chip--on-dark">Estate management</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#what-the-scan-reads-and-what-it-needs">What the scan reads, and what it needs</a></li><li><a href="#the-rule-categories">The rule categories</a></li><li><a href="#three-findings-the-release-notes-would-have-produced-that-are-not-real">Three findings the release notes would have produced, that are not real</a></li><li><a href="#a-reference-is-not-a-call">A reference is not a call</a></li><li><a href="#why-bundled-libraries-dominate-the-findings">Why bundled libraries dominate the findings</a></li><li><a href="#why-zero-blockers-is-the-normal-result">Why zero blockers is the normal result</a></li><li><a href="#the-class-file-version-question-and-what-it-actually-means">The class-file version question, and what it actually means</a></li><li><a href="#what-the-scan-does-not-tell-you">What the scan does not tell you</a></li><li><a href="#what-you-can-do-yourself-and-when-to-send-a-listing">What you can do yourself, and when to send a listing</a></li></ol>
+    </nav>
+<h2 id="what-the-scan-reads-and-what-it-needs">What the scan reads, and what it needs</h2>
+<div class="pl-body">
+  <p>A Java class file records every type and every member it links against, in a table
+     near the front of the file. That table is not optional and it is not stripped: it is
+     how the JVM resolves anything at all. So for a given jar you can list, exactly, which
+     APIs its code references &mdash; without running it, without source, and without the
+     vendor's cooperation.</p>
+  <p>Three things make that useful rather than merely true for Niagara modules.</p>
+  <p><strong>It recurses into nested jars.</strong> Niagara modules routinely embed
+     third-party libraries as jars inside the module jar. Across the stock 4.15 module set
+     there are several hundred of them. They run on the same JVM, so a scan that stops at
+     the outer jar misses most of what there is to find, and attributes nothing to the
+     module that ships it.</p>
+  <p><strong>It subtracts what the jar provides itself.</strong> A fat jar that bundles a
+     removed API and then references it is self-satisfied &mdash; the reference resolves
+     inside the jar and is not a finding. Without that subtraction the loudest findings on
+     any real module set are false.</p>
+  <p><strong>It reports the class-file version per jar.</strong> Cheap to read, and it
+     answers a different question from the API scan. More on that below.</p>
+  <p>No licence is involved. A licence gates running Workbench and a station; reading a
+     jar already on disk does not.</p>
+</div>
+
+<h2 id="the-rule-categories">The rule categories</h2>
+<div class="pl-body">
+  <p>The rules sort into three severities, and the severities mean something specific
+     about JVM behaviour rather than something vague about risk.</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Severity</th><th scope="col">Means</th><th scope="col">Families</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">blocker</th>
+        <td>The call throws unconditionally, or the class no longer exists.</td>
+        <td>Installing a security manager; reading the subject off the access control
+            context; stopping, suspending or resuming a thread; the Java EE and CORBA
+            packages; the old JavaScript engine; RMI activation; the old ACL package;
+            anything under the JDK's internal packages.</td></tr>
+    <tr><th scope="row">high</th>
+        <td>It still links and still runs, but the meaning changed silently.</td>
+        <td>Privileged blocks that no longer elevate; any branch guarded by
+            &ldquo;is there a security manager&rdquo;, which is now always false;
+            JDK-internal <code>sun.*</code> and <code>com.sun.*</code> packages that load
+            by name but are not accessible; native library loading; the deprecated
+            subject-scoping call.</td></tr>
+    <tr><th scope="row">medium</th>
+        <td>Works today, on notice, or depends on the target.</td>
+        <td>Reflective access that opens a member &mdash; fine on your own classes, an
+            exception into a closed module; finalizers; script engines with no engine left
+            in the JDK; the unsupported-but-exported internal helpers.</td></tr>
+  </tbody>
+</table>
+<div class="pl-body">
+  <p>The distinction that earns its keep is the middle one. A blocker is loud. A silently
+     changed semantic is a module that installs, starts, and does the wrong thing &mdash;
+     and those are all in the <em>high</em> row.</p>
+</div>
+
+<h2 id="three-findings-the-release-notes-would-have-produced-that-are-not-real">Three findings the release notes would have produced, that are not real</h2>
+<div class="pl-body">
+  <p>The rule table above was not written from release notes. It was written from a Java
+     25 JDK sitting on the same machine as the jars, being asked what still exists and
+     what each survivor actually does. That mattered more than expected:
+     <strong>three rules were wrong on the first pass and were corrected from what the JVM
+     did.</strong></p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Assumed from the notes</th><th scope="col">What the JDK does</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">The XA transaction package was removed with Java EE</th>
+        <td><strong>Present.</strong> It survived in a module of its own. This alone had
+            condemned three perfectly healthy database modules.</td></tr>
+    <tr><th scope="row">The applet package is gone</th>
+        <td><strong>Present</strong>, deprecated for removal since Java 9. Worth a note,
+            not a blocker.</td></tr>
+    <tr><th scope="row">The old certificate package was removed</th>
+        <td><strong>Present.</strong> The rule was deleted outright.</td></tr>
+  </tbody>
+</table>
+<div class="pl-body">
+  <p>Every one of those would have produced a confident, wrong, published verdict against
+     somebody's module. A scan's credibility is entirely in how its rules were obtained.
+     Ask that question of any readiness report, including this one: was the rule run, or
+     was it read?</p>
+</div>
+
+<h2 id="a-reference-is-not-a-call">A reference is not a call</h2>
+<div class="pl-body">
+  <p>The second class of false positive is subtler, and no JDK can settle it: a symbol in
+     the constant pool means the class is <em>linked against</em> it, not that the code
+     path is ever reached. Three real examples from the stock module set, each of which
+     looked like a blocker and is not.</p>
+  <p>A bundled graphics library shipped a helper for its own standalone desktop viewer,
+     which installs a security manager. Nothing in the module references that class. It is
+     dead weight in the jar and never loads.</p>
+  <p>A bundled cloud SDK reaches a removed API through a reflective lookup wrapped in a
+     try/catch, with a working pure-Java fallback and a warning log. It degrades. It does
+     not break.</p>
+  <p>A module contains a nested jar that is a browser-side download &mdash; served to a
+     client, never loaded by the station JVM at all. Its bytecode is irrelevant to the
+     station and its findings are noise.</p>
+  <p>So a scan's output is a <strong>must-review list, not a failure list</strong>, except
+     where the JDK now throws unconditionally. Turning a review item into a verdict takes
+     a decompiler at the call site, and that step is where a first pass of five blockers
+     became two.</p>
+</div>
+
+<h2 id="why-bundled-libraries-dominate-the-findings">Why bundled libraries dominate the findings</h2>
+<div class="pl-body">
+  <p>Run this across a real set of commercial third-party modules and the shape of the
+     output is consistent: the findings are overwhelmingly in the libraries the module
+     bundles, not in the code the vendor wrote.</p>
+  <p>There is a good reason for it. A driver's own classes mostly talk to the framework's
+     component, device and point API, which is old, stable and uses nothing the JVM has
+     touched. The JSON parser, the logging facade, the crypto provider, the HTTP client
+     and the compression library bundled alongside it are general-purpose code, and
+     general-purpose code is exactly what reflects on itself, probes for optional APIs and
+     interacts with the security manager.</p>
+  <p>Across eighteen shipping jars from one commercial catalogue: <strong>34 findings and
+     zero blockers</strong>, with almost every row belonging to a bundled library rather
+     than the vendor's own classes. The practical reading is that the work is
+     <em>recompile, bump the bundled libraries, re-sign</em> &mdash; a release cycle, not a
+     rewrite.</p>
+</div>
+
+<h2 id="why-zero-blockers-is-the-normal-result">Why zero blockers is the normal result</h2>
+<div class="pl-body">
+  <p>It is worth saying plainly, because the framing around a major version change invites
+     the opposite assumption: <strong>a well-built module usually scans clean.</strong>
+     Two modules built in this workshop return no findings on any rule, and that is not
+     cleverness &mdash; it is the consequence of a small API surface, pure Java with
+     JavaScript and CSS resources, no native code, no reflection and no security-manager
+     interaction. Most competently built modules look similar.</p>
+  <p>The blockers that do exist are in the framework's own core, and that is the honest
+     commercial message. Nobody ports around them; everybody waits on the same edit,
+     equally. Which also means the reverse is worth distrusting: a plan that assumes your
+     competitors will fail to port is planning on the wrong thing. They will port.</p>
+</div>
+
+<h2 id="the-class-file-version-question-and-what-it-actually-means">The class-file version question, and what it actually means</h2>
+<div class="pl-body">
+  <p>Separate from the API scan, every jar has a spread of class-file versions, and a very
+     old one is a genuine signal. It is worth being exact about what it signals, because
+     the obvious guess is wrong.</p>
+  <p>The obvious guess is that a modern JVM refuses old bytecode. Measured on a Java 25
+     JDK, it does not: class files are accepted from the oldest format the JVM has ever
+     supported upward, including through the old verification path with branching and
+     exception handlers. One format version older than that is rejected with an explicit
+     unsupported-class-version error. So a class from the framework's ancestry era, buried
+     in a bundled library, <strong>loads</strong>.</p>
+  <p>The real problem is on the build side. A Java 25 compiler <strong>refuses to target
+     Java 6 or 7 at all</strong>, and warns that its support for Java 8 is obsolete and
+     will be removed. So a module carrying a pre-Java-6 class inside a bundled library is
+     not facing a load failure &mdash; it is facing a maintenance dead end: no current
+     toolchain can rebuild that library, and if nobody can rebuild it, nobody can fix it.
+     One shipping module in a commercial catalogue carries exactly that, and there is no
+     reason to think its vendor knows, because the class is not theirs. It arrived inside
+     a dependency chosen a long time ago.</p>
+</div>
+<div class="pl-note">
+  <p><strong>The check that costs nothing.</strong> List the class-file versions in every
+     jar in a <code>modules/</code> folder. Anything well below the framework's own level
+     is a bundled library nobody has revisited in a decade, and it is worth knowing which
+     module ships it before a migration date is agreed.</p>
+</div>
+
+<h2 id="what-the-scan-does-not-tell-you">What the scan does not tell you</h2>
+<div class="pl-body">
+  <p>This is the limit, and it is a hard one. The scan measures <strong>one</strong>
+     change: the move off Java 8, and whether a given module's bytecode survives it. It
+     says nothing about framework API changes, manifest schema changes, repackaging, or
+     anything rewritten for reasons unrelated to the JVM. A module that passes every rule
+     can still fail to compile against a new SDK.</p>
+  <p>And the reason it cannot say more is simple: <strong>there is no Niagara 5 build to
+     test against.</strong> Pre-release access runs through the vendor's own developer
+     programme, there is no public download, and nothing on a bench here runs it. So any
+     statement that a module is N5-ready &mdash; ours, a vendor's, or one in a readiness
+     report &mdash; is <strong>static analysis against a Java 25 JDK, not a test on a
+     Niagara 5 build</strong>. Treat a supplier who does not draw that distinction with
+     more suspicion than one who does.</p>
+</div>
+
+<h2 id="what-you-can-do-yourself-and-when-to-send-a-listing">What you can do yourself, and when to send a listing</h2>
+<div class="pl-body">
+  <p>Most of the first pass is genuinely a do-it-yourself job, and it is better done early
+     by whoever knows the estate than late by somebody who does not.</p>
+</div>
+<ol class="pl-steps">
+  <li><div><strong>List the modules folder.</strong> Every jar, every station. This alone
+      surprises people: estates carry modules nobody remembers installing.</div></li>
+  <li><div><strong>Read each jar's manifest.</strong> Vendor, module name, version, and the
+      framework version it is stamped against. That is your inventory, and it is
+      machine-readable rather than remembered.</div></li>
+  <li><div><strong>Check the signature state.</strong> A module that is unsigned, or signed
+      by a certificate the target host does not trust, has a problem independent of
+      anything to do with Java versions &mdash; and mandatory signing is one of the
+      announced changes.</div></li>
+  <li><div><strong>Check class-file versions.</strong> Cheap, and it finds the
+      maintenance dead ends described above.</div></li>
+</ol>
+<div class="pl-body">
+  <p>What takes longer than it looks is the rest: recursing into nested jars, telling a
+     live call site from a dead one, and knowing which of twenty rules are real on a
+     current JDK rather than plausible from a changelog. That is the part where a first
+     pass of five blockers turns out to be two.</p>
+  <p>So: if the estate is a handful of modules, do it yourself with the four steps above
+     and you will have most of the answer. If it is more than that, or you want the verdict
+     written down in a form you can hand to a client or put in a capital plan, send the
+     listing. That scan is free, and what comes back is a table &mdash; one row per module,
+     findings by severity, class-file version, signing state, and a plain verdict.</p>
+</div>
+
+<p>The companion note covers the one break that is not in anybody's published
+change list: <a href="/notes/niagara-module-permissions-on-java-25/">what Java 25 does to
+Niagara's module permission model</a>. For the audit and porting work itself, see
+<a href="/services/niagara-5-migration/">Niagara 5 migration</a>.</p>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l8 4v6c0 4.6-3.3 8.3-8 9.5-4.7-1.2-8-4.9-8-9.5v-6z"/><path d="M9 12l2.2 2.2L15.5 10"/></svg></span>
+        <h3><a href="/services/niagara-5-migration/">Niagara 5 migration</a></h3>
+        <p>Niagara 5 readiness audits and migration, including JACE 8000 to JACE 9000: which third-party modules survive the new runtime and mandatory signing.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span>
+        <h3><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></h3>
+        <p>Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/n4-to-n5-third-party-modules/">What happens to third-party modules moving from N4 to N5</a></h3>
+      <p>A module with no Niagara 5 build can stop the migrator outright, and one that has a build can still fail to load. What breaks, and why.</p>
+      <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Estate management</li><li class="pl-chip">Module development</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/ax-to-n4-migration/">What actually blocks an AX to N4 migration</a></h3>
+      <p>A station cannot migrate until every module it uses has been refactored for Niagara 4 — and licences, users and permissions all change shape on the way.</p>
+      <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Estate management</li><li class="pl-chip">Module development</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-permissions-on-java-25/">What Java 25 does to Niagara's module permission model</a></h3>
+      <p>Niagara's module permission model is built on Java's Security Manager. On a Java 25 JVM it cannot be installed, so the checks stop happening.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Station security</li><li class="pl-chip">Migration</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com?subject=Niagara%20enquiry&body=Niagara%20version%3A%20%0ATarget%20hardware%20(JACE%20%2F%20Supervisor%20%2F%20PC)%3A%20%0AVerification%20mode%20(medium%20%2F%20high%20%2F%20not%20sure)%3A%20%0A%0AWhat%20it%20has%20to%20do%3A%20%0A">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent <a href="/services/building-automation/">building automation</a>
+          software on the Niagara Framework: custom modules, bajaux widgets, PX graphics,
+          station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/services/building-automation/">Building automation</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+<!-- Cookieless, no personal data, no consent banner needed. -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4b22c0dd7f50413da48d0286988da559"}'></script>
+</body>
+</html>

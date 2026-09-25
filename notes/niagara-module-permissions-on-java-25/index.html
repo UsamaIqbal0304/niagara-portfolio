@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Java 25 Does to Niagara Module Permissions</title>
+<meta name="description" content="Niagara&#x27;s module permission model is built on Java&#x27;s Security Manager. On a Java 25 JVM it cannot be installed, so the checks stop happening.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/niagara-module-permissions-on-java-25/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="What Java 25 Does to Niagara Module Permissions">
+<meta property="og:description" content="Niagara&#x27;s module permission model is built on Java&#x27;s Security Manager. On a Java 25 JVM it cannot be installed, so the checks stop happening.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/niagara-module-permissions-on-java-25/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Java 25 Does to Niagara Module Permissions">
+<meta name="twitter:description" content="Niagara&#x27;s module permission model is built on Java&#x27;s Security Manager. On a Java 25 JVM it cannot be installed, so the checks stop happening.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/niagara-module-permissions-on-java-25.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "building automation systems",
+    "BMS integration",
+    "DDC controls",
+    "HVAC controls software",
+    "HVAC plant graphics",
+    "supervisory control",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "founder": {
+    "@type": "Person",
+    "name": "Usama Iqbal",
+    "jobTitle": "Niagara developer"
+   },
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   },
+   "makesOffer": [
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/niagara-modules/#service",
+      "@type": "Service",
+      "name": "Custom Niagara modules and drivers",
+      "serviceType": "Custom software development"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/bajaux-widgets/#service",
+      "@type": "Service",
+      "name": "bajaux web widgets and dashboards",
+      "serviceType": "User interface development"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/px-graphics/#service",
+      "@type": "Service",
+      "name": "PX graphics and standard sheets",
+      "serviceType": "Graphics engineering"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/station-engineering/#service",
+      "@type": "Service",
+      "name": "Station engineering and new controller setup",
+      "serviceType": "Systems engineering"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/workbench-tooling/#service",
+      "@type": "Service",
+      "name": "Workbench tooling and bulk engineering",
+      "serviceType": "Engineering automation"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/niagara-5-migration/#service",
+      "@type": "Service",
+      "name": "Niagara 5 readiness and migration",
+      "serviceType": "Migration and porting"
+     }
+    }
+   ]
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/niagara-module-permissions-on-java-25/#article",
+   "headline": "What Java 25 does to Niagara's module permission model",
+   "description": "Niagara's module permission model is built on Java's Security Manager. On a Java 25 JVM it cannot be installed, so the checks stop happening.",
+   "url": "https://plantroomlabs.com/notes/niagara-module-permissions-on-java-25/",
+   "inLanguage": "en-GB",
+   "keywords": "Module development, Station security, Migration",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-26",
+   "dateModified": "2026-09-26",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/niagara-module-permissions-on-java-25/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Module permissions on Java 25"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+    <details class="pl-menu" data-menu>
+      <summary aria-label="Menu"><span class="pl-menu__bars" aria-hidden="true"></span>Menu</summary>
+      <ul class="pl-menu__panel">
+        <li><a href="/services/">Services</a></li><li><a href="/work/">Work</a></li><li><a href="/services/niagara-5-migration/">Niagara 5</a></li><li><a href="/notes/" aria-current="page">Notes</a></li><li><a href="/faq/">FAQ</a></li><li><a href="/about/">About</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </details>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Module permissions on Java 25</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>What Java 25 does to Niagara's module permission model</h1>
+    <p class="pl-lede">A module asks for privilege in its manifest, and the framework grants or refuses it through Java's <code>Policy</code> and <code>SecurityManager</code>. On a Java 25 JVM neither can be installed &mdash; so those checks do not start failing. <strong>They stop happening.</strong></p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Module development</li><li class="pl-chip pl-chip--on-dark">Station security</li><li class="pl-chip pl-chip--on-dark">Migration</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#how-a-module-asks-for-privilege-today">How a module asks for privilege today</a></li><li><a href="#what-a-java-25-jvm-does-to-that-machinery">What a Java 25 JVM does to that machinery</a></li><li><a href="#the-checks-do-not-fail-they-disappear">The checks do not fail, they disappear</a></li><li><a href="#two-places-where-it-is-worse-than-a-no-op">Two places where it is worse than a no-op</a></li><li><a href="#what-this-means-if-you-write-modules">What this means if you write modules</a></li><li><a href="#how-this-was-measured-so-you-can-repeat-it">How this was measured, so you can repeat it</a></li><li><a href="#what-to-ask-the-developer-program">What to ask the Developer Program</a></li><li><a href="#what-this-does-and-does-not-prove">What this does and does not prove</a></li></ol>
+    </nav>
+<h2 id="how-a-module-asks-for-privilege-today">How a module asks for privilege today</h2>
+<div class="pl-body">
+  <p>Niagara 4 has a real, documented privilege model for module code, and most people
+     who write modules have never had to look at it, because the framework asks for the
+     permissions on their behalf. Tridium's developer documentation describes it plainly:
+     Niagara 4 introduced the use of Java's Security Manager to restrict who may run
+     certain sections of code, and from 4.2 onward the policy is determined by the
+     contents of a module's own manifest, in which a module requests the permissions it
+     needs.</p>
+  <p>Read off the bytecode, the machinery is a custom <code>java.security.Policy</code>
+     subclass installed by the runtime environment, plus a hierarchy of permission-group
+     classes in the core framework jar. There are <strong>26 named permission groups</strong> a
+     module may request, and the list is a reasonable index of what a module can do that
+     matters: authentication, backups and restore, key store access, loading libraries,
+     reflection, network communication, modifying IO streams, modifying session IDs,
+     managing execution, shutdown hooks, setting system time, system properties, signing,
+     reading environment variables, getting the authenticated user, database connections,
+     MBean access, diagnostics, logging, runtime execution.</p>
+  <p>Two of those groups already require the module to be signed before the request is
+     honoured at all. That detail matters later.</p>
+</div>
+
+<h2 id="what-a-java-25-jvm-does-to-that-machinery">What a Java 25 JVM does to that machinery</h2>
+<div class="pl-body">
+  <p>The Security Manager was deprecated for removal, then permanently disabled. On a
+     current JVM the relevant calls behave like this &mdash; measured by running them,
+     not read off a release note:</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">Call</th><th scope="col">What it does on Java 25</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">System.getSecurityManager()</th>
+        <td>Returns <code>null</code>. Always, with no way to change it.</td></tr>
+    <tr><th scope="row">System.setSecurityManager(sm)</th>
+        <td>Throws <code>UnsupportedOperationException</code> &mdash; including when the
+            argument is <code>null</code>, so even code whose only intent is to
+            <em>disable</em> the manager now throws.</td></tr>
+    <tr><th scope="row">Policy.setPolicy(p)</th>
+        <td>Throws <code>UnsupportedOperationException</code>. A custom
+            <code>Policy</code> can be written, compiled and shipped; it can never be
+            installed.</td></tr>
+    <tr><th scope="row">AccessController.doPrivileged(a)</th>
+        <td>Runs the action. It does not elevate anything, because there is no longer
+            anything to elevate past.</td></tr>
+    <tr><th scope="row">Subject.getSubject(context)</th>
+        <td>Throws <code>UnsupportedOperationException</code>.</td></tr>
+    <tr><th scope="row">Subject.current()</th>
+        <td>Works. This is the replacement, and it sees a subject established by either
+            the old <code>doAs</code> or the new <code>callAs</code>.</td></tr>
+  </tbody>
+</table>
+<div class="pl-body">
+  <p>So the permission model has no JDK left to stand on. Not "needs porting" &mdash; the
+     two entry points it is built on both throw.</p>
+</div>
+
+<h2 id="the-checks-do-not-fail-they-disappear">The checks do not fail, they disappear</h2>
+<div class="pl-body">
+  <p>This is the part worth being precise about, because it is the opposite of what a
+     removal usually does. The framework-wide idiom at a check site is: fetch the
+     security manager, and if it is not null, ask it to check a permission. On Java 8 the
+     manager is there and the check runs. On Java 25 the manager is null, the
+     <code>if</code> is false, and execution continues straight past into the guarded
+     work.</p>
+  <p>Scanning the 4.15 module set on disk, <strong>31 stock modules carry that
+     pattern</strong>, and the list reads like an index of the security surface: the core
+     framework jar, the platform layer, platform crypto, the signing service, client
+     certificate authentication, SAML, the web and servlet layers, fox, tunnelling,
+     backup, the cloud connectors, email, the OPC UA server, the system database, the
+     HTTP client, and Workbench itself. Four representative examples, decompiled, guard
+     platform initialisation, the station's signing password, the signing service, and
+     the station's password-encryption key.</p>
+</div>
+<div class="pl-note pl-note--warn">
+  <p><strong>The code still runs. The permission layer is simply not there.</strong> A
+     module that would have been refused a permission is not refused; nothing logs, and
+     nothing looks broken.</p>
+</div>
+<div class="pl-body">
+  <p>To be clear about what this is and is not: <strong>this is not a live hole in
+     anything shipping today.</strong> Niagara 4 runs on Java 8, where the layer works
+     exactly as documented. It is a statement about what has to be rebuilt before the
+     framework runs on a modern JVM &mdash; and rebuilding it is the framework vendor's
+     work, not a module author's.</p>
+</div>
+
+<h2 id="two-places-where-it-is-worse-than-a-no-op">Two places where it is worse than a no-op</h2>
+<div class="pl-body">
+  <p>A silently-skipped check at least keeps running. Two calls in the framework's own
+     core do not: they throw where they used to return.</p>
+  <p>Both are the same call &mdash; reading the authenticated subject off the access
+     control context. One is in the runtime environment's security utility class. The
+     other is the core framework's session manager, in the method that answers "who is
+     the current user". Its blast radius is the whole web and UI session stack: the web
+     and servlet layers, bajaux, the legacy HX views, the HTTP client, backup views.</p>
+  <p>And it is <strong>documented public API for module developers</strong>. The developer
+     documentation's own guidance on CSRF protection tells you to fetch the current
+     session and read its CSRF token off it. Any third-party module that followed that
+     advice throws on a Java 25 JVM &mdash; not because the module is badly written, but
+     because it did what the documentation said.</p>
+  <p>The fix is mechanical: <code>Subject.current()</code> replaces
+     <code>Subject.getSubject(...)</code> and works under both the old and the new
+     scoping calls. But it is a one-line fix <em>inside the framework's own jars</em>, so
+     no amount of work on a third-party module makes that call site safe. Everybody waits
+     on the same edit.</p>
+</div>
+
+<h2 id="what-this-means-if-you-write-modules">What this means if you write modules</h2>
+<div class="pl-body">
+  <p>Four practical consequences, in the order they are likely to bite.</p>
+  <p><strong>The documented way to request privilege has no announced replacement.</strong>
+     The published breaking-change material for the next major version says, on this
+     subject, that the Security Manager is removed. It does not say what a module uses
+     instead to request a permission, or what happens to a manifest that asks for one.
+     That is the single biggest open question for anyone maintaining a module catalogue,
+     and it is not answerable from public material.</p>
+  <p><strong>Do not build new work on it.</strong> If a design depends on being granted a
+     permission group, or on <code>doPrivileged</code> actually elevating, it depends on a
+     mechanism with no forward path. A module that needs no permission group at all has
+     one fewer unknown in it, and in practice a module that sticks to the old, stable part
+     of the component and driver API needs none.</p>
+  <p><strong>Two specific calls to stop writing now.</strong> Reading the subject off the
+     access control context, and the session manager call above. Both have replacements
+     that already work on Java 8, so moving off them costs nothing and removes a
+     guaranteed failure later. Likewise, the old subject-scoping call still works but is
+     deprecated for removal; the newer one is a drop-in.</p>
+  <p><strong>A guess, labelled as one.</strong> Two permission groups already require a
+     signed module, and the next major version makes a valid signature mandatory for
+     every module. The most likely shape of the replacement is therefore
+     signature-at-load-time rather than permission-at-call-time. That is inference, not
+     information. The measured part is only that the current mechanism cannot work.</p>
+</div>
+
+<h2 id="how-this-was-measured-so-you-can-repeat-it">How this was measured, so you can repeat it</h2>
+<div class="pl-body">
+  <p>No licence and no pre-release access is involved, which is the point. A Niagara
+     licence gates <em>running</em> Workbench and a station. It does not gate reading a
+     jar that is already on your disk, and it does not gate running a JDK.</p>
+  <p>Three steps.</p>
+</div>
+<ol class="pl-steps">
+  <li><div><strong>Put a real Java 25 JDK next to the install.</strong> Not as a runtime
+      for Niagara &mdash; nothing runs on it. It is there to be asked questions.</div></li>
+  <li><div><strong>Ask it what each API actually does.</strong> A short program that calls
+      every API in question inside its own try/catch and prints the outcome, plus a second
+      one that simply asks whether each package still resolves. That output is the
+      evidence; the rule table is written from it.</div></li>
+  <li><div><strong>Read the jars' constant pools.</strong> Every class records the types
+      and members it links against. Walk them and you get, per module, the exact list of
+      removed or changed APIs it touches &mdash; then confirm each hit at the call site
+      with a decompiler before believing it.</div></li>
+</ol>
+<div class="pl-note">
+  <p><strong>Why the third step needs the second.</strong> The first pass of this scan
+     produced five blockers. Three were wrong because the rules came from release notes
+     rather than from the JVM, and two more were wrong because a reference in a constant
+     pool is not a call that ever runs. Running a real JDK and a decompiler removed all
+     five. A finding that has not survived both steps is a guess with a severity label
+     on it.</p>
+</div>
+
+<h2 id="what-to-ask-the-developer-program">What to ask the Developer Program</h2>
+<div class="pl-body">
+  <p>If you hold a developer membership, these are the questions whose answers are not in
+     public material, and they are worth asking in writing:</p>
+</div>
+<ul>
+  <li>What replaces a module's permission request? Is the manifest element retained,
+      ignored, or an error?</li>
+  <li>Are the 26 permission groups enforced by any other mechanism, or is module code now
+      simply trusted once its signature verifies?</li>
+  <li>Has the session-manager call that reads the current user been changed to the
+      supported replacement, and in which pre-release build?</li>
+  <li>Is there a supported way for a module to learn the authenticated user, given the old
+      route throws?</li>
+  <li>Does the documentation that tells module authors to use that call get updated, and
+      when?</li>
+</ul>
+
+<h2 id="what-this-does-and-does-not-prove">What this does and does not prove</h2>
+<div class="pl-body">
+  <p><strong>Measured.</strong> What a Java 25 JVM does to each API, by running it. Which
+     modules in the 4.15 set on disk touch those APIs, by reading their bytecode. That the
+     permission model's two installation points both throw.</p>
+  <p><strong>Not measured, and not claimable.</strong> Anything about how the next major
+     version actually behaves. <strong>No Niagara 5 build exists to test against</strong>
+     &mdash; pre-release access runs through the vendor's own programme and there is no
+     public download &mdash; so every statement here is
+     <strong>static analysis against a Java 25 JDK, not a test on a Niagara 5
+     build</strong>. It says nothing about API changes, manifest schema changes, or
+     repackaging done for other reasons. A module that passes a scan like this can still
+     fail to compile against a new SDK.</p>
+  <p>That is a narrower claim than "N5-ready", and it is the one that can be backed up.</p>
+</div>
+
+<p>The companion note covers what a scan like this finds across a real module set, and
+what it cannot tell you: <a href="/notes/what-an-n5-module-scan-actually-finds/">what an
+N5 module scan actually finds</a>. For the audit and porting work itself, see
+<a href="/services/niagara-5-migration/">Niagara 5 migration</a>.</p>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l8 4v6c0 4.6-3.3 8.3-8 9.5-4.7-1.2-8-4.9-8-9.5v-6z"/><path d="M9 12l2.2 2.2L15.5 10"/></svg></span>
+        <h3><a href="/services/niagara-5-migration/">Niagara 5 migration</a></h3>
+        <p>Niagara 5 readiness audits and migration, including JACE 8000 to JACE 9000: which third-party modules survive the new runtime and mandatory signing.</p></div><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span>
+        <h3><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></h3>
+        <p>Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/n4-to-n5-third-party-modules/">What happens to third-party modules moving from N4 to N5</a></h3>
+      <p>A module with no Niagara 5 build can stop the migrator outright, and one that has a build can still fail to load. What breaks, and why.</p>
+      <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Estate management</li><li class="pl-chip">Module development</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/what-an-n5-module-scan-actually-finds/">What a static Niagara 5 module scan actually finds</a></h3>
+      <p>Reading a module's bytecode against Java 25 gives a per-module answer. What it finds, what it cannot tell you, and the false alarms it avoids.</p>
+      <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Module development</li><li class="pl-chip">Estate management</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/ax-to-n4-migration/">What actually blocks an AX to N4 migration</a></h3>
+      <p>A station cannot migrate until every module it uses has been refactored for Niagara 4 — and licences, users and permissions all change shape on the way.</p>
+      <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Estate management</li><li class="pl-chip">Module development</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com?subject=Niagara%20enquiry&body=Niagara%20version%3A%20%0ATarget%20hardware%20(JACE%20%2F%20Supervisor%20%2F%20PC)%3A%20%0AVerification%20mode%20(medium%20%2F%20high%20%2F%20not%20sure)%3A%20%0A%0AWhat%20it%20has%20to%20do%3A%20%0A">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent <a href="/services/building-automation/">building automation</a>
+          software on the Niagara Framework: custom modules, bajaux widgets, PX graphics,
+          station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/services/building-automation/">Building automation</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+<!-- Cookieless, no personal data, no consent banner needed. -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4b22c0dd7f50413da48d0286988da559"}'></script>
+</body>
+</html>
