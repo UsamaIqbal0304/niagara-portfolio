@@ -32,6 +32,13 @@ TAGLINE    = "Niagara Framework engineering"
 # The one published address. A Workspace alias on the admin mailbox rather
 # than its own seat, so it costs nothing; the seat is what gets billed.
 EMAIL      = "info@plantroomlabs.com"
+# The four things /contact/ asks for, pre-typed into the compose window so an
+# enquiry starts as a form to fill rather than a blank page to write.
+ENQUIRY    = (f"mailto:{EMAIL}?subject=Niagara%20enquiry"
+              "&body=Niagara%20version%3A%20%0A"
+              "Target%20hardware%20(JACE%20%2F%20Supervisor%20%2F%20PC)%3A%20%0A"
+              "Verification%20mode%20(medium%20%2F%20high%20%2F%20not%20sure)%3A%20%0A%0A"
+              "What%20it%20has%20to%20do%3A%20%0A")
 TODAY      = date.today().isoformat()
 OUT        = os.path.dirname(os.path.abspath(__file__))
 
@@ -451,6 +458,7 @@ ORG = {
     ],
     "areaServed": {"@type": "Place", "name": "Worldwide (remote)"},
     "availableLanguage": "en",
+    "founder": {"@type": "Person", "name": "Usama Iqbal", "jobTitle": "Niagara developer"},
     "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "sales",
@@ -499,6 +507,8 @@ SERVICES = [
         "<strong>ux</strong> modules written against the Baja API, signed, and stamped to "
         "install across a mixed estate."),
   chips=["Baja API", "rt / wb / ux", "Pure Java", "Signed modules", "Source on request"],
+  close=('Send the protocol document and the point list.',
+         'A day of reading them is usually enough to say whether this is a driver, a stock feature you have not found, or a job that should not be a module at all. That answer costs nothing.'),
   body="""
 <h2>What this covers</h2>
 <div class="pl-grid pl-grid--2" style="margin-top:var(--pl-s-9)">
@@ -574,6 +584,8 @@ SERVICES = [
         "Bound to real ORDs and BQL history, <strong>responsive by construction</strong>, "
         "and themed so the graphics look like your company rather than like 2011."),
   chips=["bajaux", "BajaScript", "HTML5", "Live ORD binding", "BQL history", "Light + dark"],
+  close=('Send one PX sheet and the view you wish it were.',
+         'A screenshot of the graphic you have now and a sentence about what it should do instead is enough to scope a widget package: how many components, which are new, which are re-skins, and what it comes to as one fixed price.'),
   body="""
 <h2>Why bajaux rather than more PX widgets</h2>
 <div class="pl-body" style="margin-top:var(--pl-s-7)">
@@ -637,6 +649,8 @@ SERVICES = [
         "problem: eighty sheets that were copied, hand-edited and now disagree. The fix is a "
         "small set of bindable standard sheets and a rule for applying them."),
   chips=["PX templates", "Relative ORDs", "Nav hierarchy", "Graphics standard", "Retrofit"],
+  close=('Send the plant list and one of the duplicated sheets.',
+         'How many sheet types your estate actually needs is a countable question, and counting it is the first hour of the job. You get the count, the sheet list and a fixed price against it, whether or not you proceed.'),
   body="""
 <h2>The duplication problem</h2>
 <div class="pl-body" style="margin-top:var(--pl-s-7)">
@@ -706,6 +720,8 @@ SERVICES = [
         "security, histories and backups — is the half that decides whether the site is "
         "maintainable in year three."),
   chips=["Platform commissioning", "TLS / certificates", "BACnet & Modbus", "Tagging", "Histories", "Backups"],
+  close=('Send the equipment schedule and the controller list.',
+         'Station work is priced from what is being connected and how many points it carries, so those two documents are usually enough for a fixed price rather than a range.'),
   body="""
 <h2>New station, end to end</h2>
 <ol class="pl-steps" style="margin-top:var(--pl-s-10)">
@@ -767,6 +783,8 @@ SERVICES = [
         "applying tags by hand, auditing a station before a migration. "
         "<strong>Tools your engineers run themselves</strong>, inside Workbench."),
   chips=["Bulk rename", "Retagging", "Station audit", "Provisioning", "BQL", "Repeatable"],
+  close=('Tell us what the repetitive job is, and how many times a year it happens.',
+         'Bulk tooling pays for itself or it does not, and that is arithmetic rather than opinion. If the tool costs more than the engineer-days it saves, you will be told so.'),
   body="""
 <h2>The economics</h2>
 <div class="pl-body" style="margin-top:var(--pl-s-7)">
@@ -777,7 +795,7 @@ SERVICES = [
      until somebody's concentration lapses on row 1,900.</p>
 </div>
 
-<h2 style="margin-top:var(--pl-s-13)">Tools commonly asked for</h2>
+<h2 style="margin-top:var(--pl-s-13)">The tools worth building</h2>
 <div class="pl-grid pl-grid--2" style="margin-top:var(--pl-s-9)">
   <div class="pl-card"><h3>Bulk rename and retag</h3>
     <p>Pattern-driven renaming and tagging across a station or a Niagara Network, with a
@@ -826,8 +844,13 @@ SERVICES = [
   lede=("Niagara 5 changes three things that break modules: <strong>Java 21</strong>, "
         "<strong>mandatory signatures with no grace period</strong>, and "
         "<strong>hardware</strong> — it does not run on a JACE-8000 at all. The first useful "
-        "step is finding out which of your modules actually survive."),
+        "step is finding out which of your modules actually survive. Nothing stops working "
+        "in 2026; the reason to start now is that the inventory is the input to next "
+        "year's capital plan, and controller replacement has a lead time rather than a "
+        "switch."),
   chips=["Java 8 → 21", "Mandatory signing", "JACE-8000 → 9000", "Module inventory", "Porting"],
+  close=('Send a module list, or say you do not have one.',
+         'Not having one is the normal case and is the reason the audit exists. A station backup or a screenshot of the modules folder is enough to start; what comes back is a fixed price for the full inventory.'),
   body="""
 <h2>What actually changes</h2>
 <table class="pl-spec" style="margin-top:var(--pl-s-9)">
@@ -883,6 +906,21 @@ SERVICES = [
      one-off modules written for your site years ago by somebody who has moved on, which nobody
      has thought about since, and which the station will simply decline to load. An estate of
      any size usually has several, and they are only discoverable by looking.</p>
+</div>
+
+<h2 style="margin-top:var(--pl-s-13)">If the catalogue is yours</h2>
+<p class="pl-sub">Module vendors have the hardest version of this problem: not one module
+   to port, but every module, to a fixed date, with customers already asking.</p>
+<div class="pl-grid pl-grid--3" style="margin-top:var(--pl-s-9)">
+  <div class="pl-card"><h3>Priced per module</h3>
+    <p>So it can be staged rather than committed to as one number. Start with the two most
+       at risk; the rest follow once the pattern is proven on those.</p></div>
+  <div class="pl-card"><h3>Your name on it</h3>
+    <p>Your module name, your vendor string, your certificate. The readiness statement is
+       written for you to publish to your own customers.</p></div>
+  <div class="pl-card"><h3>No customer contact</h3>
+    <p>A subcontract stays a subcontract. We do not appear in front of your customers, and
+       an NDA before the first technical call is signed rather than negotiated.</p></div>
 </div>
 """,
   deliver=[
@@ -987,7 +1025,7 @@ def service_page(s):
   </div>
 </section>
 {notes_band}
-{CTA}
+{cta(*s["close"]) if s.get("close") else CTA}
 '''
     page(s["slug"], s["title"], s["desc"], body,
          schema=[ORG, SERVICE_LD(s["h1"], s["desc"], s["slug"], s["type_"])],
@@ -996,19 +1034,25 @@ def service_page(s):
 
 # ----------------------------------------------------------------- shared
 
-CTA = f'''
+def cta(h2=None, lede=None, label="Start a conversation"):
+    """The closing band. The default is generic on purpose; a service page
+    overrides it to ask for the one artefact that lets the job be priced."""
+    return f'''
 <section class="pl-band pl-section pl-anchor" id="contact">
   <div class="pl-wrap pl-cta">
     <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
-    <h2>Tell us the version, the hardware, and what it has to do.</h2>
-    <p class="pl-lede">You will get a written scope and a fixed price against it.
-       If the honest answer is that you do not need us, you will get that instead.</p>
+    <h2>{h2 or "Tell us the version, the hardware, and what it has to do."}</h2>
+    <p class="pl-lede">{lede or """You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead."""}</p>
     <div class="pl-btn-row">
-      <a class="pl-btn pl-btn--on-dark" href="{href('contact/')}">Start a conversation</a>
-      <a class="pl-btn pl-btn--quiet-dark" href="mailto:{EMAIL}">{EMAIL}</a>
+      <a class="pl-btn pl-btn--on-dark" href="{href('contact/')}">{label}</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="{ENQUIRY}">{EMAIL}</a>
     </div>
   </div>
 </section>'''
+
+
+CTA = cta()
 
 def service_cards(band=False, level=3):
     """level as in demo_block(): h3 under the home page's "Six things" h2,
@@ -1110,7 +1154,7 @@ def build_home():
     body = f'''
 <section class="pl-band pl-hero">
   <div class="pl-wrap">
-    <p class="pl-eyebrow">Independent Niagara Framework engineering</p>
+    <p class="pl-eyebrow">One engineer · remote · every reply from the person who does the work</p>
     <h1>Somebody built this Niagara station. They have moved on.</h1>
     <p class="pl-lede">
       So the custom module will not load on the version you are moving to, and nobody kept
@@ -1136,7 +1180,7 @@ def build_home():
     </ul>
     <div class="pl-btn-row">
       <a class="pl-btn pl-btn--on-dark" href="{href('work/')}">Try a live demo</a>
-      <a class="pl-btn pl-btn--quiet-dark" href="#services">What we build</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="{href('contact/')}">Ask what a job would cost</a>
     </div>
   </div>
 </section>
@@ -1146,8 +1190,9 @@ def build_home():
     <div class="pl-section__head">
       <p class="pl-eyebrow">Services</p>
       <h2>Six things, done properly</h2>
-      <p class="pl-sub">Each one scoped in writing and priced per deliverable. Most projects
-         start with one and grow into two. New to the framework? Start with
+      <p class="pl-sub">Each one scoped in writing and priced per deliverable. They are
+         separable on purpose — a widget set does not require the station work, and an audit
+         does not require either. New to the framework? Start with
          <a href="{href(BA)}">where Niagara sits in a building automation
          system</a>.</p>
     </div>
@@ -1187,8 +1232,9 @@ def build_home():
         <p>Built against your actual point naming and tagging, so it does not need rework on
            handover.</p></div>
       <div class="pl-card"><h3>Patch compatibility</h3>
-        <p>A stated commitment against Niagara point releases. A module that quietly breaks on a
-           security update is not finished work.</p></div>
+        <p>Every quote names the Niagara releases the module is tested against and how long
+           breakage caused by a point release is fixed at no charge. A module that quietly
+           stops working after a security update is not finished work.</p></div>
       <div class="pl-card"><h3>Source on request</h3>
         <p>Bespoke work can be delivered with source, so you are not dependent on us to keep it
            alive.</p></div>
@@ -1220,6 +1266,7 @@ def build_home():
           <tr><th scope="row">Hardware</th><td>JACE-8000 cannot run N5. Controller swap per node.</td></tr>
           <tr><th scope="row">Themes</th><td>N4 Zebra and Lucid are not carried forward.</td></tr>
           <tr><th scope="row">N4 support</th><td>To 2028. No cliff in 2026.</td></tr>
+          <tr><th scope="row">Why now</th><td>The audit feeds the capital plan, not the other way round.</td></tr>
         </tbody>
       </table>
     </div>
@@ -1255,10 +1302,13 @@ def build_home():
         <p>The widgets on the Work page are the module code itself, running in your browser
            against a simulated station that pushes live values. Change the theme, turn the ORD
            overlay on, watch it re-render. Nothing is a screenshot.</p></div></li>
-      <li><div><h3><a href="{href('services/niagara-5-migration/')}">Ask what a job would cost</a></h3>
-        <p>A Niagara&nbsp;5 readiness audit is the usual first piece: an inventory of every
-           third-party and bespoke module in the estate, and what each one needs before it
-           will load. Fixed price, and it stands on its own if you go elsewhere afterwards.</p></div></li>
+      <li><div><h3><a href="{href('contact/')}">Ask what a job would cost</a></h3>
+        <p>A Niagara&nbsp;5 <a href="{href('services/niagara-5-migration/')}">readiness
+           audit</a> is the usual starting point when nobody knows what is installed: an
+           inventory of every third-party and bespoke module in the estate, and what each
+           one needs before it will load. Fixed price, and it stands on its own if you go
+           elsewhere afterwards. Send a module list, or say you do not have one — not
+           having one is the normal case.</p></div></li>
     </ol>
   </div>
 </section>
@@ -1545,6 +1595,20 @@ FAQS = [
   "stock catalogue, and building owners with an estate and a migration to scope. Work is "
   "remote."),
 
+ ("Will you work as a subcontractor, under our name?",
+  "Yes, and for module vendors and distributors that is the normal shape. The deliverable "
+  "carries your module name, your vendor string and your certificate; the specification "
+  "and the installation note are written to be handed to your customer with your logo on "
+  "them; and there is no requirement to disclose who wrote it. A mutual NDA before the "
+  "first technical conversation is fine and is signed, not negotiated."),
+
+ ("We have a catalogue of modules and a Niagara 5 deadline. Can you take some of it?",
+  "That is the work this practice was set up to do. A catalogue port is priced per module "
+  "rather than as one lump, so it can be staged: the two that are most at risk first, the "
+  "rest once the pattern is proven on those. Each module comes back recompiled under Java "
+  "21, re-signed to your certificate, with a dependency audit, a regression pass against "
+  "your own test station, and a readiness statement you can publish to your customers."),
+
  ("Do you work on Niagara AX?",
   "Only to get you off it. AX is end of life, so the honest answer is that new modules and new "
   "graphics should not be written against it. What is worth doing on an AX site is the "
@@ -1557,6 +1621,32 @@ FAQS = [
   "No. This is an independent development practice. Niagara, Niagara Framework, JACE, "
   "Workbench and Tridium are trademarks of Tridium, Inc., used here only to describe what the "
   "work is compatible with."),
+
+ ("How long does a piece of work take?",
+  "A widget or a Workbench tool is quoted at two to four weeks from signed specification "
+  "to delivery. A driver depends almost entirely on the protocol document: a published "
+  "specification with a clean register map is weeks, a proprietary one that has to be "
+  "observed on the wire is longer, and which of those you have is established before a "
+  "price exists. A readiness audit is the fastest thing here — it is mostly tooling — and "
+  "a station build is governed by site access rather than by code. Any date quoted is in "
+  "the specification, and so is what happens if it slips."),
+
+ ("You have no published clients. Why would I be the first?",
+  "Because the risk is smaller than it looks and it is deliberately front-loaded. The "
+  "specification comes before the price and is yours to keep — if it is wrong, you have "
+  "lost a conversation. Work is delivered in reviewable pieces rather than as one drop at "
+  "the end, so a misunderstanding costs days. Bespoke work comes with source, so the "
+  "module outlives this practice. And what cannot be shown in logos is shown in code: the "
+  "demos on this site are the real widget source, and the notes are the engineering "
+  "reasoning in public. Judge it on those rather than on a client list."),
+
+ ("What happens if you are not available in two years?",
+  "You hold the source, the build instructions and the specification, so another developer "
+  "can pick it up — that is the reason source is in scope rather than an upsell. The "
+  "signing arrangement is documented at handover, including what has to happen to re-sign "
+  "the module under a different certificate. The failure mode this whole practice exists "
+  "because of is a module whose author has vanished and whose source nobody holds, and it "
+  "would be absurd to reproduce it."),
 ]
 
 
@@ -1607,10 +1697,29 @@ def build_about():
     {{{{CRUMBS}}}}
     <p class="pl-eyebrow">About</p>
     <h1>An independent Niagara development practice</h1>
-    <p class="pl-lede">Small, remote, and focused on one
-       <a href="{href(BA)}">building automation</a> framework rather than on
-       being available for anything. The work is Niagara: modules, widgets, graphics, stations
-       and migrations.</p>
+    <p class="pl-lede">One engineer, one framework, and no account manager between you and
+       the person writing the code. The work is Niagara: modules, widgets,
+       <a href="{href(BA)}">building automation</a> graphics, stations and migrations —
+       quoted as a fixed price against a written specification, and scheduled rather than
+       queued. If the next slot is months away you will be told in the first reply.</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-body">
+      <p class="pl-eyebrow">Who you would be working with</p>
+      <h2>Usama Iqbal</h2>
+      <p>One engineer. The person who answers the email is the person who writes the
+         specification, writes the Java, signs the jar and takes the call when a station
+         will not load it. Nothing is subcontracted onward without saying so first.</p>
+      <p>Remote. Written work — specifications, installation notes, audit reports — is in
+         English and is yours to keep.</p>
+      <p>The background is software rather than field engineering: Java, web front ends
+         and build tooling, applied to one framework. A commissioning engineer will know
+         some things about a site that I do not, which is why the specification comes
+         before the price and why the first question is usually about your point naming.</p>
+    </div>
   </div>
 </section>
 
@@ -1652,9 +1761,9 @@ def build_about():
 
       <h2>Working together</h2>
       <p>Engagements are remote and quoted as a fixed price per deliverable against a written
-         specification. The first conversation is usually half an hour and frequently ends with
-         a recommendation that costs nothing — a stock feature you had not found, or a
-         configuration change that removes the need for a module at all.</p>
+         specification. The first conversation is half an hour and is free, and it is allowed
+         to end with a recommendation that costs nothing — a stock feature you had not found,
+         or a configuration change that removes the need for a module at all.</p>
       <p>Estates are rarely uniform. A single client often has stations on Niagara&nbsp;AX, on
          several Niagara&nbsp;4 point releases and on nothing at all yet, with HVAC plant from
          four vendors underneath. Work is scoped against the version floor that estate actually
@@ -1870,7 +1979,7 @@ def build_building_automation():
       <li><div><h3>Consultants and specifiers</h3>
         <p>A second opinion on whether a specification is deliverable in Niagara, what a
            requirement will really cost in station work, and which parts of it stock features
-           already cover. This is frequently half an hour and no invoice.</p></div></li>
+           already cover. This is half an hour and no invoice.</p></div></li>
     </ol>
   </div>
 </section>
@@ -1899,10 +2008,11 @@ def build_contact():
     {{{{CRUMBS}}}}
     <p class="pl-eyebrow">Contact</p>
     <h1>Tell us what it has to do</h1>
-    <p class="pl-lede">One email, read by the person who would do the work. You will get a
-       written scope and a fixed price, or an honest reason not to proceed.</p>
+    <p class="pl-lede">One email, read by Usama Iqbal — the person who would write the
+       code. You will get a written scope and a fixed price, or an honest reason not to
+       proceed.</p>
     <p style="margin-top:var(--pl-s-9)">
-      <a class="pl-contact-email" href="mailto:{EMAIL}">{EMAIL}</a>
+      <a class="pl-contact-email" href="{ENQUIRY}">{EMAIL}</a>
     </p>
   </div>
 </section>
@@ -1943,10 +2053,11 @@ def build_contact():
              and a reputation for straight answers is worth more than one project.</p>
         </div>
         <div class="pl-note" style="margin-top:var(--pl-s-9)">
-          <p><b>Not sure it is even a module?</b> Plenty of requests that arrive as "we need a
-             custom driver" turn out to be a tagging problem, a poll-rate problem or a stock
-             feature nobody found. Describe the symptom rather than the solution and you will
-             get a better answer.</p>
+          <p><b>Not sure it is even a module?</b> A good share of what gets specified as "we
+             need a custom driver" is a tagging problem, a poll-rate problem or a stock
+             feature nobody found — and saying so costs you nothing and costs us a job we
+             would rather not have sold you. Describe the symptom rather than the solution
+             and you will get a better answer.</p>
         </div>
       </div>
     </div>

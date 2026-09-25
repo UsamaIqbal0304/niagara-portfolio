@@ -8,7 +8,7 @@
 
 Contact: info@plantroomlabs.com
 Website: https://plantroomlabs.com/
-Last updated: 2026-09-24
+Last updated: 2026-09-26
 
 ## What this practice does
 
@@ -103,11 +103,26 @@ No, and deliberately so. The widget code, the config files and the ORD strings a
 **Who do you work with?**
 BMS systems integrators and controls contractors who need a module or a widget set they do not have time to write, distributors whose customers are asking for something outside the stock catalogue, and building owners with an estate and a migration to scope. Work is remote.
 
+**Will you work as a subcontractor, under our name?**
+Yes, and for module vendors and distributors that is the normal shape. The deliverable carries your module name, your vendor string and your certificate; the specification and the installation note are written to be handed to your customer with your logo on them; and there is no requirement to disclose who wrote it. A mutual NDA before the first technical conversation is fine and is signed, not negotiated.
+
+**We have a catalogue of modules and a Niagara 5 deadline. Can you take some of it?**
+That is the work this practice was set up to do. A catalogue port is priced per module rather than as one lump, so it can be staged: the two that are most at risk first, the rest once the pattern is proven on those. Each module comes back recompiled under Java 21, re-signed to your certificate, with a dependency audit, a regression pass against your own test station, and a readiness statement you can publish to your customers.
+
 **Do you work on Niagara AX?**
 Only to get you off it. AX is end of life, so the honest answer is that new modules and new graphics should not be written against it. What is worth doing on an AX site is the inventory: what is actually running on the station, which of it has a Niagara 4 equivalent, which of it was bespoke and has no source, and what the building automation estate has to look like on the other side. That inventory is the same piece of work as a Niagara 5 readiness audit, one framework generation earlier.
 
 **Are you affiliated with Tridium?**
 No. This is an independent development practice. Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium, Inc., used here only to describe what the work is compatible with.
+
+**How long does a piece of work take?**
+A widget or a Workbench tool is quoted at two to four weeks from signed specification to delivery. A driver depends almost entirely on the protocol document: a published specification with a clean register map is weeks, a proprietary one that has to be observed on the wire is longer, and which of those you have is established before a price exists. A readiness audit is the fastest thing here — it is mostly tooling — and a station build is governed by site access rather than by code. Any date quoted is in the specification, and so is what happens if it slips.
+
+**You have no published clients. Why would I be the first?**
+Because the risk is smaller than it looks and it is deliberately front-loaded. The specification comes before the price and is yours to keep — if it is wrong, you have lost a conversation. Work is delivered in reviewable pieces rather than as one drop at the end, so a misunderstanding costs days. Bespoke work comes with source, so the module outlives this practice. And what cannot be shown in logos is shown in code: the demos on this site are the real widget source, and the notes are the engineering reasoning in public. Judge it on those rather than on a client list.
+
+**What happens if you are not available in two years?**
+You hold the source, the build instructions and the specification, so another developer can pick it up — that is the reason source is in scope rather than an upsell. The signing arrangement is documented at handover, including what has to happen to re-sign the module under a different certificate. The failure mode this whole practice exists because of is a module whose author has vanished and whose source nobody holds, and it would be absurd to reproduce it.
 
 ## Notes (technical knowledge base)
 
