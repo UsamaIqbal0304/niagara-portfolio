@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to Build and Load a Custom Niagara 4 Module</title>
+<meta name="description" content="What a Niagara module actually is on disk, the two ways to build one, and the three Software Manager refusals that actually mean something.">
+<link rel="canonical" href="https://plantroomlabs.com/notes/building-and-loading-a-custom-niagara-module/">
+<meta name="author" content="Plantroom Labs">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Plantroom Labs">
+<meta property="og:title" content="How to Build and Load a Custom Niagara 4 Module">
+<meta property="og:description" content="What a Niagara module actually is on disk, the two ways to build one, and the three Software Manager refusals that actually mean something.">
+<meta property="og:url" content="https://plantroomlabs.com/notes/building-and-loading-a-custom-niagara-module/">
+<meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How to Build and Load a Custom Niagara 4 Module">
+<meta name="twitter:description" content="What a Niagara module actually is on disk, the two ways to build one, and the three Software Manager refusals that actually mean something.">
+<meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
+
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48"><!-- Safari, and any browser that ignores the SVG -->
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — site summary for language models">
+<link rel="alternate" type="text/markdown" href="/notes/building-and-loading-a-custom-niagara-module.md" title="This page as markdown">
+
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-var.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/plantroom.css">
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": [
+    "Organization",
+    "ProfessionalService"
+   ],
+   "@id": "https://plantroomlabs.com/#org",
+   "name": "Plantroom Labs",
+   "url": "https://plantroomlabs.com/",
+   "email": "info@plantroomlabs.com",
+   "logo": "https://plantroomlabs.com/assets/mark.svg",
+   "image": "https://plantroomlabs.com/assets/og.png",
+   "slogan": "Niagara Framework engineering, quoted against a written spec.",
+   "description": "Independent Niagara Framework development practice. Custom Niagara modules and drivers, bajaux widgets, PX graphics, station engineering and Niagara 5 migration work for systems integrators, controls contractors and building owners.",
+   "knowsAbout": [
+    "Niagara Framework",
+    "Niagara 4",
+    "Niagara 5",
+    "Tridium Niagara",
+    "bajaux",
+    "BajaScript",
+    "Baja API",
+    "PX graphics",
+    "JACE 8000",
+    "JACE 9000",
+    "Niagara Supervisor",
+    "Workbench",
+    "BACnet",
+    "Modbus",
+    "building management systems",
+    "building automation",
+    "building automation systems",
+    "BMS integration",
+    "DDC controls",
+    "HVAC controls software",
+    "HVAC plant graphics",
+    "supervisory control",
+    "module signing",
+    "BQL",
+    "ORD"
+   ],
+   "areaServed": {
+    "@type": "Place",
+    "name": "Worldwide (remote)"
+   },
+   "availableLanguage": "en",
+   "founder": {
+    "@type": "Person",
+    "name": "Usama Iqbal",
+    "jobTitle": "Niagara developer"
+   },
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "info@plantroomlabs.com",
+    "availableLanguage": "en",
+    "areaServed": "Worldwide"
+   },
+   "makesOffer": [
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/niagara-modules/#service",
+      "@type": "Service",
+      "name": "Custom Niagara modules and drivers",
+      "serviceType": "Custom software development"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/bajaux-widgets/#service",
+      "@type": "Service",
+      "name": "bajaux web widgets and dashboards",
+      "serviceType": "User interface development"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/px-graphics/#service",
+      "@type": "Service",
+      "name": "PX graphics and standard sheets",
+      "serviceType": "Graphics engineering"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/station-engineering/#service",
+      "@type": "Service",
+      "name": "Station engineering and new controller setup",
+      "serviceType": "Systems engineering"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/workbench-tooling/#service",
+      "@type": "Service",
+      "name": "Workbench tooling and bulk engineering",
+      "serviceType": "Engineering automation"
+     }
+    },
+    {
+     "@type": "Offer",
+     "itemOffered": {
+      "@id": "https://plantroomlabs.com/services/niagara-5-migration/#service",
+      "@type": "Service",
+      "name": "Niagara 5 readiness and migration",
+      "serviceType": "Migration and porting"
+     }
+    }
+   ]
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://plantroomlabs.com/notes/building-and-loading-a-custom-niagara-module/#article",
+   "headline": "How to build and load a custom Niagara 4 module",
+   "description": "What a Niagara module actually is on disk, the two ways to build one, and the three Software Manager refusals that actually mean something.",
+   "url": "https://plantroomlabs.com/notes/building-and-loading-a-custom-niagara-module/",
+   "inLanguage": "en-GB",
+   "keywords": "Module development, Build tooling, Deployment",
+   "isAccessibleForFree": true,
+   "datePublished": "2026-09-26",
+   "dateModified": "2026-09-26",
+   "author": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "publisher": {
+    "@id": "https://plantroomlabs.com/#org"
+   },
+   "mainEntityOfPage": "https://plantroomlabs.com/notes/building-and-loading-a-custom-niagara-module/"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://plantroomlabs.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Notes",
+     "item": "https://plantroomlabs.com/notes/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Building a module"
+    }
+   ]
+  }
+ ]
+}</script>
+</head>
+<body>
+<a class="pl-skip" href="#main">Skip to content</a>
+<nav class="pl-nav" aria-label="Primary">
+  <div class="pl-wrap pl-nav__inner">
+    <a class="pl-brand" href="/">
+      <svg class="pl-brand__mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="var(--gx-run-soft)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-accent)"/></g></svg>
+      <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+    </a>
+    <ul class="pl-nav__links">
+      <li><a href="/services/">Services</a></li><li class="pl-nav__item--drop-420"><a href="/work/">Work</a></li><li class="pl-nav__item--drop-520"><a href="/services/niagara-5-migration/">Niagara 5</a></li><li class="pl-nav__item--drop-560"><a href="/notes/" aria-current="page">Notes</a></li><li class="pl-nav__item--drop-680"><a href="/faq/">FAQ</a></li><li class="pl-nav__item--drop-680"><a href="/about/">About</a></li>
+      <li><a class="pl-btn pl-btn--primary" href="/contact/" style="color:var(--pl-invert)">Get a quote</a></li>
+    </ul>
+    <details class="pl-menu" data-menu>
+      <summary aria-label="Menu"><span class="pl-menu__bars" aria-hidden="true"></span>Menu</summary>
+      <ul class="pl-menu__panel">
+        <li><a href="/services/">Services</a></li><li><a href="/work/">Work</a></li><li><a href="/services/niagara-5-migration/">Niagara 5</a></li><li><a href="/notes/" aria-current="page">Notes</a></li><li><a href="/faq/">FAQ</a></li><li><a href="/about/">About</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </details>
+  </div>
+</nav>
+<main id="main">
+
+<section class="pl-band pl-hero pl-hero--page">
+  <div class="pl-wrap">
+    <nav class="pl-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/notes/">Notes</a></li><li>Building a module</li></ol></nav>
+    <p class="pl-eyebrow">Note</p>
+    <h1>How to build and load a custom Niagara 4 module</h1>
+    <p class="pl-lede">Software Manager will accept a jar built from an empty directory without checking whether it does anything. Whether it <strong>installs</strong> and whether it <strong>works</strong> are two separate questions, and almost everything that decides them sits outside the dialog that says “Success.”</p>
+    <ul class="pl-chips"><li class="pl-chip pl-chip--on-dark">Module development</li><li class="pl-chip pl-chip--on-dark">Build tooling</li><li class="pl-chip pl-chip--on-dark">Deployment</li></ul>
+    <p class="pl-hero__meta">Written September 2026</p>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
+      <p class="pl-eyebrow">On this page</p>
+      <ol><li><a href="#what-a-module-is-on-disk">What a module is on disk</a></li><li><a href="#two-ways-to-build-one">Two ways to build one</a></li><li><a href="#the-bare-minimum-module-xml">The bare minimum module.xml</a></li><li><a href="#signing-briefly">Signing, briefly</a></li><li><a href="#getting-it-onto-a-station">Getting it onto a station</a></li><li><a href="#the-three-errors-that-actually-mean-something">The three errors that actually mean something</a></li></ol>
+    </nav>
+<h2 id="what-a-module-is-on-disk">What a module is on disk</h2>
+<div class="pl-body">
+  <p>A Niagara module is a signed jar with one extra file. Open one up and next
+     to the compiled classes and the usual jarsigner output
+     (<code>META-INF/MANIFEST.MF</code>, <code>META-INF/NIAGARA4.SF</code>,
+     <code>META-INF/NIAGARA4.RSA</code>) there is <code>META-INF/module.xml</code>
+     — the one part of the jar that is Niagara-specific, and the file the
+     station reads before it trusts anything else inside. Alongside it:
+     <code>module.palette</code> (what Workbench's palette side shows), a
+     <code>&lt;name&gt;-rt.lexicon</code> for translatable strings, and, for a
+     browser-facing module, an <code>rc/</code> folder holding the
+     <code>.js</code>, <code>.css</code> and images the browser loads directly.
+     Nothing in the jar is obfuscated — <code>javap</code>, <code>jdeps</code>,
+     plain <code>unzip</code> and any decompiler all work on it directly.</p>
+  <p>A module also declares a <strong>runtime profile</strong>, both in its own
+     name and in <code>module.xml</code>'s <code>runtimeProfile</code>
+     attribute: <code>-rt</code> runs inside the station itself,
+     <code>-wb</code> runs only inside Workbench, <code>-ux</code> is the one
+     that reaches an operator's ordinary browser. One piece of functionality
+     is often several jars sharing a logical name —
+     <code>acmeTools-rt.jar</code>, <code>acmeTools-wb.jar</code>,
+     <code>acmeTools-ux.jar</code> — each with its own <code>module.xml</code>,
+     targeting a different classpath at a different end of the wire. In a full
+     4.15 install, of roughly 750 shipped modules a little over half are
+     <code>-rt</code>, most of the rest <code>-wb</code>, and only a small
+     slice <code>-ux</code> — the profile that actually reaches a browser, and
+     the one a typical PX-facing widget module is.</p>
+</div>
+
+<h2 id="two-ways-to-build-one">Two ways to build one</h2>
+<div class="pl-body">
+  <p>There are two workable routes, and only one needs anything beyond a
+     Niagara install already on disk.</p>
+  <p>Tridium ships its own Gradle-based build system inside every install, as a
+     flat Maven repository, with worked example projects for a driver, a
+     type-extension module, and a signing pipeline. It needs Gradle 7.6, a
+     full JDK (the one bundled inside a Niagara install is trimmed down and
+     drops the jar-packaging tools, so a separate system JDK 8 has to supply
+     <code>jar</code> and <code>jarsigner</code>), a Gradle plugin version
+     that actually matches the install you point it at, and — for a
+     <code>-ux</code> target only — Node tooling on <code>PATH</code> for its
+     grunt/yarn step. Type declarations for each profile live in their own
+     <code>module-include.xml</code> — one file per profile subproject sharing
+     a logical module name — folded into that profile's own
+     <code>module.xml</code> when the build runs. It is the fuller
+     build: it drives the <code>@NiagaraType</code> annotation processor,
+     which reads an annotation on a Java class and generates both the
+     <code>Type</code>/<code>getType()</code> boilerplate and the matching
+     <code>&lt;type&gt;</code> entry, so neither is written by hand. Signing
+     here is automatic too, but by a throwaway self-signed key generated on
+     first use — a development convenience, not a route to a shippable
+     module.</p>
+  <p>The other route needs no SDK and no licence: a plain <code>javac</code>
+     against the jars already in the install's own <code>modules</code>
+     directory, followed by a hand-built zip. This works by giving up the
+     annotation processor and writing its output by hand — not much of a
+     loss, since a browser-facing widget is typically a
+     <code>BSingleton</code> implementing <code>BIJavaScript</code>, and the
+     two methods the processor would otherwise generate are only a few
+     lines:</p>
+</div>
+
+<pre><code>public static final Type TYPE = Sys.loadType(BAcmeWidget.class);
+public Type getType() { return TYPE; }
+
+private static final JsInfo jsInfo =
+    JsInfo.make(BOrd.make("module://acmeTools/rc/AcmeWidget.js"));
+public JsInfo getJsInfo(Context cx) { return jsInfo; }</code></pre>
+
+<div class="pl-body">
+  <p>The matching <code>&lt;type&gt;</code> entry in <code>module.xml</code> is
+     written by hand alongside it, one line per class. Because these classes
+     only touch a handful of 4.0-era API
+     (<code>javax.baja.sys.BSingleton</code>,
+     <code>javax.baja.web.BIFormFactorCompact</code>/<code>BIOffline</code>,
+     <code>javax.baja.web.js.BIJavaScript</code>/<code>JsInfo</code>), the same
+     source compiles unchanged against whichever install <code>javac</code> is
+     pointed at, from a current 4.15 install back to 4.14 — Niagara 4 is Java 8
+     throughout. What a built jar actually asks the running station for at
+     load time is checkable rather than assumed: walk the constant pool of the
+     compiled classes, list every external framework method referenced, and
+     compare that against the API the oldest target actually has.</p>
+</div>
+
+<h2 id="the-bare-minimum-module-xml">The bare minimum module.xml</h2>
+<div class="pl-body">
+  <p>Everything the station checks at install time is in one file. A minimal
+     <code>-ux</code> example, trimmed to the parts that matter:</p>
+</div>
+
+<pre><code>&lt;module name="acmeTools-ux" moduleName="acmeTools" runtimeProfile="ux"
+        vendor="Acme" vendorVersion="1.0.0" bajaVersion="0"
+        preferredSymbol="ac" nre="true" autoload="true" installable="true"&gt;
+  &lt;dependencies&gt;
+    &lt;dependency name="baja"   vendor="Tridium" vendorVersion="4.14"/&gt;
+    &lt;dependency name="js-ux"  vendor="Tridium" vendorVersion="4.14"/&gt;
+  &lt;/dependencies&gt;
+  &lt;types&gt;
+    &lt;type name="AcmeWidget" class="com.example.acmeTools.ux.BAcmeWidget"/&gt;
+  &lt;/types&gt;
+&lt;/module&gt;</code></pre>
+
+<div class="pl-body">
+  <p>Two details here catch people moving a module between hosts. First,
+     <code>moduleName</code> — not the jar's filename — is what an ORD or a PX
+     <code>&lt;import&gt;</code> resolves against, and Tridium's own shipped
+     modules aren't consistent about whether <code>name</code> or
+     <code>class</code> comes first inside a <code>&lt;type&gt;</code> element,
+     so parsing the file with a regex instead of a real XML parser eventually
+     gets it wrong. Second, the <code>vendorVersion</code> on each
+     <code>&lt;dependency&gt;</code> is a floor, not a pin — get that wrong and
+     a module that compiles cleanly is refused outright by an older station.
+     That distinction, and how to make the stamp a build argument instead of
+     an accident of the build machine, is its own note:
+     <a href="/notes/niagara-module-version-stamping/">which Niagara version to
+     stamp a module for</a>.</p>
+</div>
+
+<h2 id="signing-briefly">Signing, briefly</h2>
+<div class="pl-body">
+  <p>An unsigned jar installs on nothing running the default verification
+     mode — 4.15 documents <code>medium</code>, which requires a certificate
+     the target host already trusts. Self-signed is fine, but only once that
+     certificate is imported into that host's trust store; the same jar can
+     install cleanly on one host and be refused on the next with no change to
+     the file at all. What each mode actually checks, and why it cannot be
+     relaxed from a launch argument, is covered elsewhere:
+     <a href="/notes/niagara-module-signing/">Niagara module signing: what a
+     station checks</a>. Worth repeating here: sign the version you are
+     actually going to ship, not the throwaway dev-loop key a build tool
+     generates by default.</p>
+</div>
+
+<h2 id="getting-it-onto-a-station">Getting it onto a station</h2>
+<div class="pl-body">
+  <p>For a JACE, there is one supported way in: Platform → Software Manager,
+     pointed at the jar (or a distribution file built from it) over the
+     platform connection — not a jar copied into a directory by hand. A JACE
+     doesn't hand you a filesystem to engineer against the way a PC install's
+     own <code>modules</code> directory does during the SDK-less dev loop
+     above; Software Manager is what actually places the file, rebuilds the
+     module registry, and triggers whatever restart is needed. A jar that
+     compiles, is stamped correctly and is signed correctly, but was never
+     pushed through that path, is not installed anywhere — whatever the build
+     log says.</p>
+</div>
+
+<h2 id="the-three-errors-that-actually-mean-something">The three errors that actually mean something</h2>
+<div class="pl-body">
+  <p>Software Manager's own dialog isn't a diagnostic tool — it reports success
+     or a short failure line, and the same line can cover more than one root
+     cause. In practice, almost everything reduces to three.</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">What it says</th><th scope="col">What it means</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Dependency error naming a version</th>
+        <td>The module's declared floor is higher than the station's own
+            version. Nothing in the code is wrong — rebuild with the stamp set
+            to the station's actual version, not whatever version the build
+            machine happens to have installed.</td></tr>
+    <tr><th scope="row">Unsigned or untrusted module</th>
+        <td>The jar's signing certificate is not in <em>this</em> host's trust
+            store. The question is never "is it signed" — it's "does this
+            particular host trust this particular certificate."</td></tr>
+    <tr><th scope="row">Class not found, after a successful install</th>
+        <td>The type resolved at install time, but a class it depends on lives
+            in a different runtime profile than the one that tried to load it
+            — a <code>-ux</code> view referencing a type that only exists on
+            the <code>-rt</code>/<code>-wb</code> side, or a type declared in
+            the wrong profile's <code>module-include.xml</code>. It installs,
+            then fails the first time something tries to instantiate it.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>None of these three is a reason to start guessing at the code — all three
+     are checkable directly, against the stamp, the host's trust store, and
+     the profile that was supposed to carry the failing class. See
+     <a href="/services/niagara-modules/">custom Niagara modules &amp;
+     drivers</a> for help getting one built and shipped.</p>
+</div>
+</div>
+</section>
+
+<section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Related</p>
+      <h2>Where this comes up in the work</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link"><span class="pl-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span>
+        <h3><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></h3>
+        <p>Bespoke Niagara rt, wb and ux modules and drivers written against the Baja API: pure Java, signed, and stamped to install across a mixed estate.</p></div></div>
+  </div>
+</section>
+
+<section class="pl-section">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">More notes</p>
+      <h2>Other things worth writing down</h2>
+    </div>
+    <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
+      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
+      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/n4-to-n5-third-party-modules/">What happens to third-party modules moving from N4 to N5</a></h3>
+      <p>A module with no Niagara 5 build can stop the migrator outright, and one that has a build can still fail to load. What breaks, and why.</p>
+      <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Estate management</li><li class="pl-chip">Module development</li></ul>
+    </div></div>
+  </div>
+</section>
+
+
+<section class="pl-band pl-section pl-anchor" id="contact">
+  <div class="pl-wrap pl-cta">
+    <p class="pl-eyebrow pl-center" style="justify-content:center">Next step</p>
+    <h2>Tell us the version, the hardware, and what it has to do.</h2>
+    <p class="pl-lede">You will get a written scope and a fixed price against it.
+       If the honest answer is that you do not need us, you will get that instead.</p>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--on-dark" href="/contact/">Start a conversation</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="mailto:info@plantroomlabs.com?subject=Niagara%20enquiry&body=Niagara%20version%3A%20%0ATarget%20hardware%20(JACE%20%2F%20Supervisor%20%2F%20PC)%3A%20%0AVerification%20mode%20(medium%20%2F%20high%20%2F%20not%20sure)%3A%20%0A%0AWhat%20it%20has%20to%20do%3A%20%0A">info@plantroomlabs.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pl-footer">
+  <div class="pl-wrap">
+    <div class="pl-footer__cols">
+      <div>
+        <a class="pl-brand" href="/">
+          <svg class="pl-brand__mark" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+<rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" stroke="rgba(155,133,255,0.35)" stroke-width="1.5"/>
+<g transform="translate(16 16) scale(0.86) translate(-16 -16)">
+<path d="M5 22H11V10a3 3 0 0 1 6 0v12a3 3 0 0 0 6 0V10h5" stroke="var(--pl-dark-accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="5" cy="22" r="2.2" fill="var(--pl-dark-accent)"/><circle cx="27" cy="10" r="2.2" fill="var(--pl-dark-accent)"/></g></svg>
+          <span class="pl-brand__name">Plantroom Labs<span>Niagara Framework engineering</span></span>
+        </a>
+        <p style="margin-top:var(--pl-s-7); max-width:42ch">
+          Independent <a href="/services/building-automation/">building automation</a>
+          software on the Niagara Framework: custom modules, bajaux widgets, PX graphics,
+          station engineering and Niagara&nbsp;5 migration work.
+        </p>
+        <p style="margin-top:var(--pl-s-6)">
+          <a href="mailto:info@plantroomlabs.com">info@plantroomlabs.com</a>
+        </p>
+      </div>
+      <div>
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/services/niagara-modules/">Custom modules &amp; drivers</a></li>
+          <li><a href="/services/bajaux-widgets/">bajaux widgets</a></li>
+          <li><a href="/services/px-graphics/">PX graphics</a></li>
+          <li><a href="/services/station-engineering/">Station engineering</a></li>
+          <li><a href="/services/workbench-tooling/">Workbench tooling</a></li>
+          <li><a href="/services/niagara-5-migration/">Niagara 5 migration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          <li><a href="/work/">Work</a></li>
+          <li><a href="/notes/">Notes</a></li>
+          <li><a href="/services/building-automation/">Building automation</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pl-footer__legal">
+      <p>
+        Niagara, Niagara Framework, JACE, Workbench and Tridium are trademarks of Tridium,&nbsp;Inc.
+        Plantroom Labs is an independent development practice and is not affiliated with, authorised by or
+        endorsed by Tridium, Inc. or Honeywell. Screenshots are from a demonstration station built
+        for this portfolio, not from a client site.
+      </p>
+      <p>&copy; 2026 Plantroom Labs</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+<!-- Cookieless, no personal data, no consent banner needed. -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4b22c0dd7f50413da48d0286988da559"}'></script>
+</body>
+</html>

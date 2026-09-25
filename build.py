@@ -3662,6 +3662,207 @@ Niagara's module permission model</a>. For the audit and porting work itself, se
 """,
  related=["services/niagara-modules/", "services/station-engineering/"],
 ),
+
+ dict(
+ slug="notes/building-and-loading-a-custom-niagara-module/",
+ date="2026-09-26",
+ nav="Building a module",
+ title="How to Build and Load a Custom Niagara 4 Module",
+ desc=("What a Niagara module actually is on disk, the two ways to build one, "
+       "and the three Software Manager refusals that actually mean something."),
+ h1="How to build and load a custom Niagara 4 module",
+ lede=("Software Manager will accept a jar built from an empty directory without "
+       "checking whether it does anything. Whether it <strong>installs</strong> "
+       "and whether it <strong>works</strong> are two separate questions, and "
+       "almost everything that decides them sits outside the dialog that says "
+       "“Success.”"),
+ tags=["Module development", "Build tooling", "Deployment"],
+ body="""
+<h2>What a module is on disk</h2>
+<div class="pl-body">
+  <p>A Niagara module is a signed jar with one extra file. Open one up and next
+     to the compiled classes and the usual jarsigner output
+     (<code>META-INF/MANIFEST.MF</code>, <code>META-INF/NIAGARA4.SF</code>,
+     <code>META-INF/NIAGARA4.RSA</code>) there is <code>META-INF/module.xml</code>
+     — the one part of the jar that is Niagara-specific, and the file the
+     station reads before it trusts anything else inside. Alongside it:
+     <code>module.palette</code> (what Workbench's palette side shows), a
+     <code>&lt;name&gt;-rt.lexicon</code> for translatable strings, and, for a
+     browser-facing module, an <code>rc/</code> folder holding the
+     <code>.js</code>, <code>.css</code> and images the browser loads directly.
+     Nothing in the jar is obfuscated — <code>javap</code>, <code>jdeps</code>,
+     plain <code>unzip</code> and any decompiler all work on it directly.</p>
+  <p>A module also declares a <strong>runtime profile</strong>, both in its own
+     name and in <code>module.xml</code>'s <code>runtimeProfile</code>
+     attribute: <code>-rt</code> runs inside the station itself,
+     <code>-wb</code> runs only inside Workbench, <code>-ux</code> is the one
+     that reaches an operator's ordinary browser. One piece of functionality
+     is often several jars sharing a logical name —
+     <code>acmeTools-rt.jar</code>, <code>acmeTools-wb.jar</code>,
+     <code>acmeTools-ux.jar</code> — each with its own <code>module.xml</code>,
+     targeting a different classpath at a different end of the wire. In a full
+     4.15 install, of roughly 750 shipped modules a little over half are
+     <code>-rt</code>, most of the rest <code>-wb</code>, and only a small
+     slice <code>-ux</code> — the profile that actually reaches a browser, and
+     the one a typical PX-facing widget module is.</p>
+</div>
+
+<h2>Two ways to build one</h2>
+<div class="pl-body">
+  <p>There are two workable routes, and only one needs anything beyond a
+     Niagara install already on disk.</p>
+  <p>Tridium ships its own Gradle-based build system inside every install, as a
+     flat Maven repository, with worked example projects for a driver, a
+     type-extension module, and a signing pipeline. It needs Gradle 7.6, a
+     full JDK (the one bundled inside a Niagara install is trimmed down and
+     drops the jar-packaging tools, so a separate system JDK 8 has to supply
+     <code>jar</code> and <code>jarsigner</code>), a Gradle plugin version
+     that actually matches the install you point it at, and — for a
+     <code>-ux</code> target only — Node tooling on <code>PATH</code> for its
+     grunt/yarn step. Type declarations for each profile live in their own
+     <code>module-include.xml</code> — one file per profile subproject sharing
+     a logical module name — folded into that profile's own
+     <code>module.xml</code> when the build runs. It is the fuller
+     build: it drives the <code>@NiagaraType</code> annotation processor,
+     which reads an annotation on a Java class and generates both the
+     <code>Type</code>/<code>getType()</code> boilerplate and the matching
+     <code>&lt;type&gt;</code> entry, so neither is written by hand. Signing
+     here is automatic too, but by a throwaway self-signed key generated on
+     first use — a development convenience, not a route to a shippable
+     module.</p>
+  <p>The other route needs no SDK and no licence: a plain <code>javac</code>
+     against the jars already in the install's own <code>modules</code>
+     directory, followed by a hand-built zip. This works by giving up the
+     annotation processor and writing its output by hand — not much of a
+     loss, since a browser-facing widget is typically a
+     <code>BSingleton</code> implementing <code>BIJavaScript</code>, and the
+     two methods the processor would otherwise generate are only a few
+     lines:</p>
+</div>
+
+<pre><code>public static final Type TYPE = Sys.loadType(BAcmeWidget.class);
+public Type getType() { return TYPE; }
+
+private static final JsInfo jsInfo =
+    JsInfo.make(BOrd.make("module://acmeTools/rc/AcmeWidget.js"));
+public JsInfo getJsInfo(Context cx) { return jsInfo; }</code></pre>
+
+<div class="pl-body">
+  <p>The matching <code>&lt;type&gt;</code> entry in <code>module.xml</code> is
+     written by hand alongside it, one line per class. Because these classes
+     only touch a handful of 4.0-era API
+     (<code>javax.baja.sys.BSingleton</code>,
+     <code>javax.baja.web.BIFormFactorCompact</code>/<code>BIOffline</code>,
+     <code>javax.baja.web.js.BIJavaScript</code>/<code>JsInfo</code>), the same
+     source compiles unchanged against whichever install <code>javac</code> is
+     pointed at, from a current 4.15 install back to 4.14 — Niagara 4 is Java 8
+     throughout. What a built jar actually asks the running station for at
+     load time is checkable rather than assumed: walk the constant pool of the
+     compiled classes, list every external framework method referenced, and
+     compare that against the API the oldest target actually has.</p>
+</div>
+
+<h2>The bare minimum module.xml</h2>
+<div class="pl-body">
+  <p>Everything the station checks at install time is in one file. A minimal
+     <code>-ux</code> example, trimmed to the parts that matter:</p>
+</div>
+
+<pre><code>&lt;module name="acmeTools-ux" moduleName="acmeTools" runtimeProfile="ux"
+        vendor="Acme" vendorVersion="1.0.0" bajaVersion="0"
+        preferredSymbol="ac" nre="true" autoload="true" installable="true"&gt;
+  &lt;dependencies&gt;
+    &lt;dependency name="baja"   vendor="Tridium" vendorVersion="4.14"/&gt;
+    &lt;dependency name="js-ux"  vendor="Tridium" vendorVersion="4.14"/&gt;
+  &lt;/dependencies&gt;
+  &lt;types&gt;
+    &lt;type name="AcmeWidget" class="com.example.acmeTools.ux.BAcmeWidget"/&gt;
+  &lt;/types&gt;
+&lt;/module&gt;</code></pre>
+
+<div class="pl-body">
+  <p>Two details here catch people moving a module between hosts. First,
+     <code>moduleName</code> — not the jar's filename — is what an ORD or a PX
+     <code>&lt;import&gt;</code> resolves against, and Tridium's own shipped
+     modules aren't consistent about whether <code>name</code> or
+     <code>class</code> comes first inside a <code>&lt;type&gt;</code> element,
+     so parsing the file with a regex instead of a real XML parser eventually
+     gets it wrong. Second, the <code>vendorVersion</code> on each
+     <code>&lt;dependency&gt;</code> is a floor, not a pin — get that wrong and
+     a module that compiles cleanly is refused outright by an older station.
+     That distinction, and how to make the stamp a build argument instead of
+     an accident of the build machine, is its own note:
+     <a href="/notes/niagara-module-version-stamping/">which Niagara version to
+     stamp a module for</a>.</p>
+</div>
+
+<h2>Signing, briefly</h2>
+<div class="pl-body">
+  <p>An unsigned jar installs on nothing running the default verification
+     mode — 4.15 documents <code>medium</code>, which requires a certificate
+     the target host already trusts. Self-signed is fine, but only once that
+     certificate is imported into that host's trust store; the same jar can
+     install cleanly on one host and be refused on the next with no change to
+     the file at all. What each mode actually checks, and why it cannot be
+     relaxed from a launch argument, is covered elsewhere:
+     <a href="/notes/niagara-module-signing/">Niagara module signing: what a
+     station checks</a>. Worth repeating here: sign the version you are
+     actually going to ship, not the throwaway dev-loop key a build tool
+     generates by default.</p>
+</div>
+
+<h2>Getting it onto a station</h2>
+<div class="pl-body">
+  <p>For a JACE, there is one supported way in: Platform → Software Manager,
+     pointed at the jar (or a distribution file built from it) over the
+     platform connection — not a jar copied into a directory by hand. A JACE
+     doesn't hand you a filesystem to engineer against the way a PC install's
+     own <code>modules</code> directory does during the SDK-less dev loop
+     above; Software Manager is what actually places the file, rebuilds the
+     module registry, and triggers whatever restart is needed. A jar that
+     compiles, is stamped correctly and is signed correctly, but was never
+     pushed through that path, is not installed anywhere — whatever the build
+     log says.</p>
+</div>
+
+<h2>The three errors that actually mean something</h2>
+<div class="pl-body">
+  <p>Software Manager's own dialog isn't a diagnostic tool — it reports success
+     or a short failure line, and the same line can cover more than one root
+     cause. In practice, almost everything reduces to three.</p>
+</div>
+<table class="pl-spec">
+  <thead><tr><th scope="col">What it says</th><th scope="col">What it means</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Dependency error naming a version</th>
+        <td>The module's declared floor is higher than the station's own
+            version. Nothing in the code is wrong — rebuild with the stamp set
+            to the station's actual version, not whatever version the build
+            machine happens to have installed.</td></tr>
+    <tr><th scope="row">Unsigned or untrusted module</th>
+        <td>The jar's signing certificate is not in <em>this</em> host's trust
+            store. The question is never "is it signed" — it's "does this
+            particular host trust this particular certificate."</td></tr>
+    <tr><th scope="row">Class not found, after a successful install</th>
+        <td>The type resolved at install time, but a class it depends on lives
+            in a different runtime profile than the one that tried to load it
+            — a <code>-ux</code> view referencing a type that only exists on
+            the <code>-rt</code>/<code>-wb</code> side, or a type declared in
+            the wrong profile's <code>module-include.xml</code>. It installs,
+            then fails the first time something tries to instantiate it.</td></tr>
+  </tbody>
+</table>
+
+<div class="pl-body">
+  <p>None of these three is a reason to start guessing at the code — all three
+     are checkable directly, against the stamp, the host's trust store, and
+     the profile that was supposed to carry the failing class. See
+     <a href="/services/niagara-modules/">custom Niagara modules &amp;
+     drivers</a> for help getting one built and shipped.</p>
+</div>
+""",
+ related=["services/niagara-modules/"],
+),
 ]
 NOTES += [
 
@@ -7280,13 +7481,14 @@ class _Markdown(HTMLParser):
 
     BLOCK = {"h2", "h3", "p", "li", "tr"}
     KNOWN = BLOCK | {"div", "ul", "ol", "table", "thead", "tbody", "th", "td",
-                     "strong", "b", "em", "i", "code", "a", "br"}
+                     "strong", "b", "em", "i", "code", "a", "br", "pre"}
 
     def __init__(self):
         HTMLParser.__init__(self)
         self.out, self.buf, self.stack = [], [], []
         self.row, self.rows, self.in_head = [], 0, False
         self.note, self.list_kind, self.item = False, None, 0
+        self.pre = False
 
     # -- helpers ------------------------------------------------------------
     def _text(self):
@@ -7316,8 +7518,14 @@ class _Markdown(HTMLParser):
         elif tag == "a":
             self.buf.append("[")
             self.stack.append(a.get("href", ""))
+        elif tag == "pre":
+            # A code block: whitespace is content here, so the buffer is
+            # emitted verbatim rather than through _text().
+            self.pre = True
+            self.buf = []
         elif tag == "code":
-            self.buf.append("`")
+            if not self.pre:
+                self.buf.append("`")
         elif tag in ("strong", "b"):
             self.buf.append("**")
         elif tag in ("em", "i"):
@@ -7326,10 +7534,15 @@ class _Markdown(HTMLParser):
             self.buf.append(" ")
 
     def handle_endtag(self, tag):
-        if tag == "a":
+        if tag == "pre":
+            code = html.unescape("".join(self.buf)).strip("\n")
+            self.buf, self.pre = [], False
+            self.out += ["", "```", *code.split("\n"), "```", ""]
+        elif tag == "a":
             self.buf.append(f"]({href_abs(self.stack.pop())})")
         elif tag == "code":
-            self.buf.append("`")
+            if not self.pre:
+                self.buf.append("`")
         elif tag in ("strong", "b"):
             self.buf.append("**")
         elif tag in ("em", "i"):
@@ -7560,6 +7773,7 @@ NOTE_GROUPS = [
       "notes/what-runs-on-a-jace/",
       "notes/commissioning-a-jace-8000/",
       "notes/platform-versus-station/",
+      "notes/building-and-loading-a-custom-niagara-module/",
       "notes/niagara-module-permissions-on-java-25/",
       "notes/bas-or-bms/"]),
     ("Drivers and field buses", "drivers-and-field-buses",

@@ -6,3 +6,4 @@ __pycache__/
 # Deploy state for indexnow.py: which URLs were submitted at which content
 # hash. Local bookkeeping, and GitHub Pages would publish it from the root.
 .indexnow-state.json
+.wrangler/
