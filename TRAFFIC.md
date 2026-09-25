@@ -80,8 +80,8 @@ What ranks a site this size, in this order:
 
 1. **Pages that answer a specific question.** `/notes/` is the whole strategy:
    each note targets one long-tail query a Niagara engineer actually types,
-   and nobody else has written the answer down. Six notes is a start, not a
-   knowledge base. Twenty is a knowledge base.
+   and nobody else has written the answer down. Thirty notes is a knowledge
+   base; the next ones should come from questions real enquiries ask.
 2. **Being linked to.** A link from the Niagara Community forum, Reddit
    r/BuildingAutomation, or a LinkedIn post that is worth reading, is worth
    more than any on-page change left to make here. Answer a question in

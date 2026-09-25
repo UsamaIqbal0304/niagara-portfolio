@@ -3,23 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Niagara 5 Migration &amp; Module Readiness Audit</title>
-<meta name="description" content="Niagara 5 readiness audits and migration: which third-party modules survive the new runtime and mandatory signing, and porting your modules so they load.">
+<title>Niagara 5 Migration &amp; JACE 9000 Module Audit</title>
+<meta name="description" content="Niagara 5 readiness audits and migration, including JACE 8000 to JACE 9000: which third-party modules survive the new runtime and mandatory signing.">
 <link rel="canonical" href="https://plantroomlabs.com/services/niagara-5-migration/">
 <meta name="author" content="Plantroom Labs">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Plantroom Labs">
-<meta property="og:title" content="Niagara 5 Migration &amp; Module Readiness Audit">
-<meta property="og:description" content="Niagara 5 readiness audits and migration: which third-party modules survive the new runtime and mandatory signing, and porting your modules so they load.">
+<meta property="og:title" content="Niagara 5 Migration &amp; JACE 9000 Module Audit">
+<meta property="og:description" content="Niagara 5 readiness audits and migration, including JACE 8000 to JACE 9000: which third-party modules survive the new runtime and mandatory signing.">
 <meta property="og:url" content="https://plantroomlabs.com/services/niagara-5-migration/">
 <meta property="og:image" content="https://plantroomlabs.com/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Niagara 5 Migration &amp; Module Readiness Audit">
-<meta name="twitter:description" content="Niagara 5 readiness audits and migration: which third-party modules survive the new runtime and mandatory signing, and porting your modules so they load.">
+<meta name="twitter:title" content="Niagara 5 Migration &amp; JACE 9000 Module Audit">
+<meta name="twitter:description" content="Niagara 5 readiness audits and migration, including JACE 8000 to JACE 9000: which third-party modules survive the new runtime and mandatory signing.">
 <meta name="twitter:image" content="https://plantroomlabs.com/assets/og.png">
 
 <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
@@ -153,7 +153,7 @@
    "@type": "Service",
    "@id": "https://plantroomlabs.com/services/niagara-5-migration/#service",
    "name": "Niagara 5 readiness and migration",
-   "description": "Niagara 5 readiness audits and migration: which third-party modules survive the new runtime and mandatory signing, and porting your modules so they load.",
+   "description": "Niagara 5 readiness audits and migration, including JACE 8000 to JACE 9000: which third-party modules survive the new runtime and mandatory signing.",
    "serviceType": "Migration and porting",
    "provider": {
     "@id": "https://plantroomlabs.com/#org"
@@ -360,6 +360,14 @@
       <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
       <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
       <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/n4-to-n5-third-party-modules/">What happens to third-party modules moving from N4 to N5</a></h3>
+      <p>A module with no Niagara 5 build can stop the migrator outright, and one that has a build can still fail to load. What breaks, and why.</p>
+      <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Estate management</li><li class="pl-chip">Module development</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/jace-8000-to-jace-9000-licence-transfer/">JACE-8000 to JACE-9000: what the licence transfer does and does not do</a></h3>
+      <p>The JACE 8000 to 9000 licence transfer, step by step: what it requires, what it does not include, and which parts cannot be undone.</p>
+      <ul class="pl-chips"><li class="pl-chip">JACE</li><li class="pl-chip">Migration</li><li class="pl-chip">Licensing</li></ul>
     </div><div class="pl-card pl-card--link">
       <h3><a href="/notes/ax-to-n4-migration/">What actually blocks an AX to N4 migration</a></h3>
       <p>A station cannot migrate until every module it uses has been refactored for Niagara 4 — and licences, users and permissions all change shape on the way.</p>

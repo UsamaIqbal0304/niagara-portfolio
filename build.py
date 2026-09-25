@@ -837,9 +837,9 @@ SERVICES = [
   date="2026-09-22",
   nav="Niagara 5 migration",
   h1="Niagara 5 readiness and migration",
-  title="Niagara 5 Migration & Module Readiness Audit",
-  desc=("Niagara 5 readiness audits and migration: which third-party modules survive the new "
-        "runtime and mandatory signing, and porting your modules so they load."),
+  title="Niagara 5 Migration & JACE 9000 Module Audit",
+  desc=("Niagara 5 readiness audits and migration, including JACE 8000 to JACE 9000: which "
+        "third-party modules survive the new runtime and mandatory signing."),
   type_="Migration and porting",
   lede=("Niagara 5 changes three things that break modules: <strong>Java 21</strong>, "
         "<strong>mandatory signatures with no grace period</strong>, and "
@@ -1315,8 +1315,8 @@ def build_home():
 
 {CTA}
 '''
-    page("", f"Niagara Building Automation Software | {BRAND}",
-         "Building automation software on the Niagara Framework, for BMS integrators and "
+    page("", f"Niagara Building Automation Systems | {BRAND}",
+         "Building automation systems on the Niagara Framework, for BMS integrators and "
          "building owners: custom modules, bajaux widgets, PX graphics, Niagara 5.",
          body,
          schema=[ORG, {
@@ -1987,8 +1987,8 @@ def build_building_automation():
 {CTA}
 '''
     page(BA,
-         "Building Automation Software Engineering on Niagara",
-         "Independent building automation software on the Niagara Framework: BMS "
+         "Building Automation System Engineering on Niagara",
+         "Independent building automation system engineering on the Niagara Framework: BMS "
          "integration, custom drivers, HVAC graphics, station work, Niagara 5.",
          body,
          schema=[ORG, {
@@ -2565,7 +2565,7 @@ NOTES = [
   slug="notes/niagara-module-signing/",
   date="2026-09-22",
   nav="Module signing",
-  title="What a Station Checks Before Loading a Module",
+  title="Niagara Module Signing: What a Station Checks",
   desc=("Niagara's three module verification modes, what each one demands of your "
         "certificate, and why the setting cannot be relaxed from the command line."),
   h1="What a station checks before loading a module",
@@ -2653,6 +2653,343 @@ NOTES = [
   related=["services/niagara-modules/", "services/station-engineering/"],
  ),
 
+
+ dict(
+  slug="notes/n4-to-n5-third-party-modules/",
+  date="2026-09-25",
+  nav="N4→N5 third-party modules",
+  title="What Happens to Third-Party Modules Moving N4 to N5",
+  desc=("A module with no Niagara 5 build can stop the migrator outright, and "
+        "one that has a build can still fail to load. What breaks, and why."),
+  h1="What happens to third-party modules moving from N4 to N5",
+  lede=("A migration can be refused before it starts, over one forgotten "
+        "module — or load a signed module and reject an unsigned one right "
+        "next to it. <strong>What breaks, in the order it breaks</strong>, "
+        "sourced from Tridium's own transfer FAQ and a Platinum "
+        "distributor's own words."),
+  tags=["Migration", "Estate management", "Module development"],
+  body="""
+<h2>The failure that lands with no warning</h2>
+<div class="pl-body">
+  <p>An N4-to-N5 migration can be refused outright, and the reason is rarely the
+     station itself. It is one module — usually a small one, usually installed
+     years ago by someone who has since left — that the vendor never built for
+     the new runtime. Tridium's own migration tooling checks for this, and can
+     refuse to proceed.</p>
+  <p>This is worth knowing before a migration date goes on a calendar, not
+     after.</p>
+</div>
+
+<h2>What the distributor's own FAQ requires</h2>
+<div class="pl-body">
+  <p>One Sightsolutions, a Tridium Platinum distributor, puts it plainly in
+     their N5 FAQ:</p>
+</div>
+<div class="pl-note">
+  <p>&ldquo;Prior to executing the migration, you will need to identify any
+     3rd party modules (e.g. software not developed by Tridium) installed in
+     the station and confirm whether an N5 version is available. If not, then
+     the process may fail to execute.&rdquo;</p>
+</div>
+<div class="pl-body">
+  <p>Read that as a prerequisite, not a warning. The inventory has to happen
+     before the migration is attempted, because the migrator's behaviour when
+     it hits an unsupported module is to stop, not to skip it and continue.</p>
+</div>
+
+<h2>A module with an N5 build is not automatically safe either</h2>
+<div class="pl-body">
+  <p>Niagara 5 moves the runtime from Java 8 to Java 21, and removes
+     <code>SecurityManager</code> entirely. One consequence of that removal is
+     that a valid signature stops being a recommendation and becomes
+     mandatory, with no grace period. An unsigned module, a self-signed one
+     outside your trust store, or one whose signing certificate has lapsed,
+     will not load — independent of whether the code itself has been ported.</p>
+  <p>So two separate questions need separate answers for every third-party
+     module in a station: does an N5 build exist at all, and if it does, is it
+     validly signed for the host it is going to load on. A module can clear
+     the first test and still fail the second.</p>
+</div>
+
+<h2>Licences do not travel with the software</h2>
+<div class="pl-body">
+  <p>Tridium's own JACE 8000-to-9000 licence transfer FAQ states that any
+     third-party software options on JACE 8000 licences are moved to the
+     customer's stock during the migration process. In practice that means
+     the licence is detached from the host during the transfer, not carried
+     forward automatically. Each third-party vendor then has to re-issue
+     against the new Host ID before that feature runs again — a step that
+     depends entirely on the vendor still being reachable and willing to do
+     it.</p>
+  <p>The same stock-transfer mechanism applies to Tridium's own licensed
+     options that have no JACE-9000 equivalent: the capability is not
+     blocked, it is simply gone, because there is nothing on the new platform
+     to re-attach the licence to.</p>
+</div>
+
+<h2>Graphics: what actually carries over</h2>
+<div class="pl-body">
+  <p>The migrator's Px handling is qualified, not blanket. The distributor's
+     FAQ describes it as covering Px &ldquo;for standard Niagara Px
+     capabilities&rdquo; — standard sheets and standard bindings move across
+     cleanly. What does not move across is the theme: Niagara 5 ships new
+     navigation, layout and themes, and the N4 Zebra and Lucid themes are not
+     carried forward. Any graphics built or styled against those themes, or
+     any custom bajaux widget skinned to match them, needs a visual review
+     after migration — not an assumption that it will look the same.</p>
+</div>
+
+<h2>None of this is a 2026 deadline</h2>
+<div class="pl-body">
+  <p>It is worth being precise about the dates, because the framing around
+     this release tends to compress them. 31 October 2026 is the cut-off for
+     a licence-transfer discount; after it, the JACE 8000-to-9000 transfer
+     costs full price instead of just the transfer fee, and nothing about a
+     running station changes on that date. Niagara 4 itself reaches end of
+     life in Q3 2028, and Niagara 4.15 — the last N4 release — is a
+     long-term-support version supported through that date, on both
+     JACE-8000 and JACE-9000 hardware. There is no cliff in 2026. There is a
+     widening gap between stations that know what will survive the move and
+     stations that do not, and that gap gets more expensive to close the
+     longer it is left.</p>
+</div>
+
+<h2>What to build before the date gets picked</h2>
+<div class="pl-body">
+  <p>The useful output is a list, not an impression: every third-party module
+     in the station, its vendor, whether an N5 build exists, and whether its
+     current signature is valid and trusted. For anything without a clear yes
+     on both, decide early whether the vendor is going to do the work,
+     whether the module can be replaced, or whether it needs rebuilding from
+     its observed behaviour because the original vendor is no longer
+     reachable. That last case is more common on older estates than most
+     people expect, and it is the one that turns a software question into a
+     scheduling one.</p>
+</div>
+
+<p>For the audit and porting work itself, see
+<a href="/services/niagara-5-migration/">Niagara 5 migration</a>.</p>
+""",
+  related=["services/niagara-5-migration/", "services/niagara-modules/"],
+ ),
+
+ dict(
+  slug="notes/jace-8000-to-jace-9000-licence-transfer/",
+  date="2026-09-25",
+  nav="JACE licence transfer",
+  title="JACE-8000 to JACE-9000: What the Licence Transfer Does",
+  desc=("The JACE 8000 to 9000 licence transfer, step by step: what it "
+        "requires, what it does not include, and which parts cannot be "
+        "undone."),
+  h1="JACE-8000 to JACE-9000: what the licence transfer does and does not do",
+  lede=("Six steps, two separate purchases, and a 45-day clock most people "
+        "do not know is running. <strong>What the transfer actually "
+        "requires</strong>, and what it quietly does not include."),
+  tags=["JACE", "Migration", "Licensing"],
+  body="""
+<h2>What the promotion actually discounts</h2>
+<div class="pl-body">
+  <p>The JACE 8000-to-9000 licence transfer is priced two ways. With an
+     active SMA, the transfer is a fixed fee under the line item
+     <code>LIC-CHG-UPG</code>. Miss the promotional window and the same
+     transfer is priced as a new licence instead. That window closes 31
+     October 2026. Nothing about a running JACE-8000 changes on that date —
+     it is a pricing cut-off on the transfer, not a support cut-off on the
+     hardware.</p>
+</div>
+
+<h2>What has to be true before you start</h2>
+<div class="pl-body">
+  <p>Two preconditions matter, and both are easy to miss. First, the station
+     has to be upgraded to Niagara 4.15 — the LTS release — before the
+     N4-to-N5 migrator will accept it; anything older is refused at that
+     step. Second, the licence needs an active SMA. An expired SMA does not
+     just block the migration, it blocks ordinary software updates as well,
+     so it is worth checking independently of any migration plan.</p>
+</div>
+
+<h2>The steps, in order</h2>
+<ol class="pl-steps" style="margin-top:var(--pl-s-10)">
+  <li><div><h3>Upgrade to 4.15 LTS</h3><p>The station has to be on the last
+      Niagara 4 release before the migrator will touch it.</p></div></li>
+  <li><div><h3>Buy the JACE-9000 hardware and SD card</h3><p>The replacement
+      controller ships unlicensed; it takes its identity from the licence
+      transfer, not from the box.</p></div></li>
+  <li><div><h3>Pay the transfer fee against an active SMA</h3><p>This is the
+      <code>LIC-CHG-UPG</code> line item. An expired SMA stops here.</p></div></li>
+  <li><div><h3>Return the old JACE-8000 SD card within 45 days</h3><p>Miss the
+      window and Tridium bills for the software that was on it.</p></div></li>
+  <li><div><h3>Run the N4-to-N5 station migrator</h3><p>This is the step that
+      can refuse to proceed over an unsupported third-party module.</p></div></li>
+  <li><div><h3>Buy the N4-to-N5 software upgrade separately</h3><p>The
+      licence transfer makes the licence N5-<em>compatible</em>. It does not
+      include N5 itself, and an additional migration fee can apply on
+      top.</p></div></li>
+</ol>
+
+<h2>What is reversible, and what is not</h2>
+<div class="pl-body">
+  <p>The migration itself is not reversible once run. The old JACE-8000 SD
+     card is left in a &ldquo;Traded&rdquo; state specifically so it cannot
+     be reused elsewhere. The JACE-8000 board is treated differently from its
+     SD card, though: once the licence has moved off it, the board reverts to
+     Unlicensed and can be redeployed — as a spare, or relicensed for a
+     different station — rather than being scrapped. Plan the hardware side
+     around that distinction: the card goes back, the board does not have
+     to.</p>
+</div>
+
+<h2>Ordering windows, by region</h2>
+<div class="pl-body">
+  <p>JACE-8000 hardware is not disappearing from price lists on the same
+     schedule everywhere. It remains orderable in North America, the Middle
+     East and Africa, and Asia-Pacific through 31 December 2026. In Europe,
+     ordering closed at the end of 2025. Neither date affects a JACE-8000
+     already in service — Niagara 4 itself is supported through Q3 2028, with
+     4.15 as the long-term-support release covering that whole period on
+     both JACE-8000 and JACE-9000.</p>
+</div>
+
+<h2>Why this is worth planning without an urgent reason</h2>
+<div class="pl-body">
+  <p>None of the above is a reason to migrate this quarter. It is a reason to
+     know, station by station, what the transfer actually requires before a
+     customer or a project manager asks for a date. SMA status is checkable
+     today. The 4.15 upgrade is a normal maintenance task that can happen
+     independently of any N5 decision. Knowing which modules would block the
+     migrator — see the companion note on third-party modules — is the one
+     piece of this that takes real lead time, and it is the piece worth
+     starting first.</p>
+  <p>For a systems integrator managing several sites, the practical unit of
+     work is not any single fee line, it is the SMA and 4.15 audit run across
+     the whole estate before an individual JACE gets scheduled for transfer.
+     An expired SMA is not something that surfaces cleanly at the point of
+     migration; it is state that has usually been drifting quietly for
+     months, unnoticed because nobody was trying to update that station
+     anyway. Finding it during a pre-migration audit costs an email to the
+     licence holder. Finding it mid-transfer costs a stalled project.</p>
+  <p>One more distinction worth holding onto, because it gets flattened in
+     casual conversation: the licence transfer and the N5 upgrade are two
+     separate purchases with two separate fees, even though they usually
+     happen in the same project. A site can complete the JACE-8000-to-9000
+     hardware and licence transfer and still be running Niagara 4 on the new
+     box, deliberately, if there is no pressing reason yet to take the N5
+     upgrade at the same time. Nothing about the transfer forces that second
+     purchase.</p>
+</div>
+
+<p>For the audit and the transfer work itself, see
+<a href="/services/niagara-5-migration/">Niagara 5 migration</a>.</p>
+""",
+  related=["services/niagara-5-migration/", "services/station-engineering/"],
+ ),
+
+ dict(
+  slug="notes/bas-or-bms/",
+  date="2026-09-25",
+  nav="BAS or BMS",
+  title="BAS or BMS: Where a Niagara Station Actually Fits",
+  desc=("BAS and BMS mostly mean the same thing. The distinction worth "
+        "tracking is single-vendor versus open — and where a Niagara "
+        "station sits either way."),
+  h1="BAS or BMS: where a Niagara station actually fits",
+  lede=("BAS and BMS get used as if they mean different things. They mostly "
+        "do not. <strong>The distinction that actually changes a "
+        "project</strong> is single-vendor versus open, and that is where a "
+        "Niagara station sits."),
+  tags=["Building automation", "BMS integration", "Terminology"],
+  body="""
+<h2>Two acronyms for the same control layer</h2>
+<div class="pl-body">
+  <p>BAS — Building Automation System — and BMS — Building Management System
+     — describe the same thing in practice: the software and controllers
+     that run HVAC plant, monitor conditions, and give someone a single place
+     to see and adjust them. The split is mostly geographic and generational
+     rather than technical. BAS is the term more commonly used in North
+     America, historically tied to direct digital control of HVAC equipment
+     specifically. BMS is the term more common in the UK, Europe and much of
+     Asia-Pacific, and it has historically implied slightly wider scope: HVAC
+     plus, in some specifications, lighting control, access monitoring or
+     fire alarm status feeding into the same head-end.</p>
+  <p>Neither definition is enforced by anyone. Manufacturers, consultants and
+     specifications use both words to mean whatever their author means by
+     them, and asking which one is correct usually gets a shrug rather than a
+     clean answer. Treat both as marketing terms first and technical terms
+     second.</p>
+</div>
+
+<h2>Where the words stop being interchangeable</h2>
+<div class="pl-body">
+  <p>The distinction that is actually worth tracking down is not
+     BAS-versus-BMS. It is <strong>single-vendor versus open</strong>. A
+     packaged BAS from one HVAC controls manufacturer talks its own protocol
+     to its own controllers, and if you want to add a chiller from a
+     different manufacturer, you are usually stuck bridging it or replacing
+     it. A Niagara station is built to sit above that layer: it is a
+     supervisory and integration platform that speaks BACnet, Modbus and a
+     number of other protocols without custom work, and it does not care
+     whether the spec in front of it called the result a BAS or a BMS. The
+     JACE running the station is doing the same job either way — normalising
+     a mixed estate of controllers into one interface, one alarm chain and
+     one set of histories.</p>
+  <p>So the useful question when a document uses either acronym is not which
+     word is correct. It is whether the system behind it is a closed,
+     single-vendor product or an open integration layer, because that answer
+     determines whether a Niagara station is the thing sitting on top of it,
+     replacing it, or irrelevant to it entirely. A closed BAS that only ever
+     needs to talk to itself has no obvious reason to run Niagara. A site
+     with three vendors' worth of legacy controllers and a spreadsheet
+     instead of a single interface is exactly the case a Niagara station is
+     built for, whatever the tender document happened to call it.</p>
+</div>
+
+<h2>What &ldquo;BMS integration&rdquo; means when a Niagara integrator says it</h2>
+<div class="pl-body">
+  <p>In practice, integration work under either acronym comes down to the
+     same list: bring points in from whatever field protocol the equipment
+     speaks, present them through a consistent graphics and navigation layer,
+     wire alarms and histories to somewhere useful, and give the building
+     owner or facilities team one login instead of five. Where a site already
+     has a packaged BAS running one piece of plant and a separate BMS
+     head-end covering the rest of the building, a Niagara station is
+     frequently the layer that unifies both without replacing either —
+     reading from the existing BAS controller over whatever protocol it
+     exposes, rather than ripping it out and starting again.</p>
+</div>
+
+<h2>Reading a spec that uses either word</h2>
+<div class="pl-body">
+  <p>A short checklist for a document that says &ldquo;BMS&rdquo; or
+     &ldquo;BAS&rdquo; without defining either:</p>
+  <ul>
+    <li><strong>What protocols are actually in scope?</strong> BACnet and
+        Modbus cover most of it; anything proprietary needs its own line item
+        and its own risk, because it usually means a gateway or a vendor
+        dependency the rest of the document does not mention.</li>
+    <li><strong>Is this supervisory or field-level?</strong> A document
+        calling for a &ldquo;BMS&rdquo; can mean anything from a dashboard
+        reading existing controllers to full DDC replacement of every field
+        device, and the two are entirely different projects with entirely
+        different costs.</li>
+    <li><strong>Single-vendor or open?</strong> This decides whether the work
+        is integration or replacement, and the price difference between the
+        two is large enough that it should be settled before any number gets
+        quoted.</li>
+    <li><strong>Who owns the graphics standard?</strong> A packaged BAS
+        usually ships its own fixed set of screens. An open BMS or Niagara
+        integration layer needs a graphics standard written for it, and that
+        is its own scope item, not something bundled with the drivers.</li>
+  </ul>
+  <p>None of that depends on which acronym the document happened to use on
+     its cover page. Read past the word to what it is actually describing,
+     and the acronym stops mattering.</p>
+</div>
+
+<p>For the integration work itself, see
+<a href="/services/building-automation/">Building automation</a>.</p>
+""",
+  related=["services/building-automation/"],
+ ),
 ]
 NOTES += [
 
@@ -6550,7 +6887,8 @@ NOTE_GROUPS = [
       "notes/niagara-module-signing/",
       "notes/what-runs-on-a-jace/",
       "notes/commissioning-a-jace-8000/",
-      "notes/platform-versus-station/"]),
+      "notes/platform-versus-station/",
+      "notes/bas-or-bms/"]),
     ("Drivers and field buses", "drivers-and-field-buses",
      "Getting values off equipment, and why the values you get are wrong or late.",
      ["notes/bacnet-mstp-on-a-jace/",
@@ -6577,7 +6915,9 @@ NOTE_GROUPS = [
      "Doing the same thing to fifty stations, and moving them forward a version.",
      ["notes/scheduled-niagara-station-backups/",
       "notes/niagara-provisioning-jobs/",
-      "notes/ax-to-n4-migration/"]),
+      "notes/ax-to-n4-migration/",
+      "notes/n4-to-n5-third-party-modules/",
+      "notes/jace-8000-to-jace-9000-licence-transfer/"]),
     ("Security and access", "security-and-access",
      "Who can reach the station, and what they can do once they are in.",
      ["notes/niagara-tls-certificates/",

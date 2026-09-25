@@ -49,9 +49,9 @@ python3 -m http.server 8098 -d .
 | `img/` | still captures from the preview harness in `~/niagara/ux` |
 | `brand/` | the logo kit — its own README; the site copies the badge and favicons out of it, so change geometry there, never in `build.py` |
 
-Forty-one indexed pages: `/`, `/services/` + six service pages, `/work/`,
-`/building-automation/`, `/faq/`, `/about/`, `/contact/`, `/notes/` and a page per
-note. `check.py` asserts `sitemap.xml` lists exactly the indexable set, so this
+Forty-four indexed pages: `/`, `/services/` + six service pages,
+`/services/building-automation/`, `/work/`, `/faq/`, `/about/`, `/contact/`,
+`/notes/` and a page per note (thirty at the time of writing). `check.py` asserts `sitemap.xml` lists exactly the indexable set, so this
 count is checked rather than remembered — run it for the current number.
 
 `/demos/{ahu,building,nav}/` are built too but carry `noindex, follow` and are
