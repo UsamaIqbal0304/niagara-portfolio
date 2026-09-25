@@ -1,110 +1,77 @@
 # Traffic and ranking for plantroomlabs.com
 
-Two different questions, answered by two different tools, and neither can be
-switched on from this repo alone — both need an account in Usama's name. What
-the repo already holds is the wiring: fill one string into `build.py`, run
-`python3 build.py`, and the site starts reporting.
+Three questions, three tools. All three were switched on between 23 and 25
+September 2026; this file records what was done and where the numbers now come
+from, so nobody repeats the setup or goes looking for a dashboard that has an
+API.
 
-| Question | Tool | What it needs from you |
+| Question | Tool | State |
 |---|---|---|
-| How many people came, from where, to which page | Cloudflare Web Analytics | a free Cloudflare account, then one token pasted into `build.py` |
-| What searches the site appears in, and at what position | Google Search Console | a Google account, then one token pasted into `build.py` |
-| The same, for Bing / DuckDuckGo / ChatGPT search | Bing Webmaster Tools | can be imported from Search Console in two clicks |
+| How many people came, from where, to which page | Cloudflare Web Analytics | live since 23 Sep — beacon token in `build.py` |
+| What searches the site appears in, and its position | Google Search Console | verified 23 Sep by DNS TXT; API access via service account |
+| The same, for Bing / DuckDuckGo / ChatGPT search | Bing Webmaster Tools | imported from Search Console 24 Sep; API key issued 25 Sep |
 
-Nothing here tracks a person. The beacon is cookieless and stores nothing
-about a visitor, which is why the site carries no consent banner — adding a
-tool that needs one would mean adding the banner too, and a banner costs more
-visitors than the extra data is worth.
+Nothing here tracks a person. The beacon is cookieless and stores nothing about
+the visitor, which is why the site carries no consent banner — adding a tool
+that needs one would mean adding a banner too, and a banner costs more visitors
+than the extra data is worth.
+
+All three are readable without opening a dashboard: the `plantroom-site` MCP
+server (`~/mcp-servers/plantroom-site/`, credentials in `~/.secrets/`) exposes
+`cf_traffic` / `cf_top`, `gsc_performance` / `gsc_inspect` and `bing_*`.
 
 ## 1 — Cloudflare Web Analytics (the visitor count)
 
 Free, no event cap, and it does **not** require moving the domain's DNS to
-Cloudflare. The nameservers stay at Squarespace exactly as `DNS.md` describes.
+Cloudflare — the nameservers stay at Squarespace exactly as `DNS.md` describes.
+The account holds nothing else: no zone, no R2, no proxying.
 
-1. Sign up at <https://dash.cloudflare.com/sign-up>. No card, no domain
-   transfer — do not accept any prompt to change nameservers.
-2. In the left sidebar: **Analytics & Logs → Web Analytics**.
-3. **Add a site**, hostname `plantroomlabs.com`. Choose the **JS beacon**
-   option when asked (the alternative, "automatic setup", is the one that
-   wants the domain proxied through Cloudflare — that is the one to avoid).
-4. It shows a `<script>` snippet containing
-   `data-cf-beacon='{"token": "…"}'`. Copy the **token only** — 32 hex
-   characters, not the whole snippet.
-5. In `build.py`, set:
+Set up 23 Sep: Analytics & Logs → Web Analytics → Add site → JS beacon. The
+32-character token from the snippet is `ANALYTICS_TOKEN` in `build.py`;
+`check.py` asserts the beacon is `defer`red and present on every indexable
+page or none. Reports: visits, page views, top pages, referrers, countries,
+device and browser mix, Core Web Vitals from real visitors.
 
-   ```python
-   ANALYTICS_TOKEN = "paste_the_32_characters_here"
-   ```
-
-6. `python3 build.py && python3 check.py`, then commit and push. Data starts
-   appearing within a few minutes of the first visit; the dashboard is at
-   Web Analytics → plantroomlabs.com.
-
-What it reports: visits, page views, top pages, referrers, countries, device
-and browser mix, and Core Web Vitals from real visitors.
+First 48 hours: 145 page views, 47 visits, 110 of them on `/` — nearly all the
+owner checking the deploy. Treat the first month's numbers as a noise floor.
 
 ## 2 — Google Search Console (the ranking data)
 
-This is the only place the useful numbers live: which queries the site was
-shown for, how many times, how many clicks, and the average position. It is
-also how you tell Google about a new page rather than waiting.
+The only place useful numbers live: which queries the site was shown for,
+how many times, how many clicks, average position. Also how you tell Google
+about a new page rather than waiting.
 
-1. Go to <https://search.google.com/search-console> and sign in.
-2. **Add property → URL prefix**, and enter `https://plantroomlabs.com/`
-   exactly, with the trailing slash. (The "Domain" option verifies by DNS at
-   Squarespace and covers subdomains too — either works; URL prefix is the
-   one this repo can verify for you.)
-3. Choose the **HTML tag** verification method. It shows
-   `<meta name="google-site-verification" content="…">`. Copy the **content
-   value only**.
-4. In `build.py`:
+Verified 23 Sep as a **Domain** property (`sc-domain:plantroomlabs.com`) by a
+TXT record at Squarespace, so `VERIFY["google-site-verification"]` in
+`build.py` stays empty on purpose — the DNS record is the proof, and it covers
+`www` too. `sitemap.xml` was submitted the same day.
 
-   ```python
-   VERIFY = {
-       "google-site-verification": "paste_the_content_value_here",
-       "msvalidate.01": "",
-   }
-   ```
+API access is a GCP service account (`claude@encoded-yen-509622-n5`, key in
+`~/.secrets/gsc-service-account.json`) added as a user on the property, which
+needs no OAuth consent flow. Data lags about two days behind the UI.
 
-5. `python3 build.py && python3 check.py`, commit, push, wait for the Pages
-   deploy to finish (a minute or two), then press **Verify**.
-6. Once verified: **Sitemaps** in the left sidebar → add `sitemap.xml` →
-   Submit. The file already exists and lists every indexable page.
-7. **URL Inspection** at the top: paste any page URL and press **Request
-   indexing** to push a single page to the front of the queue. Worth doing
-   for the home page and `/work/` on the day of a real change; it is rate
-   limited, so it is not for every note.
-
-Data takes 2–3 days to start and the **Performance** report is the one to
-read: Queries, Pages, Countries, and the position column.
+**URL Inspection → Request indexing** pushes a single page to the front of the
+queue. Worth doing for the home page and `/work/` on the day of a real change;
+it is rate-limited, so not for every note.
 
 ## 3 — Bing Webmaster Tools (and, through it, ChatGPT and DuckDuckGo)
 
-Worth ten minutes because Bing's index is what DuckDuckGo and several AI
-answer engines read. Once Search Console is verified, Bing can import the
-whole property:
+Worth having because Bing's index is what DuckDuckGo and several AI answer
+engines read. Imported from Search Console on 24 Sep, which carried the
+sitemap across and proved ownership without a meta tag — `VERIFY["msvalidate.01"]`
+also stays empty. Site verification completed on 25 Sep. An API key was
+issued the same day; it lives in `~/.secrets/bing.env` and is passed as a
+query parameter, never in a header.
 
-1. <https://www.bing.com/webmasters> → **Import from Google Search Console**.
-2. If you would rather not link the accounts, add the site manually and use
-   the **Meta tag** option instead, pasting its value into `VERIFY` under
-   `msvalidate.01` the same way as above.
-3. Submit `https://plantroomlabs.com/sitemap.xml` there too.
-
-Bing also runs **IndexNow**, which this repo is already set up for: the key
-file `65d322c488b72b3c8f6fae5c95466836.txt` is published at the site root, and
-a push of new or changed URLs looks like this:
-
-```sh
-curl -X POST https://api.indexnow.org/indexnow \
-  -H 'Content-Type: application/json' \
-  -d '{"host":"plantroomlabs.com",
-       "key":"65d322c488b72b3c8f6fae5c95466836",
-       "keyLocation":"https://plantroomlabs.com/65d322c488b72b3c8f6fae5c95466836.txt",
-       "urlList":["https://plantroomlabs.com/","https://plantroomlabs.com/notes/"]}'
-```
-
-A `200` means accepted. It reaches Bing, DuckDuckGo, Yandex and Seznam.
-Google does not participate — for Google, use Search Console.
+Bing also runs **IndexNow**. The key Bing issued
+(`627f5d4b61ae4766935982388964b259`) is `INDEXNOW_KEY` in `build.py`; the
+earlier self-issued key stays published under `INDEXNOW_RETIRED` because key
+validation is asynchronous and an unpublished key file silently drops the
+batch. `indexnow.py` submits only URLs whose bytes changed since the last
+run — resubmitting all 41 on every deploy earned `429 (potential Spam)` on
+day two. `200` means accepted and validated, `202` accepted with validation
+pending. It reaches Bing, DuckDuckGo, Yandex and Seznam. Google does not
+participate — for Google, use Search Console.
 
 ## 4 — What actually moves the ranking
 
