@@ -20,6 +20,10 @@ A Niagara host decides how strict to be about module signatures with a single sy
 
 > **Default is medium, and that is the number that matters.** An unsigned module does not install on a stock station or a stock controller. Not "warns", not "logs" — refused.
 
+## Medium became the default in Niagara 4.9
+
+The default moved in two steps, not one. Niagara 4.8 shipped with the verification mode at low; 4.9 raised the shipped default to medium. A host running 4.9 or later gets medium behaviour out of the box. A host still on 4.8 does not — which is why a jar that installed unsigned for years stops installing the moment the host is upgraded, with no change to the jar itself.
+
 ## Trusted is a property of the host
 
 The most common surprise is a module that installs on one host and is refused by the next, with the same jar and the same signature. Nothing about the module changed; the second host does not have the signing certificate in its trust store.

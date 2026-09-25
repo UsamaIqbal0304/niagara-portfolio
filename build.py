@@ -2686,6 +2686,15 @@ NOTES = [
      "logs" — refused.</p>
 </div>
 
+<h2>Medium became the default in Niagara 4.9</h2>
+<div class="pl-body">
+  <p>The default moved in two steps, not one. Niagara 4.8 shipped with the verification
+     mode at low; 4.9 raised the shipped default to medium. A host running 4.9 or
+     later gets medium behaviour out of the box. A host still on 4.8 does not —
+     which is why a jar that installed unsigned for years stops installing the moment
+     the host is upgraded, with no change to the jar itself.</p>
+</div>
+
 <h2>Trusted is a property of the host</h2>
 <div class="pl-body">
   <p>The most common surprise is a module that installs on one host and is refused by
@@ -6116,6 +6125,18 @@ NOTES += [
      signs every program object it encounters, using the code-signing certificate
      configured in Workbench, and prompts for that certificate's password the first time.
      Sorting this out beforehand turns a mid-run surprise into a non-event.</p>
+</div>
+
+<h2>If the source station is not at 3.8</h2>
+<div class="pl-body">
+  <p>The migration tool only takes a backup made from a station already running
+     AX&nbsp;3.8 — Tridium's migration guide is explicit that earlier versions
+     are not supported as a source, and there is no flag that relaxes it. A 3.6 or
+     3.7 station has to reach 3.8 first, and that is an AX platform upgrade in its
+     own right, done with AX tooling, not something the N4 migration tool can
+     absorb. Pull the module list from the old station before starting: a module
+     the 3.8 install does not have is the usual reason that intermediate step
+     fails, the same shape of problem the N4 tool later enforces on purpose.</p>
 </div>
 
 <h2>Users and permissions change shape</h2>

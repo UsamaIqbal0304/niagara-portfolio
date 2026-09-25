@@ -41,6 +41,10 @@ It asks which migration template to use, controller or Supervisor, and takes the
 
 > **Configure code signing first.** From Niagara 4.3 the migration tool signs every program object it encounters, using the code-signing certificate configured in Workbench, and prompts for that certificate's password the first time. Sorting this out beforehand turns a mid-run surprise into a non-event.
 
+## If the source station is not at 3.8
+
+The migration tool only takes a backup made from a station already running AX 3.8 — Tridium's migration guide is explicit that earlier versions are not supported as a source, and there is no flag that relaxes it. A 3.6 or 3.7 station has to reach 3.8 first, and that is an AX platform upgrade in its own right, done with AX tooling, not something the N4 migration tool can absorb. Pull the module list from the old station before starting: a module the 3.8 install does not have is the usual reason that intermediate step fails, the same shape of problem the N4 tool later enforces on purpose.
+
 ## Users and permissions change shape
 
 Two structural changes happen to security during migration, and both are worth explaining to whoever owns the system before they see them.

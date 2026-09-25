@@ -235,7 +235,7 @@
 <section class="pl-section">
   <div class="pl-wrap"><nav class="pl-toc" aria-label="Sections in this note">
       <p class="pl-eyebrow">On this page</p>
-      <ol><li><a href="#the-three-modes">The three modes</a></li><li><a href="#trusted-is-a-property-of-the-host">Trusted is a property of the host</a></li><li><a href="#you-cannot-talk-a-station-out-of-it-at-the-command-line">You cannot talk a station out of it at the command line</a></li><li><a href="#program-objects-are-gated-separately">Program objects are gated separately</a></li><li><a href="#practical-consequences">Practical consequences</a></li></ol>
+      <ol><li><a href="#the-three-modes">The three modes</a></li><li><a href="#medium-became-the-default-in-niagara-4-9">Medium became the default in Niagara 4.9</a></li><li><a href="#trusted-is-a-property-of-the-host">Trusted is a property of the host</a></li><li><a href="#you-cannot-talk-a-station-out-of-it-at-the-command-line">You cannot talk a station out of it at the command line</a></li><li><a href="#program-objects-are-gated-separately">Program objects are gated separately</a></li><li><a href="#practical-consequences">Practical consequences</a></li></ol>
     </nav>
 <h2 id="the-three-modes">The three modes</h2>
 <div class="pl-body">
@@ -266,6 +266,15 @@
   <p><strong>Default is medium, and that is the number that matters.</strong> An unsigned
      module does not install on a stock station or a stock controller. Not "warns", not
      "logs" — refused.</p>
+</div>
+
+<h2 id="medium-became-the-default-in-niagara-4-9">Medium became the default in Niagara 4.9</h2>
+<div class="pl-body">
+  <p>The default moved in two steps, not one. Niagara 4.8 shipped with the verification
+     mode at low; 4.9 raised the shipped default to medium. A host running 4.9 or
+     later gets medium behaviour out of the box. A host still on 4.8 does not —
+     which is why a jar that installed unsigned for years stops installing the moment
+     the host is upgraded, with no change to the jar itself.</p>
 </div>
 
 <h2 id="trusted-is-a-property-of-the-host">Trusted is a property of the host</h2>
