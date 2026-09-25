@@ -12,6 +12,7 @@ Live: <https://plantroomlabs.com/> (domain registered 2026-09-21)
 python3 build.py          # rewrites every page, sitemap.xml, robots.txt, llms.txt
 python3 check.py          # verifies the output; non-zero exit gates the commit
 python3 indexnow.py       # after pushing: pings the engines with what changed
+./deploy-pages.sh         # optional: mirror HEAD to Cloudflare Pages (staging until the NS move)
 ```
 
 `indexnow.py` runs last, once the change is live, and submits only the pages

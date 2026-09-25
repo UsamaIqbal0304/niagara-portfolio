@@ -242,3 +242,34 @@ records were briefly wrong (`185.199.111.15`, a missing `3`), which failed
 GitHub's domain check and stopped it requesting a certificate. The records
 are right now, and re-saving the custom domain in Settings → Pages re-runs
 the check.
+
+## Moving to Cloudflare Pages (staged 2026-09-26, not switched)
+
+The site is mirrored at <https://plantroomlabs.pages.dev> by `deploy-pages.sh`
+(Cloudflare Pages project `plantroomlabs`). It is a staging copy: canonical
+URLs, sitemap and `CNAME` still name GitHub Pages, and Google indexes only
+`plantroomlabs.com`. Nothing about the live site changes until the steps
+below are taken, in this order — each one is Usama's, none is a code change.
+
+1. **Cloudflare dashboard → Add a site → `plantroomlabs.com`**, free plan.
+   It scans and imports DNS. Check every record in the table at the top of
+   this file arrived, especially the mail set: `MX 1 smtp.google.com`, the
+   SPF `TXT`, `google._domainkey TXT`, `_dmarc TXT` and the
+   `google-site-verification` TXT that proves the Search Console property.
+   Missing any of these means mail stops or Search Console un-verifies.
+2. **Pages project `plantroomlabs` → Custom domains → add `plantroomlabs.com`
+   and `www.plantroomlabs.com`.** Cloudflare adds the records itself; delete
+   the four `185.199.*` A records and the `usamaiqbal0304.github.io` CNAME
+   at that point, not before.
+3. **Squarespace → change nameservers** to the two Cloudflare gives. Takes
+   minutes to hours. `dig NS plantroomlabs.com` shows when it has landed.
+4. Verify: `curl -sI https://plantroomlabs.com/ | grep -i server` says
+   `cloudflare`; `/build.py` is 404; mail still arrives (send one to `info@`);
+   `gsc_sites` still lists the property.
+5. **Only then**: GitHub → repo Settings → Pages → Unpublish, and make the
+   repo private. Doing this earlier takes the live site down, because GitHub
+   Pages does not serve private repos on the free plan.
+
+After the move `deploy-pages.sh` is the publish step, replacing "push and wait
+for Pages". Web Analytics keeps working as-is; the beacon does not depend on
+where the pages are served from.
