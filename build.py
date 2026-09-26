@@ -1334,8 +1334,11 @@ def build_home():
         <p><strong>The module scan is free.</strong> Send a listing of a station's
            <code>modules/</code> folder, the jars, or a backup, and a per-module table comes
            back — findings by severity, class-file version, signing state, a plain verdict.
-           No charge, nothing attached to it. It is static analysis against a Java&nbsp;25
+           No charge, and it obliges nothing. It is static analysis against a Java&nbsp;25
            JDK, not a test on a Niagara&nbsp;5 build, and it says so on the page.</p>
+        <p class="pl-btn-row" style="margin-top:var(--pl-s-8)">
+          <a class="pl-btn pl-btn--primary" href="{SCAN_ENQUIRY}" style="color:var(--pl-invert)">Send a module list</a>
+        </p>
         <p><a href="{href('services/niagara-5-migration/')}">How the scan and the audit work &rarr;</a>
            &nbsp;·&nbsp; <a href="{href('notes/niagara-module-permissions-on-java-25/')}">What Java&nbsp;25 does to module permissions &rarr;</a></p>
       </div>
