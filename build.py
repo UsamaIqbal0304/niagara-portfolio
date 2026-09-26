@@ -1421,7 +1421,7 @@ def build_services_index():
     <p class="pl-eyebrow">Services</p>
     <h1>What we build, and what you get for it</h1>
     <p class="pl-lede">Six services, all of them the software layer of a
-       <a href="{href(BA)}">building automation system</a>. Each quoted as a
+       <a href="{href(BA)}">building automation system</a> running on Tridium Niagara. Each quoted as a
        fixed price against a written specification, with the deliverables listed before the
        work starts.</p>
   </div>
@@ -1480,9 +1480,9 @@ def build_services_index():
 
 {CTA}
 '''
-    page("services/", "Niagara Framework Services — Modules, Widgets, PX, Stations",
-         "Niagara services: custom module and driver development, bajaux widgets, PX graphics "
-         "standards, station commissioning, Workbench tooling and migration.",
+    page("services/", "Tridium Niagara Services — Modules, Widgets, PX, Stations",
+         "Independent Tridium Niagara services: custom module and driver development, bajaux "
+         "widgets, PX graphics standards, station commissioning and migration.",
          body,
          schema=[ORG, {
              "@type": "ItemList", "name": "Niagara Framework services",
