@@ -234,14 +234,13 @@ echo | openssl s_client -connect plantroomlabs.com:443 \
   -servername plantroomlabs.com 2>/dev/null | openssl x509 -noout -subject -dates
 ```
 
-Status as of 2026-09-22: A, CNAME, MX, SPF and DKIM all correct and verified.
-DMARC and CAA not yet added. The Pages certificate has not been issued — the
-apex still answers with GitHub's `*.github.io` certificate, which is why a
-browser calls the site insecure. That is a queue, not a fault: the four A
-records were briefly wrong (`185.199.111.15`, a missing `3`), which failed
-GitHub's domain check and stopped it requesting a certificate. The records
-are right now, and re-saving the custom domain in Settings → Pages re-runs
-the check.
+Status as of 2026-09-26: A, CNAME, MX, SPF, DKIM, DMARC and CAA all correct
+and verified, **and the certificate is now issued** — the apex answers with
+`CN = plantroomlabs.com` from Let's Encrypt, valid 22 Sep – 21 Dec 2026, so the
+padlock is real. This paragraph used to say the certificate had not been
+issued, and the cause was the four A records having been briefly wrong
+(`185.199.111.15`, a missing `3`), which failed GitHub's domain check. Re-saving
+the custom domain in Settings → Pages re-ran the check and it passed.
 
 ## Moving to Cloudflare Pages (staged 2026-09-26, not switched)
 
