@@ -483,11 +483,17 @@
         <p>The modules that hurt are not the ones from vendors still trading. They are the
            bespoke ones written for a site years ago by somebody who has moved on — and they are
            only discoverable by looking.</p>
-        <p><a href="/services/niagara-5-migration/">How the readiness audit works &rarr;</a></p>
+        <p><strong>The module scan is free.</strong> Send a listing of a station's
+           <code>modules/</code> folder, the jars, or a backup, and a per-module table comes
+           back — findings by severity, class-file version, signing state, a plain verdict.
+           No charge, nothing attached to it. It is static analysis against a Java&nbsp;25
+           JDK, not a test on a Niagara&nbsp;5 build, and it says so on the page.</p>
+        <p><a href="/services/niagara-5-migration/">How the scan and the audit work &rarr;</a>
+           &nbsp;·&nbsp; <a href="/notes/niagara-module-permissions-on-java-25/">What Java&nbsp;25 does to module permissions &rarr;</a></p>
       </div>
       <table class="pl-spec">
         <tbody>
-          <tr><th scope="row">Java 8 &rarr; 21</th><td>Recompile; <code>SecurityManager</code> is gone.</td></tr>
+          <tr><th scope="row">Java 8 &rarr; 25</th><td>Recompile; <code>SecurityManager</code> is gone.</td></tr>
           <tr><th scope="row">Signing</th><td>Mandatory, no grace period. Unsigned will not load.</td></tr>
           <tr><th scope="row">Hardware</th><td>JACE-8000 cannot run N5. Controller swap per node.</td></tr>
           <tr><th scope="row">Themes</th><td>N4 Zebra and Lucid are not carried forward.</td></tr>
@@ -509,17 +515,17 @@
          that is a good outcome. <a href="/notes/">All notes &rarr;</a></p>
     </div>
     <div class="pl-grid pl-grid--3"><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-module-version-stamping/">Which Niagara version to stamp a module for</a></h3>
-      <p>A module's declared dependency version is a floor, not a pin. Build against the newest SDK you have and stamp for the oldest station it has to load on.</p>
-      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Mixed estates</li><li class="pl-chip">Build tooling</li></ul>
-    </div><div class="pl-card pl-card--link">
-      <h3><a href="/notes/niagara-module-signing/">What a station checks before loading a module</a></h3>
-      <p>Niagara's three module verification modes, what each one demands of your certificate, and why the setting cannot be relaxed from the command line.</p>
-      <ul class="pl-chips"><li class="pl-chip">Module signing</li><li class="pl-chip">Certificates</li><li class="pl-chip">Deployment</li></ul>
+      <h3><a href="/notes/niagara-module-permissions-on-java-25/">What Java 25 does to Niagara's module permission model</a></h3>
+      <p>Niagara's module permission model is built on Java's Security Manager. On a Java 25 JVM it cannot be installed, so the checks stop happening.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Station security</li><li class="pl-chip">Migration</li></ul>
     </div><div class="pl-card pl-card--link">
       <h3><a href="/notes/n4-to-n5-third-party-modules/">What happens to third-party modules moving from N4 to N5</a></h3>
       <p>A module with no Niagara 5 build can stop the migrator outright, and one that has a build can still fail to load. What breaks, and why.</p>
       <ul class="pl-chips"><li class="pl-chip">Migration</li><li class="pl-chip">Estate management</li><li class="pl-chip">Module development</li></ul>
+    </div><div class="pl-card pl-card--link">
+      <h3><a href="/notes/building-and-loading-a-custom-niagara-module/">How to build and load a custom Niagara 4 module</a></h3>
+      <p>What a Niagara module actually is on disk, the two ways to build one, and the three Software Manager refusals that actually mean something.</p>
+      <ul class="pl-chips"><li class="pl-chip">Module development</li><li class="pl-chip">Build tooling</li><li class="pl-chip">Deployment</li></ul>
     </div></div>
   </div>
 </section>
@@ -541,12 +547,12 @@
            against a simulated station that pushes live values. Change the theme, turn the ORD
            overlay on, watch it re-render. Nothing is a screenshot.</p></div></li>
       <li><div><h3><a href="/contact/">Ask what a job would cost</a></h3>
-        <p>A Niagara&nbsp;5 <a href="/services/niagara-5-migration/">readiness
-           audit</a> is the usual starting point when nobody knows what is installed: an
-           inventory of every third-party and bespoke module in the estate, and what each
-           one needs before it will load. Fixed price, and it stands on its own if you go
-           elsewhere afterwards. Send a module list, or say you do not have one — not
-           having one is the normal case.</p></div></li>
+        <p>The usual first step costs nothing: a <a href="/services/niagara-5-migration/">free
+           module scan</a> of whatever list, jars or backup you have, which says which
+           third-party and bespoke modules need work before Niagara&nbsp;5 will load them.
+           The priced step, if there is one, is the full readiness audit and the porting —
+           fixed price, and it stands on its own if you go elsewhere afterwards. Not having
+           a module list is the normal case; say so and it is still a start.</p></div></li>
     </ol>
   </div>
 </section>

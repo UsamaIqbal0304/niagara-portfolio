@@ -1315,11 +1315,17 @@ def build_home():
         <p>The modules that hurt are not the ones from vendors still trading. They are the
            bespoke ones written for a site years ago by somebody who has moved on — and they are
            only discoverable by looking.</p>
-        <p><a href="{href('services/niagara-5-migration/')}">How the readiness audit works &rarr;</a></p>
+        <p><strong>The module scan is free.</strong> Send a listing of a station's
+           <code>modules/</code> folder, the jars, or a backup, and a per-module table comes
+           back — findings by severity, class-file version, signing state, a plain verdict.
+           No charge, nothing attached to it. It is static analysis against a Java&nbsp;25
+           JDK, not a test on a Niagara&nbsp;5 build, and it says so on the page.</p>
+        <p><a href="{href('services/niagara-5-migration/')}">How the scan and the audit work &rarr;</a>
+           &nbsp;·&nbsp; <a href="{href('notes/niagara-module-permissions-on-java-25/')}">What Java&nbsp;25 does to module permissions &rarr;</a></p>
       </div>
       <table class="pl-spec">
         <tbody>
-          <tr><th scope="row">Java 8 &rarr; 21</th><td>Recompile; <code>SecurityManager</code> is gone.</td></tr>
+          <tr><th scope="row">Java 8 &rarr; 25</th><td>Recompile; <code>SecurityManager</code> is gone.</td></tr>
           <tr><th scope="row">Signing</th><td>Mandatory, no grace period. Unsigned will not load.</td></tr>
           <tr><th scope="row">Hardware</th><td>JACE-8000 cannot run N5. Controller swap per node.</td></tr>
           <tr><th scope="row">Themes</th><td>N4 Zebra and Lucid are not carried forward.</td></tr>
@@ -1340,7 +1346,7 @@ def build_home():
          from memory. No pitch in them — if a note means you do not need to hire anyone,
          that is a good outcome. <a href="{href('notes/')}">All notes &rarr;</a></p>
     </div>
-    <div class="pl-grid pl-grid--3">{"".join(note_card(n) for n in NOTES[:3])}</div>
+    <div class="pl-grid pl-grid--3">{"".join(note_card(n) for n in HOME_NOTES)}</div>
   </div>
 </section>
 
@@ -1361,12 +1367,12 @@ def build_home():
            against a simulated station that pushes live values. Change the theme, turn the ORD
            overlay on, watch it re-render. Nothing is a screenshot.</p></div></li>
       <li><div><h3><a href="{href('contact/')}">Ask what a job would cost</a></h3>
-        <p>A Niagara&nbsp;5 <a href="{href('services/niagara-5-migration/')}">readiness
-           audit</a> is the usual starting point when nobody knows what is installed: an
-           inventory of every third-party and bespoke module in the estate, and what each
-           one needs before it will load. Fixed price, and it stands on its own if you go
-           elsewhere afterwards. Send a module list, or say you do not have one — not
-           having one is the normal case.</p></div></li>
+        <p>The usual first step costs nothing: a <a href="{href('services/niagara-5-migration/')}">free
+           module scan</a> of whatever list, jars or backup you have, which says which
+           third-party and bespoke modules need work before Niagara&nbsp;5 will load them.
+           The priced step, if there is one, is the full readiness audit and the porting —
+           fixed price, and it stands on its own if you go elsewhere afterwards. Not having
+           a module list is the normal case; say so and it is still a start.</p></div></li>
     </ol>
   </div>
 </section>
@@ -7786,6 +7792,14 @@ def note_page(n):
 # The index is the page that has to make twenty notes look like a knowledge
 # base rather than a pile. Grouping gives it headings a search engine can
 # read, and gives a reader arriving with a vague problem somewhere to start.
+# The three notes the home page leads with: the original research first, then
+# the two questions engineers arrive with most. Chosen, not "the first three".
+HOME_NOTES = [next(n for n in NOTES if n["slug"] == s) for s in (
+    "notes/niagara-module-permissions-on-java-25/",
+    "notes/n4-to-n5-third-party-modules/",
+    "notes/building-and-loading-a-custom-niagara-module/",
+)]
+
 NOTE_GROUPS = [
     ("Modules and deployment", "modules-and-deployment",
      "Building something that installs, runs and keeps running on a controller.",
