@@ -1,5 +1,5 @@
 /**
- * RocketGX navigation for Niagara 4 PX graphics.
+ * Plantroom Labs navigation for Niagara 4 PX graphics.
  *
  * The icon rail plus its submenu panel, as one WebWidget. They are one widget
  * on purpose: selecting a rail section changes the submenu's whole contents, so
@@ -8,24 +8,24 @@
  * rather than four.
  *
  * Drop it on a PX view as a wb:WebWidget with
- *   js         = view:rocketGx:RocketGxNavWidget
- *   fileConfig = file:^rocketGx/nav.json
+ *   js         = view:plantroomUi:PlantroomNavWidget
+ *   fileConfig = file:^plantroomUi/nav.json
  *
  * Navigation model, in priority order:
  *   1. entry has an `ord`  -> navigate the browser to that station view
- *   2. otherwise           -> emit a `rocketgx:navigate` CustomEvent on window,
- *                             which RocketGxDashboardWidget listens for
+ *   2. otherwise           -> emit a `plantroomui:navigate` CustomEvent on window,
+ *                             which PlantroomDashboardWidget listens for
  * so the same widget works whether the sheet is a set of linked PX views or a
  * single view with a live-updating stage.
  *
- * @module nmodule/rocketGx/rc/RocketGxNavWidget
+ * @module nmodule/plantroomUi/rc/PlantroomNavWidget
  */
 define([
   'bajaux/Widget',
   'bajaux/mixin/subscriberMixIn',
   'baja!',
   'Promise',
-  'css!nmodule/rocketGx/rc/RocketGxStyle'
+  'css!nmodule/plantroomUi/rc/PlantroomStyle'
 ], function (Widget, subscriberMixIn, baja, Promise) {
   'use strict';
 
@@ -80,18 +80,18 @@ define([
 
   /* --------------------------------------------------------------- widget */
 
-  var RocketGxNavWidget = function RocketGxNavWidget(params) {
+  var PlantroomNavWidget = function PlantroomNavWidget(params) {
     Widget.call(this, { params: params, defaults: widgetDefaults() });
     subscriberMixIn(this);
     this.$cfg = { nav: [], floors: [] };
     this.$state = { section: null, entry: null, floor: null, open: {} };
   };
 
-  RocketGxNavWidget.prototype = Object.create(Widget.prototype);
-  RocketGxNavWidget.prototype.constructor = RocketGxNavWidget;
+  PlantroomNavWidget.prototype = Object.create(Widget.prototype);
+  PlantroomNavWidget.prototype.constructor = PlantroomNavWidget;
 
   /** fileConfig ORD wins over the inline config string. */
-  RocketGxNavWidget.prototype.$resolveConfig = function () {
+  PlantroomNavWidget.prototype.$resolveConfig = function () {
     var props = this.properties(),
         fileOrd = String(props.getValue('fileConfig') || '').trim(),
         inline = String(props.getValue('config') || '').trim();
@@ -109,7 +109,7 @@ define([
     return Promise.resolve(inline ? parse(inline) : { nav: [], floors: [] });
   };
 
-  RocketGxNavWidget.prototype.doInitialize = function (dom) {
+  PlantroomNavWidget.prototype.doInitialize = function (dom) {
     var that = this;
     that.$dom = dom;
     return that.$resolveConfig().then(function (cfg) {
@@ -123,19 +123,19 @@ define([
     });
   };
 
-  RocketGxNavWidget.prototype.doLoad = function () {
+  PlantroomNavWidget.prototype.doLoad = function () {
     if (this.$dom) { this.$render(); }
     return Promise.resolve();
   };
 
-  RocketGxNavWidget.prototype.$section = function () {
+  PlantroomNavWidget.prototype.$section = function () {
     var id = this.$state.section, list = this.$cfg.nav || [], i;
     for (i = 0; i < list.length; i++) { if (list[i].id === id) { return list[i]; } }
     return list[0] || null;
   };
 
   /** Keep the selected entry inside the selected section. */
-  RocketGxNavWidget.prototype.$syncEntry = function () {
+  PlantroomNavWidget.prototype.$syncEntry = function () {
     var s = this.$section();
     if (s && s.sub && s.sub.groups && s.sub.groups.length) {
       var first = s.sub.groups[0].items[0];
@@ -147,7 +147,7 @@ define([
 
   /* ------------------------------------------------------------------ html */
 
-  RocketGxNavWidget.prototype.$render = function () {
+  PlantroomNavWidget.prototype.$render = function () {
     var that = this,
         props = that.properties(),
         cfg = that.$cfg,
@@ -160,7 +160,7 @@ define([
     }
 
     var root = document.createElement('div');
-    root.className = 'rgx-root gx-mesh';
+    root.className = 'plu-root gx-mesh';
     root.setAttribute('data-theme', props.getValue('theme') === 'dark' ? 'dark' : 'light');
     root.style.setProperty('--gx-run', props.getValue('accentColor'));
     root.style.setProperty('--gx-n-95', props.getValue('activeColor'));
@@ -185,12 +185,12 @@ define([
     that.$wire(root);
   };
 
-  RocketGxNavWidget.prototype.$railHtml = function () {
+  PlantroomNavWidget.prototype.$railHtml = function () {
     var that = this, cfg = this.$cfg, brand = cfg.brand || {};
     return '<nav class="gx-rail" aria-label="Systems">' +
       '<div class="gx-rail__brand">' +
         '<span class="gx-rail__mark">' + icon(brand.icon || 'site') + '</span>' +
-        '<span class="gx-rail__wordmark">' + esc(brand.name || 'RocketGX') + '</span>' +
+        '<span class="gx-rail__wordmark">' + esc(brand.name || 'Plantroom Labs') + '</span>' +
       '</div>' +
       '<div class="gx-rail__nav" data-rail>' +
         (cfg.nav || []).map(function (s) {
@@ -219,7 +219,7 @@ define([
     '</nav>';
   };
 
-  RocketGxNavWidget.prototype.$subHtml = function () {
+  PlantroomNavWidget.prototype.$subHtml = function () {
     var s = this.$section(), that = this;
     if (!s) { return '<aside class="gx-sub is-empty"></aside>'; }
 
@@ -253,7 +253,7 @@ define([
       '</div></aside>';
   };
 
-  RocketGxNavWidget.prototype.$itemHtml = function (it) {
+  PlantroomNavWidget.prototype.$itemHtml = function (it) {
     var that = this,
         active = it.id === this.$state.entry,
         meta = it.meta
@@ -295,7 +295,7 @@ define([
 
   /* ---------------------------------------------------------- interaction */
 
-  RocketGxNavWidget.prototype.$wire = function (root) {
+  PlantroomNavWidget.prototype.$wire = function (root) {
     var that = this,
         rail = root.querySelector('[data-rail]'),
         tip = root.querySelector('[data-tip]'),
@@ -375,13 +375,13 @@ define([
   };
 
   /**
-   * Tell the rest of the sheet where we are. RocketGxDashboardWidget listens for
+   * Tell the rest of the sheet where we are. PlantroomDashboardWidget listens for
    * this; anything else on the page may too.
    */
-  RocketGxNavWidget.prototype.$publish = function () {
+  PlantroomNavWidget.prototype.$publish = function () {
     var s = this.$section();
     try {
-      window.dispatchEvent(new CustomEvent('rocketgx:navigate', {
+      window.dispatchEvent(new CustomEvent('plantroomui:navigate', {
         detail: {
           section: this.$state.section,
           sectionLabel: s ? s.label : '',
@@ -393,16 +393,16 @@ define([
   };
 
   /** Browser profile serves station views under /ord/. */
-  RocketGxNavWidget.prototype.$navigate = function (ord) {
+  PlantroomNavWidget.prototype.$navigate = function (ord) {
     if (!ord) { return; }
     var url = ord.indexOf('/') === 0 ? ord : '/ord/' + encodeURIComponent(ord).replace(/%3A/g, ':');
     window.location.href = url;
   };
 
-  RocketGxNavWidget.prototype.doDestroy = function () {
+  PlantroomNavWidget.prototype.doDestroy = function () {
     if (this.$dom) { (this.$dom[0] || this.$dom).innerHTML = ''; }
     return Promise.resolve();
   };
 
-  return RocketGxNavWidget;
+  return PlantroomNavWidget;
 });

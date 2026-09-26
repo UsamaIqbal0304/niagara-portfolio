@@ -149,9 +149,9 @@ SHOTS = {
   "01-desktop-expanded.png":      (1440, 1024),
   "02-collapsed-rail-flyout.png": (1440, 1024),
   "03-iphone.png":                (1000, 1780),
-  "rgx-01-level1.png":            (1600, 1000),
-  "rgx-02-commissioning.png":     (1600, 1000),
-  "rgx-03-tooltip.png":           (1600, 1000),
+  "04-building-summary.png":      (1600, 1000),
+  "05-plant-schematic.png":       (1600, 1000),
+  "06-rail-tooltip.png":          (1600, 1000),
 }
 
 def shot(name, alt, lazy=True, cls=""):
@@ -1147,20 +1147,20 @@ DEMOS = [
              "because a simulated station is pushing them. Move the set point and the plant "
              "responds.")),
  dict(id="building", title="Building summary", height=760, fit=False,
-      module="rocketGx", widget="RocketGxDashboardWidget", config="dashboard.json",
-      theme="light", shot="rgx-01-level1.png",
+      module="plantroomUi", widget="PlantroomDashboardWidget", config="dashboard.json",
+      theme="light", shot="04-building-summary.png",
       controls=["theme", "ords"],
-      props={"fileConfig": "file:^rocketGx/dashboard.json", "theme": "light",
+      props={"fileConfig": "file:^plantroomUi/dashboard.json", "theme": "light",
              "showTopBar": True, "showOrds": False},
       blurb=("The same discipline at building level, light theme: KPI tiles for demand, "
              "chilled water and LTHW, plant monitoring, and an equipment table carrying fault "
              "and warning states. Toggle the theme \u2014 every component re-points from the "
              "token layer without one of them being touched.")),
  dict(id="nav", title="Navigation rail", height=600, fit=True,
-      module="rocketGx", widget="RocketGxNavWidget", config="nav.json",
+      module="plantroomUi", widget="PlantroomNavWidget", config="nav.json",
       theme="dark", shot="02-collapsed-rail-flyout.png",
       controls=["theme"],
-      props={"fileConfig": "file:^rocketGx/nav.json", "theme": "dark"},
+      props={"fileConfig": "file:^plantroomUi/nav.json", "theme": "dark"},
       blurb=("Site, building and floor navigation. Collapse it and it becomes an icon rail with "
              "flyout menus, so a tight PX viewport or a phone still gives the graphics the full "
              "width. Click through the sections.")),
@@ -1543,12 +1543,12 @@ def build_work():
     </div>
     <div class="pl-grid pl-grid--2">
       <figure class="pl-figure">
-        {shot('rgx-02-commissioning.png', "Building summary dashboard in a dark theme: a floor selector open on the left, full ORD paths under each KPI tile, and a chilled and heating water schematic with a live reading on every symbol.")}
+        {shot('05-plant-schematic.png', "Building summary dashboard in a dark theme: a floor selector open on the left, full ORD paths under each KPI tile, and a chilled and heating water schematic with a live reading on every symbol.")}
         <figcaption><b>Commissioning mode.</b> Full ORD paths surfaced under each tile, so the
           engineer commissioning the job can see exactly what each value is bound to.</figcaption>
       </figure>
       <figure class="pl-figure">
-        {shot('rgx-03-tooltip.png', "Building summary dashboard with a navigation flyout and a rail tooltip open, beside a plant schematic showing chiller, pump and coil readings.")}
+        {shot('06-rail-tooltip.png', "Building summary dashboard with a navigation flyout and a rail tooltip open, beside a plant schematic showing chiller, pump and coil readings.")}
         <figcaption><b>Schematic and callouts.</b> A drawn plant schematic with a bound
           reading on every symbol, and contextual detail without leaving the view.</figcaption>
       </figure>

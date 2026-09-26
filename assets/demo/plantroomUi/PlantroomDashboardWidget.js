@@ -1,5 +1,5 @@
 /**
- * RocketGX dashboard stage for Niagara 4 PX graphics.
+ * Plantroom Labs dashboard stage for Niagara 4 PX graphics.
  *
  * The top bar plus the block grid: KPI tiles, value rows with edit/open
  * actions, two-column plant-monitoring lists, callouts, an equipment table, and
@@ -10,17 +10,17 @@
  * station; offline, unresolved ORDs leave the design-time value in place, which
  * is what the PX editor shows at engineering time anyway.
  *
- * Listens for `rocketgx:navigate` from RocketGxNavWidget so the heading follows
+ * Listens for `plantroomui:navigate` from PlantroomNavWidget so the heading follows
  * the rail without either widget knowing about the other's internals.
  *
- * @module nmodule/rocketGx/rc/RocketGxDashboardWidget
+ * @module nmodule/plantroomUi/rc/PlantroomDashboardWidget
  */
 define([
   'bajaux/Widget',
   'bajaux/mixin/subscriberMixIn',
   'baja!',
   'Promise',
-  'css!nmodule/rocketGx/rc/RocketGxStyle'
+  'css!nmodule/plantroomUi/rc/PlantroomStyle'
 ], function (Widget, subscriberMixIn, baja, Promise) {
   'use strict';
 
@@ -77,17 +77,17 @@ define([
 
   /* --------------------------------------------------------------- widget */
 
-  var RocketGxDashboardWidget = function RocketGxDashboardWidget(params) {
+  var PlantroomDashboardWidget = function PlantroomDashboardWidget(params) {
     Widget.call(this, { params: params, defaults: widgetDefaults() });
     subscriberMixIn(this);
     this.$cfg = { blocks: [] };
     this.$nav = null;
   };
 
-  RocketGxDashboardWidget.prototype = Object.create(Widget.prototype);
-  RocketGxDashboardWidget.prototype.constructor = RocketGxDashboardWidget;
+  PlantroomDashboardWidget.prototype = Object.create(Widget.prototype);
+  PlantroomDashboardWidget.prototype.constructor = PlantroomDashboardWidget;
 
-  RocketGxDashboardWidget.prototype.$resolveConfig = function () {
+  PlantroomDashboardWidget.prototype.$resolveConfig = function () {
     var props = this.properties(),
         fileOrd = String(props.getValue('fileConfig') || '').trim(),
         inline = String(props.getValue('config') || '').trim();
@@ -105,11 +105,11 @@ define([
     return Promise.resolve(inline ? parse(inline) : { blocks: [] });
   };
 
-  RocketGxDashboardWidget.prototype.doInitialize = function (dom) {
+  PlantroomDashboardWidget.prototype.doInitialize = function (dom) {
     var that = this;
     that.$dom = dom;
     that.$onNav = function (ev) { that.$nav = ev.detail; that.$renderTopBar(); };
-    window.addEventListener('rocketgx:navigate', that.$onNav);
+    window.addEventListener('plantroomui:navigate', that.$onNav);
 
     return that.$resolveConfig().then(function (cfg) {
       that.$cfg = cfg || { blocks: [] };
@@ -118,7 +118,7 @@ define([
     });
   };
 
-  RocketGxDashboardWidget.prototype.doLoad = function () {
+  PlantroomDashboardWidget.prototype.doLoad = function () {
     /* doInitialize already renders and then subscribes. Rendering again here
        rebuilds the markup from the design-time config and so discards every
        value the subscriptions have applied, leaving the view frozen at its
@@ -132,7 +132,7 @@ define([
    * point pushes its value into the element that carries its id; offline every
    * ORD rejects and the design-time value stays put.
    */
-  RocketGxDashboardWidget.prototype.$subscribe = function () {
+  PlantroomDashboardWidget.prototype.$subscribe = function () {
     var that = this, targets = [];
 
     (that.$cfg.blocks || []).forEach(function (b) {
@@ -163,7 +163,7 @@ define([
     }));
   };
 
-  RocketGxDashboardWidget.prototype.$apply = function (t, comp) {
+  PlantroomDashboardWidget.prototype.$apply = function (t, comp) {
     var host = this.$dom && (this.$dom[0] || this.$dom),
         node = host && host.querySelector('[data-point="' + t.id + '"]');
     if (!node || !comp) { return; }
@@ -185,7 +185,7 @@ define([
 
   /* ------------------------------------------------------------------ html */
 
-  RocketGxDashboardWidget.prototype.$render = function () {
+  PlantroomDashboardWidget.prototype.$render = function () {
     this.$rendered = true;
     var props = this.properties(),
         cfg = this.$cfg,
@@ -198,7 +198,7 @@ define([
     }
 
     var root = document.createElement('div');
-    root.className = 'rgx-root gx-mesh';
+    root.className = 'plu-root gx-mesh';
     root.setAttribute('data-theme', props.getValue('theme') === 'dark' ? 'dark' : 'light');
     root.style.setProperty('--gx-run', props.getValue('accentColor'));
 
@@ -225,7 +225,7 @@ define([
     this.$wire(root);
   };
 
-  RocketGxDashboardWidget.prototype.$renderTopBar = function () {
+  PlantroomDashboardWidget.prototype.$renderTopBar = function () {
     var slot = this.$root && this.$root.querySelector('[data-topbar]');
     if (!slot) { return; }
     var props = this.properties(),
@@ -262,7 +262,7 @@ define([
       '</header>';
   };
 
-  RocketGxDashboardWidget.prototype.$block = function (b) {
+  PlantroomDashboardWidget.prototype.$block = function (b) {
     switch (b.type) {
       case 'kpis':     return this.$kpis(b);
       case 'values':   return this.$values(b);
@@ -274,7 +274,7 @@ define([
     }
   };
 
-  RocketGxDashboardWidget.prototype.$kpis = function (b) {
+  PlantroomDashboardWidget.prototype.$kpis = function (b) {
     var showOrds = this.properties().getValue('showOrds');
     return (b.tiles || []).map(function (k) {
       return '<section class="gx-card gx-card--hover gx-c' + (k.span || 3) + '">' +
@@ -301,7 +301,7 @@ define([
     }).join('');
   };
 
-  RocketGxDashboardWidget.prototype.$values = function (b) {
+  PlantroomDashboardWidget.prototype.$values = function (b) {
     return '<section class="gx-card gx-c' + (b.span || 4) + '">' +
       '<div class="gx-card__head">' + icon(b.icon, 'gx-badge') +
         '<span class="gx-card__title">' + esc(b.title) + '</span>' +
@@ -326,7 +326,7 @@ define([
       '</div></section>';
   };
 
-  RocketGxDashboardWidget.prototype.$split = function (b) {
+  PlantroomDashboardWidget.prototype.$split = function (b) {
     function col(rows) {
       return '<div class="gx-status-list">' + (rows || []).map(function (r) {
         /* A bound row needs a data-point on the chip, or $apply has nothing to
@@ -345,7 +345,7 @@ define([
         'gap:0 var(--gx-s-8)">' + col(b.left) + col(b.right) + '</div></div></section>';
   };
 
-  RocketGxDashboardWidget.prototype.$callouts = function (b) {
+  PlantroomDashboardWidget.prototype.$callouts = function (b) {
     return '<section class="gx-c' + (b.span || 3) + '" style="display:flex;flex-direction:column;' +
       'gap:var(--gx-s-5)">' +
       '<div class="gx-section__head"><span class="gx-eyebrow">' + esc(b.title) +
@@ -377,7 +377,7 @@ define([
       }).join('') + '</section>';
   };
 
-  RocketGxDashboardWidget.prototype.$table = function (b) {
+  PlantroomDashboardWidget.prototype.$table = function (b) {
     return '<section class="gx-card gx-c' + (b.span || 7) + '">' +
       '<div class="gx-card__head">' + icon(b.icon, 'gx-badge') +
         '<span class="gx-card__title">' + esc(b.title) + '</span>' +
@@ -407,7 +407,7 @@ define([
      engineer's rather than this file's. The only thing computed here is the
      pipe routing between two symbols, which is tedious to hand-place and has
      one right answer. */
-  RocketGxDashboardWidget.prototype.$schematic = function (b) {
+  PlantroomDashboardWidget.prototype.$schematic = function (b) {
     var w = b.width || 480, h = b.height || 290,
         nodes = b.nodes || [], byId = {};
 
@@ -537,7 +537,7 @@ define([
 
   /* ---------------------------------------------------------- interaction */
 
-  RocketGxDashboardWidget.prototype.$wire = function (root) {
+  PlantroomDashboardWidget.prototype.$wire = function (root) {
     var that = this;
     root.addEventListener('click', function (e) {
       var seg = e.target.closest('.gx-seg__opt'),
@@ -560,11 +560,11 @@ define([
     });
   };
 
-  RocketGxDashboardWidget.prototype.doDestroy = function () {
-    if (this.$onNav) { window.removeEventListener('rocketgx:navigate', this.$onNav); }
+  PlantroomDashboardWidget.prototype.doDestroy = function () {
+    if (this.$onNav) { window.removeEventListener('plantroomui:navigate', this.$onNav); }
     if (this.$dom) { (this.$dom[0] || this.$dom).innerHTML = ''; }
     return Promise.resolve();
   };
 
-  return RocketGxDashboardWidget;
+  return PlantroomDashboardWidget;
 });
