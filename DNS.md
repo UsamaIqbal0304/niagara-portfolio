@@ -273,3 +273,92 @@ below are taken, in this order — each one is Usama's, none is a code change.
 After the move `deploy-pages.sh` is the publish step, replacing "push and wait
 for Pages". Web Analytics keeps working as-is; the beacon does not depend on
 where the pages are served from.
+
+## State 2026-09-26: the zone exists, step 3 is the only one left
+
+Steps 1 and 2 above are done, from the dashboard and the API:
+
+- **Zone `plantroomlabs.com` created**, Free plan, id
+  `a37ed46d9b2698e4549940869fbaf808`, status **pending** — it stays pending
+  until the nameservers move, and nothing it holds affects the live site
+  before then. Squarespace is still authoritative.
+- Assigned nameservers: **`clara.ns.cloudflare.com`**, **`gabe.ns.cloudflare.com`**.
+- The scan imported **13 records**, and all thirteen match what
+  `dig @nse1.squarespacedns.com` returns today: 4 apex `A` (GitHub Pages,
+  proxied), `www` CNAME, `_domainconnect` CNAME, `MX 1 smtp.google.com`,
+  SPF, `google-site-verification`, `_dmarc`, `google._domainkey`, 2 CAA.
+  Nothing for mail is missing.
+- `plantroomlabs.com` and `www.plantroomlabs.com` are attached to the Pages
+  project as custom domains. Both read `pending` and will validate on their
+  own once the zone is active.
+- The account API token now carries **DNS Write, Zone Write, Zone Settings
+  Write, Zone DNS Settings Write on all zones**, so DNS is scriptable from
+  here. The token's secret did not change — `~/.secrets/cloudflare.env` is
+  still current.
+- **CAA widened** to `pki.goog`, `ssl.com` and `digicert.com` alongside
+  `letsencrypt.org`. Cloudflare issues Universal SSL from Google Trust
+  Services as often as from Let's Encrypt; a CAA set naming only Let's
+  Encrypt would have silently blocked the certificate the moment the zone
+  went live, which is precisely the invisible failure §5 warns about.
+
+### The blocker nobody flagged: DNSSEC is on
+
+The zone is signed today and the registry holds a DS record:
+
+```sh
+dig +short DS plantroomlabs.com @8.8.8.8
+# 48299 8 2 E9792744A3BB289B2D167BED77819C8F03FCCF431E623DB6A05E0997 7230451C
+```
+
+Change the nameservers with that DS still published and the domain goes dark
+for every validating resolver — which is most of them. The signatures at the
+new nameservers will not match the key the registry vouches for, and the
+failure is a `SERVFAIL`, not a fallback: the site and mail both stop.
+
+So step 3 becomes three:
+
+1. **Squarespace → turn DNSSEC off** for `plantroomlabs.com`. Wait until
+   `dig +short DS plantroomlabs.com @8.8.8.8` returns nothing — allow a day,
+   the DS TTL is the registry's, not ours.
+2. **Squarespace → nameservers** → replace all four `nse*.squarespacedns.com`
+   with `clara.ns.cloudflare.com` and `gabe.ns.cloudflare.com`.
+3. Once `dig +short NS plantroomlabs.com` shows Cloudflare and the zone reads
+   **active**, re-enable DNSSEC from the Cloudflare side (DNS → Settings →
+   DNSSEC → Enable) and paste its DS record back into Squarespace.
+
+Both of those are registrar-panel actions inside Usama's Squarespace login.
+
+### After the nameservers land
+
+The site keeps serving through the move without anything else being touched:
+the apex `A` records still point at GitHub Pages and are proxied, so
+Cloudflare fronts GitHub and the pages answer as before. That is deliberate —
+it separates "did the nameserver move work" from "did the host change work".
+
+Then, and only then, cut over to Pages:
+
+```sh
+. ~/.secrets/cloudflare.env
+ZID=a37ed46d9b2698e4549940869fbaf808
+# delete the four GitHub A records and the www CNAME
+curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+  "https://api.cloudflare.com/client/v4/zones/$ZID/dns_records?per_page=100" |
+  python3 -c 'import sys,json
+for r in json.load(sys.stdin)["result"]:
+    if r["content"].startswith("185.199.") or r["content"]=="usamaiqbal0304.github.io":
+        print(r["id"], r["type"], r["content"])'
+```
+
+Delete those ids, then re-add the two custom domains on the Pages project so
+Cloudflare writes its own apex and `www` records. Verify before declaring it
+done:
+
+```sh
+curl -sI https://plantroomlabs.com/ | grep -i '^server'      # cloudflare
+curl -so /dev/null -w '%{http_code}\n' https://plantroomlabs.com/build.py  # 404
+dig +short MX plantroomlabs.com                              # 1 smtp.google.com.
+```
+
+and send a real message to `info@plantroomlabs.com` and watch it arrive.
+Only after all four pass: GitHub → Settings → Pages → Unpublish, then make
+the repo private.
