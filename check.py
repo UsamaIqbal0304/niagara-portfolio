@@ -170,6 +170,21 @@ for rel, src in docs:
         hit = re.search(pattern, body, re.I)
         check(not hit, f"{rel}: {why} — {hit.group(0) if hit else ''}")
 
+# The one measured exhibit on the site quotes a real scan of a real vendor's
+# published catalogue. Three things have to stay true together or it stops
+# being an honest exhibit: the vendor stays unnamed, the reader is told they
+# are not a client, and the counts still add up to the set that was scanned.
+for rel, src in docs:
+    body = text_of(src)
+    if "18 third-party jars" not in body:
+        continue
+    check("not a client" in body,
+          f"{rel}: scan exhibit dropped the 'not a client' disclaimer")
+    check("10 of 18" in body and "8 of 18" in body,
+          f"{rel}: scan exhibit counts no longer say 10 of 18 and 8 of 18")
+    check("OneSightSolutions" not in body and "ossRestApiServer" not in body,
+          f"{rel}: scan exhibit names the vendor it says it does not name")
+
 # Third-party requests. The only one this site is allowed to make is the
 # cookieless analytics beacon — anything else appearing here means a script
 # got pasted in that puts a visitor's browser in touch with someone we have

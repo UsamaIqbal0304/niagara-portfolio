@@ -295,6 +295,48 @@
      problem; it is not a certificate of readiness, and it is not sold as one.</p>
 </div>
 
+<h2 style="margin-top:var(--pl-s-13)">What it found on one real catalogue</h2>
+<div class="pl-body">
+  <p>The description above is easier to trust with a number attached to it, so here is the
+     scan run over a real set: <strong>18 third-party jars from one vendor&rsquo;s published
+     catalogue</strong>, downloaded from that vendor&rsquo;s own site. They are not a client,
+     they did not commission this, and they are not named here &mdash; the point is the shape
+     of the answer, not who wrote the modules.</p>
+</div>
+<table class="pl-spec" style="margin-top:var(--pl-s-9)">
+ <thead><tr><th scope="col">What came back</th><th scope="col">Count</th><th scope="col">What it means</th></tr></thead>
+ <tbody>
+  <tr><th scope="row">Likely fine as it stands</th><td>10 of 18</td>
+      <td>No findings, signed, and every class file already at the current major version.
+          A little over half the catalogue needs nothing said about it.</td></tr>
+  <tr><th scope="row">Needs a rebuild</th><td>8 of 18</td>
+      <td>Recompile, bump a bundled library, re-sign. None of the eighteen came back needing
+          source changes we could not describe, and none came back needing the original
+          vendor.</td></tr>
+  <tr><th scope="row">Unsigned</th><td>0 of 18</td>
+      <td>The change most likely to strand a site did not apply to any of them. Their whole
+          exposure was bytecode age and one removed API, not signing.</td></tr>
+  <tr><th scope="row">All eight are <code>-rt</code> modules</th><td>8 of 11 <code>-rt</code></td>
+      <td>Every <code>-wb</code> and <code>-ux</code> module in the set scanned clean. The work
+          concentrates in the runtime modules, which is where the platform code lives &mdash;
+          useful for sequencing, because it means the Workbench-side jars are usually not the
+          problem.</td></tr>
+ </tbody>
+</table>
+<div class="pl-body">
+  <p>Inside those eight, the two causes were: <strong>five</strong> that call the
+     security-manager API from the vendor&rsquo;s own classes &mdash; on Java&nbsp;25 those
+     calls do nothing, so the fix is a deletion rather than a redesign &mdash; and
+     <strong>five</strong> that bundle class files compiled at major 46&ndash;51, which still
+     load but which no current compiler will rebuild, so the library has to be replaced. Two
+     had findings only inside bundled libraries and nothing in their own code. Those groups
+     overlap; the counts are per cause, not per module.</p>
+  <p>That is what &ldquo;most estates are fine&rdquo; looks like when it is measured instead of
+     asserted. It is also why the deliverable is a table and not a yes or no: the same
+     catalogue contains modules needing nothing and modules needing a library swap, and only
+     the row-by-row version tells you which is which.</p>
+</div>
+
 <h2 style="margin-top:var(--pl-s-13)">What actually changes</h2>
 <table class="pl-spec" style="margin-top:var(--pl-s-9)">
  <thead><tr><th scope="col">Change</th><th scope="col">Consequence for an existing estate</th></tr></thead>
