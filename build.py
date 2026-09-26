@@ -39,6 +39,19 @@ ENQUIRY    = (f"mailto:{EMAIL}?subject=Niagara%20enquiry"
               "Target%20hardware%20(JACE%20%2F%20Supervisor%20%2F%20PC)%3A%20%0A"
               "Verification%20mode%20(medium%20%2F%20high%20%2F%20not%20sure)%3A%20%0A%0A"
               "What%20it%20has%20to%20do%3A%20%0A")
+# The free module scan asks for something different from a build enquiry: not a
+# specification, just whatever list of modules already exists. The generic
+# ENQUIRY body asks for a version and a target, which reads like a quote form
+# and is the wrong first question for a scan.
+SCAN_ENQUIRY = (f"mailto:{EMAIL}?subject=Niagara%205%20module%20scan"
+                "&body=Site%20or%20estate%3A%20%0A"
+                "Niagara%20version%20(if%20known)%3A%20%0A"
+                "Number%20of%20stations%3A%20%0A%0A"
+                "Sending%20one%20of%3A%20%0A"
+                "%20%20-%20a%20listing%20of%20the%20modules%20folder%20%0A"
+                "%20%20-%20the%20jars%20themselves%20%0A"
+                "%20%20-%20a%20station%20backup%20%0A"
+                "%20%20-%20nothing%20yet%20%E2%80%94%20no%20list%20exists%20%0A")
 TODAY      = date.today().isoformat()
 OUT        = os.path.dirname(os.path.abspath(__file__))
 
@@ -851,7 +864,8 @@ SERVICES = [
         "switch."),
   chips=["Java 8 → 25", "Mandatory signing", "JACE-8000 → 9000", "Module inventory", "Porting"],
   close=('Send a module list. The scan comes back free.',
-         'A directory listing of the modules folder is enough — the jars or a station backup work just as well. What comes back is a table, one row per module, with a plain verdict: no charge, and nothing attached to it. Not having a list is the normal case and is most of the reason the audit exists, so saying so is a perfectly good way to start.'),
+         'A directory listing of the modules folder is enough — the jars or a station backup work just as well. What comes back is a table, one row per module, with a plain verdict: no charge, and nothing attached to it. Not having a list is the normal case and is most of the reason the audit exists, so saying so is a perfectly good way to start.',
+         'Start a conversation', SCAN_ENQUIRY),
   body="""
 <h2>The scan is free</h2>
 <p class="pl-sub">Before anything gets quoted there is a step that costs nothing and
@@ -1092,9 +1106,11 @@ def service_page(s):
 
 # ----------------------------------------------------------------- shared
 
-def cta(h2=None, lede=None, label="Start a conversation"):
+def cta(h2=None, lede=None, label="Start a conversation", mailto=None):
     """The closing band. The default is generic on purpose; a service page
-    overrides it to ask for the one artefact that lets the job be priced."""
+    overrides it to ask for the one artefact that lets the job be priced, and
+    may override the compose template behind the address when the artefact is
+    not a specification."""
     return f'''
 <section class="pl-band pl-section pl-anchor" id="contact">
   <div class="pl-wrap pl-cta">
@@ -1104,7 +1120,7 @@ def cta(h2=None, lede=None, label="Start a conversation"):
        If the honest answer is that you do not need us, you will get that instead."""}</p>
     <div class="pl-btn-row">
       <a class="pl-btn pl-btn--on-dark" href="{href('contact/')}">{label}</a>
-      <a class="pl-btn pl-btn--quiet-dark" href="{ENQUIRY}">{EMAIL}</a>
+      <a class="pl-btn pl-btn--quiet-dark" href="{mailto or ENQUIRY}">{EMAIL}</a>
     </div>
   </div>
 </section>'''
@@ -2153,6 +2169,25 @@ def build_contact():
 </section>
 
 <section class="pl-section pl-section--sunk">
+  <div class="pl-wrap">
+    <div class="pl-section__head">
+      <p class="pl-eyebrow">Or, before any of that</p>
+      <h2>Send a module list instead</h2>
+      <p class="pl-sub">If the question is <a href="{href('services/niagara-5-migration/')}">Niagara&nbsp;5</a>
+         rather than a build, there is a first step that costs nothing. A listing of a
+         station's <code>modules</code> folder is enough — the jars or a station backup
+         work just as well — and what comes back is a table, one row per module, with a
+         plain verdict. No charge, and it obliges nothing. Not having a list yet is the
+         normal case, and saying so is a perfectly good way to start.</p>
+    </div>
+    <div class="pl-btn-row">
+      <a class="pl-btn pl-btn--primary" href="{SCAN_ENQUIRY}" style="color:var(--pl-invert)">Send a module list</a>
+      <a class="pl-btn pl-btn--ghost" href="{href('notes/what-an-n5-module-scan-actually-finds/')}">What the scan finds</a>
+    </div>
+  </div>
+</section>
+
+<section class="pl-section">
   <div class="pl-wrap">
     <div class="pl-section__head">
       <p class="pl-eyebrow">Before you write</p>
