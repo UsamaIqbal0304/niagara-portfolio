@@ -724,9 +724,9 @@ SERVICES = [
   date="2026-09-22",
   nav="Station engineering",
   h1="Station engineering and new controller setup",
-  title="Niagara Station Setup, Commissioning & JACE Engineering",
-  desc=("Niagara station and controller setup end to end: platform commissioning, TLS, users "
-        "and roles, BACnet and Modbus, tagging, histories, alarms, backups."),
+  title="Niagara Station Commissioning & JACE Controller Setup",
+  desc=("JACE controller and Niagara station setup end to end: platform commissioning, TLS, "
+        "users, roles, BACnet and Modbus, tagging, histories, alarms, backups."),
   type_="Systems engineering",
   lede=("Standing up a new station or a new controller, properly, from platform "
         "commissioning to a handover pack. The station is the BMS head end for everything "
@@ -2137,7 +2137,7 @@ def build_building_automation():
 '''
     page(BA,
          "Building Automation System Engineering on Niagara",
-         "Independent building automation system engineering on the Niagara Framework: BMS "
+         "Independent Niagara controls and building automation system engineering: BMS "
          "integration, custom drivers, HVAC graphics, station work, Niagara 5.",
          body,
          schema=[ORG, {
