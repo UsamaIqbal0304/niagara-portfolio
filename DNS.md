@@ -328,6 +328,29 @@ So step 3 becomes three:
 
 Both of those are registrar-panel actions inside Usama's Squarespace login.
 
+**Step 1 is done — 2026-09-26, 19:54 PKT.** The panel is
+`account.squarespace.com/domains/managed/plantroomlabs.com/dns/dnssec`
+(sign in with the Google account, `admin@plantroomlabs.com`); the page is a
+single toggle, and turning it off raises a *"Turn off DNS Security
+Extensions? … Changes may take up to 48 hours"* modal that has to be
+confirmed. The Activity tab then logs "The DNSSEC setting was changed".
+
+The 48 hours is Squarespace being cautious. The registry dropped the DS
+immediately — ask the `.com` servers directly rather than a resolver, because
+that is the copy that matters:
+
+```sh
+dig NS plantroomlabs.com @a.gtld-servers.net +norecurse
+# AUTHORITY: the four nse*.squarespacedns.com NS records, and no DS alongside them
+```
+
+What is left is resolver cache. Within minutes of the change `1.1.1.1`,
+`9.9.9.9`, OpenDNS, Verisign and even `8.8.4.4` returned nothing for `DS`,
+while `8.8.8.8` still served the old record with ~5 h left on its TTL —
+Google's anycast nodes do not share a cache, so one nameserver answering
+"clear" proves nothing about the next. Poll all of them, and only move the
+nameservers once every one is empty (`/tmp/ds-watch.sh` does this on a loop).
+
 ### After the nameservers land
 
 The site keeps serving through the move without anything else being touched:
